@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version libs.versions.kotlin
+    alias(libs.plugins.jmhGradlePlugin)
     `jvm-test-suite`
 }
 
@@ -8,6 +9,12 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    jmhImplementation(libs.jmhCore)
+    jmhImplementation(libs.jmhAnnotations)
+    jmhImplementation(libs.jmhGenerator)
 }
 
 plugins.withId("org.jetbrains.kotlin.jvm") {
