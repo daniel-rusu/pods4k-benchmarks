@@ -15,6 +15,8 @@ dependencies {
     jmhImplementation(libs.jmhCore)
     jmhImplementation(libs.jmhAnnotations)
     jmhImplementation(libs.jmhGenerator)
+
+    jmhImplementation(libs.pods4k)
 }
 
 plugins.withId("org.jetbrains.kotlin.jvm") {

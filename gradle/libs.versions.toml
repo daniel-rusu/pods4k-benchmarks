@@ -5,6 +5,7 @@ jUnitPlatformLauncher = "1.11.0" # https://mvnrepository.com/artifact/org.junit.
 strikt = "0.35.1" # https://github.com/robfletcher/strikt/releases/latest
 jmhGradlePlugin = "0.7.2" # https://github.com/melix/jmh-gradle-plugin
 jmh = "1.37" # https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
+pods4k = "0.4.0" # https://github.com/daniel-rusu/pods4k/releases
 
 [libraries]
 jUnit = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jUnit" }
@@ -13,6 +14,7 @@ strikt = { module = "io.strikt:strikt-core", version.ref = "strikt" }
 jmhCore = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
 jmhAnnotations = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
 jmhGenerator = { module = "org.openjdk.jmh:jmh-generator-bytecode", version.ref = "jmh" }
+pods4k = { module = "com.danrusu.pods4k:pods4k", version.ref = "pods4k" }
 
 [plugins]
 jmhGradlePlugin = { id = "me.champeau.jmh", version.ref = "jmhGradlePlugin" }
