@@ -12,20 +12,20 @@ import kotlin.random.Random
 
 class DataGeneratorTest {
     @Test
-    fun `generateString validation`() {
+    fun `randomString validation`() {
         expectThrows<IllegalArgumentException> {
-            DataGenerator.generateString(minLength = -1, maxLength = 10, Random.Default)
+            DataGenerator.randomString(minLength = -1, maxLength = 10, Random.Default)
         }.message.isEqualTo("minLength (-1) cannot be negative")
 
         expectThrows<IllegalArgumentException> {
-            DataGenerator.generateString(minLength = 10, maxLength = 9, Random.Default)
+            DataGenerator.randomString(minLength = 10, maxLength = 9, Random.Default)
         }.message.isEqualTo("minLength (10) cannot be larger than maxLength(9)")
 
-        expectThat(DataGenerator.generateString(minLength = 7, maxLength = 7, Random.Default))
+        expectThat(DataGenerator.randomString(minLength = 7, maxLength = 7, Random.Default))
             .hasLength(7)
 
         expectThat(
-            DataGenerator.generateString(minLength = 3, maxLength = 6, Random.Default)
+            DataGenerator.randomString(minLength = 3, maxLength = 6, Random.Default)
         ).length.isIn(3..6)
     }
 }
