@@ -32,3 +32,12 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
         }
     }
 }
+
+jmh {
+    jmhVersion = libs.versions.jmh
+}
+
+// Allow running JMH benchmarks again even if no code changed
+tasks.withType<me.champeau.jmh.JMHTask> {
+    outputs.upToDateWhen { false }
+}
