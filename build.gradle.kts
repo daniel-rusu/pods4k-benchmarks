@@ -37,7 +37,7 @@ jmh {
     jmhVersion = libs.versions.jmh
 }
 
-// Allow running JMH benchmarks again even if no code changed
+// Consider the output of the JMH task always out of date to allow running benchmarks again even if no code changed
 tasks.withType<me.champeau.jmh.JMHTask> {
     outputs.upToDateWhen { false }
 }

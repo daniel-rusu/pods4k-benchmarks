@@ -1,9 +1,12 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.data
+package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import kotlin.random.Random
 
-internal class CompoundElement(
+/**
+ * Represents classes that have multiple types of fields.
+ */
+class CompoundElement(
     val referenceValue: Any,
     val booleanValue: Boolean,
     val byteValue: Byte,
