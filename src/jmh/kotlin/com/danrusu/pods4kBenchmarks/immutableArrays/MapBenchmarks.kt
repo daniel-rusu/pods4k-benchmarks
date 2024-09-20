@@ -6,7 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.Collections
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsByCollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CompoundElement
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Benchmark
@@ -39,11 +39,11 @@ open class MapBenchmarks {
     @Param("LIST", "ARRAY", "IMMUTABLE_ARRAY")
     private lateinit var collectionType: CollectionType
 
-    private lateinit var data: Collections<CompoundElement>
+    private lateinit var data: CollectionsByCollectionType<CompoundElement>
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        data = Collections(
+        data = CollectionsByCollectionType(
             numCollections = NUM_COLLECTIONS,
             type = collectionType,
             sizeDistribution = Distribution.LIST_SIZE_DISTRIBUTION,

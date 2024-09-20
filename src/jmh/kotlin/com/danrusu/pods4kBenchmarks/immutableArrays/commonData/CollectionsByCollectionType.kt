@@ -1,7 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
-import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
 
@@ -18,54 +17,36 @@ import kotlin.random.Random
  * @param createArray The factory for creating an array of the specified size
  * @param createImmutableArray The factory for creating an immutable array of the specified size
  */
-class Collections<T>(
+class CollectionsByCollectionType<T>(
     numCollections: Int,
     type: CollectionType,
     sizeDistribution: Distribution,
     createList: (Random, size: Int) -> List<T>,
     createArray: (Random, size: Int) -> Array<T>,
-    createImmutableArray: (Random, size: Int) -> ImmutableArray<T>
+    createImmutableArray: (Random, size: Int) -> ImmutableArray<T>,
 ) {
     /**
-     * Note: We're storing an array of [CollectionHolder] instances instead of 3 separate arrays for each collection
-     * type.  This is because we want to avoid auto-boxing the immutable arrays as that would create misleading results
-     * because immutable arrays are typically stored in strongly-typed variables of type [ImmutableArray].
+     * Note: We're storing an array of [WrapperForCollectionType] instances with each wrapper storing the appropriate
+     * collection instead of 3 separate arrays of collections.  This is because we want to avoid auto-boxing the
+     * immutable arrays as that would create misleading results because immutable arrays are typically stored in
+     * strongly-typed variables of type [ImmutableArray].
      */
-    val data: Array<CollectionHolder<T>>
+    val data: Array<WrapperForCollectionType<T>>
 
     init {
         // Use constant seed so the data is identical for all benchmarks since they're compared against each other
         val random = Random(0)
 
-        @Suppress("UNCHECKED_CAST")
         data = Array(numCollections) {
             val numElements = sizeDistribution.nextValue(random)
 
-            var list = emptyList<Any>() as List<T>
-            var array = emptyArray<Any>() as Array<T>
-            var immutableArray = emptyImmutableArray<T>()
-
-            when (type) {
-                CollectionType.LIST -> {
-                    list = createList(random, numElements)
-                    check(list.size == numElements)
-                }
-
-                CollectionType.ARRAY -> {
-                    array = createArray(random, numElements)
-                    check(array.size == numElements)
-                }
-
-                CollectionType.IMMUTABLE_ARRAY -> {
-                    immutableArray = createImmutableArray(random, numElements)
-                    check(immutableArray.size == numElements)
-                }
-            }
-
-            CollectionHolder(
-                list = list,
-                array = array,
-                immutableArray = immutableArray,
+            WrapperForCollectionType(
+                random = random,
+                size = numElements,
+                collectionType = type,
+                createList = createList,
+                createArray = createArray,
+                createImmutableArray = createImmutableArray,
             )
         }
     }
@@ -81,10 +62,5 @@ class Collections<T>(
     inline fun forEachImmutableArray(body: (ImmutableArray<T>) -> Unit) {
         data.forEach { body(it.immutableArray) }
     }
-}
 
-class CollectionHolder<T>(
-    val list: List<T>,
-    val array: Array<T>,
-    val immutableArray: ImmutableArray<T>,
-)
+}
