@@ -15,7 +15,7 @@ import kotlin.random.Random
  *     20 to Bounds(100, 120)
  * )
  */
-internal class Distribution(vararg percentages: Pair<Int, Bounds>) {
+class Distribution(vararg percentages: Pair<Int, Bounds>) {
     private val accumulatedPercentages: IntArray
     private val boundaries = Array(percentages.size) { percentages[it].second }
 
@@ -99,10 +99,12 @@ internal class Distribution(vararg percentages: Pair<Int, Bounds>) {
          * whereas nested lists are only stored in groups when they're expected to be smaller.
          *
          * Example scenarios of nested lists
-         * - List of orders with each order containing a list of products.  Most orders contain just 1 or 2 different
-         * products (not to be confused with the quantity of a particular product)
+         * - List of orders with each order containing a nested list of products.  Most orders contain just 1 or 2
+         * different products (not to be confused with the quantity of a particular product).
          *
-         * - List of people with each person containing a list of siblings.  Most people have fewer than 3 siblings.
+         * - List of people with each person containing a nested list of siblings.
+         *
+         * - List of cities with each city containing a nested list of attractions.
          */
         val NESTED_LIST_SIZE_DISTRIBUTION = Distribution(
             30 to Bounds(lowerBound = 0, upperBound = 1),

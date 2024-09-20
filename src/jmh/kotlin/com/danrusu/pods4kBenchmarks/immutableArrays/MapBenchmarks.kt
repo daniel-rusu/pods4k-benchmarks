@@ -2,12 +2,13 @@ package com.danrusu.pods4kBenchmarks.immutableArrays
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsOfCompoundElements
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.Collections
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CompoundElement
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.GenericCollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.GenericCollectionType.ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.GenericCollectionType.IMMUTABLE_ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.GenericCollectionType.LIST
+import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -36,15 +37,16 @@ private const val NUM_COLLECTIONS = 1000
 @State(Scope.Benchmark)
 open class MapBenchmarks {
     @Param("LIST", "ARRAY", "IMMUTABLE_ARRAY")
-    private lateinit var collectionType: GenericCollectionType
+    private lateinit var collectionType: CollectionType
 
-    private lateinit var data: CollectionsOfCompoundElements
+    private lateinit var data: Collections<CompoundElement>
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        data = CollectionsOfCompoundElements(
+        data = Collections(
             numCollections = NUM_COLLECTIONS,
             type = collectionType,
+            sizeDistribution = Distribution.LIST_SIZE_DISTRIBUTION,
             createList = { random, size ->
                 (1..size).map { CompoundElement.create(random) }
             },
