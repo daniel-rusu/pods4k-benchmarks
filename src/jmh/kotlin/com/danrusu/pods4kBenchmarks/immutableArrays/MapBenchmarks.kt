@@ -2,10 +2,10 @@ package com.danrusu.pods4kBenchmarks.immutableArrays
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.IMMUTABLE_ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsByCollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CompoundElement
 import com.danrusu.pods4kBenchmarks.utils.Distribution
