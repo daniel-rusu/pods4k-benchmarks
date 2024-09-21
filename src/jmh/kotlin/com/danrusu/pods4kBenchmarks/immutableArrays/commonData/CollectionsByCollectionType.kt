@@ -64,5 +64,4 @@ class CollectionsByCollectionType<T>(
     inline fun forEachImmutableArray(body: (ImmutableArray<T>) -> Unit) {
         data.forEach { body(it.immutableArray) }
     }
-
 }
