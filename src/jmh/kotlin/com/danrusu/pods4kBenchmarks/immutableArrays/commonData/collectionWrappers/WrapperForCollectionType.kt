@@ -5,14 +5,13 @@ import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
 import kotlin.random.Random
 
-private val emptyList = emptyList<Any>()
-private val emptyArray = emptyArray<Any>()
-private val emptyImmutableArray = emptyImmutableArray<Any>()
+private val EMPTY_LIST: List<Nothing> = emptyList()
+private val EMPTY_ARRAY: Array<Any> = emptyArray()
+private val EMPTY_IMMUTABLE_ARRAY: ImmutableArray<Nothing> = emptyImmutableArray()
 
 /**
  * Creates and stores a collection of the specified collection type by using the appropriate provided factory.
  */
-@Suppress("UNCHECKED_CAST")
 class WrapperForCollectionType<T>(
     random: Random,
     size: Int,
@@ -21,18 +20,32 @@ class WrapperForCollectionType<T>(
     createArray: (Random, size: Int) -> Array<T>,
     createImmutableArray: (Random, size: Int) -> ImmutableArray<T>,
 ) {
-    val list: List<T> = when (collectionType) {
-        CollectionType.LIST -> createList(random, size)
-        else -> emptyList as List<T>
-    }
+    var list: List<T> = EMPTY_LIST
+        private set
 
-    val array: Array<T> = when (collectionType) {
-        CollectionType.ARRAY -> createArray(random, size)
-        else -> emptyArray as Array<T>
-    }
+    @Suppress("UNCHECKED_CAST")
+    var array: Array<T> = EMPTY_ARRAY as Array<T>
+        private set
 
-    val immutableArray: ImmutableArray<T> = when (collectionType) {
-        CollectionType.IMMUTABLE_ARRAY -> createImmutableArray(random, size)
-        else -> emptyImmutableArray as ImmutableArray<T>
+    var immutableArray: ImmutableArray<T> = EMPTY_IMMUTABLE_ARRAY
+        private set
+
+    init {
+        when (collectionType) {
+            CollectionType.LIST -> {
+                list = createList(random, size)
+                check(list.size == size)
+            }
+
+            CollectionType.ARRAY -> {
+                array = createArray(random, size)
+                check(array.size == size)
+            }
+
+            CollectionType.IMMUTABLE_ARRAY -> {
+                immutableArray = createImmutableArray(random, size)
+                check(immutableArray.size == size)
+            }
+        }
     }
 }
