@@ -11,6 +11,10 @@ import kotlin.random.Random
  * for their respective type.  The wrappers will themselves store a collection with size controlled by the
  * nested-collection-size-distribution.
  *
+ * Note that the wrapper layer is on purpose in order to more closely model the real world where we don't have a list
+ * of lists directly but rather a list of objects which themselves contain lists (eg. list of Person objects and each
+ * person has a list of friends).
+ *
  * For example, for a size of 10 with a data type of [DataType.BOOLEAN] then:
  * - [array]
  *   - will be an array containing 10 [ArrayWrapperForDataType] elements
