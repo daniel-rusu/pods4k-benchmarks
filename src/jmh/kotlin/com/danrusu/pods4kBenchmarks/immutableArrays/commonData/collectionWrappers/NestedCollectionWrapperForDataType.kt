@@ -22,12 +22,12 @@ import kotlin.random.Random
  *   - will be an immutable array containing 10 [ImmutableArrayWrapperForDataType] elements
  *   - the wrappers will each store a ImmutableBooleanArray with contents copied from the array wrappers
  */
-class NestedCollectionWrapperForDataType<T>(
+class NestedCollectionWrapperForDataType(
     random: Random,
     size: Int,
     dataType: DataType,
     nestedCollectionSizeDistribution: Distribution,
-    createArray: (Random, size: Int) -> Array<T>,
+    createArray: (Random, size: Int) -> Array<String>,
     createBooleanArray: (Random, size: Int) -> BooleanArray,
     createByteArray: (Random, size: Int) -> ByteArray,
     createCharArray: (Random, size: Int) -> CharArray,
@@ -37,7 +37,7 @@ class NestedCollectionWrapperForDataType<T>(
     createLongArray: (Random, size: Int) -> LongArray,
     createDoubleArray: (Random, size: Int) -> DoubleArray,
 ) {
-    val array: Array<ArrayWrapperForDataType<T>> = Array(size) {
+    val array: Array<ArrayWrapperForDataType> = Array(size) {
         ArrayWrapperForDataType(
             random = random,
             size = nestedCollectionSizeDistribution.nextValue(random),
@@ -55,7 +55,7 @@ class NestedCollectionWrapperForDataType<T>(
     }
 
     // copy the data from the regular array so that they are tested against identical data
-    val list: List<ListWrapperForDataType<T>> = array.map {
+    val list: List<ListWrapperForDataType> = array.map {
         ListWrapperForDataType(
             random = random,
             size = it.size,
@@ -73,7 +73,7 @@ class NestedCollectionWrapperForDataType<T>(
     }
 
     // copy the data from the regular array so that they are tested against identical data
-    val immutableArray: ImmutableArray<ImmutableArrayWrapperForDataType<T>> = array.map {
+    val immutableArray: ImmutableArray<ImmutableArrayWrapperForDataType> = array.map {
         ImmutableArrayWrapperForDataType(
             random = random,
             size = it.size,

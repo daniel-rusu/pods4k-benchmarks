@@ -3,7 +3,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappe
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
-private val EMPTY_ARRAY: Array<Any> = emptyArray()
+private val EMPTY_ARRAY: Array<String> = emptyArray()
 private val EMPTY_BOOLEAN_ARRAY: BooleanArray = booleanArrayOf()
 private val EMPTY_BYTE_ARRAY: ByteArray = byteArrayOf()
 private val EMPTY_CHAR_ARRAY: CharArray = charArrayOf()
@@ -24,12 +24,11 @@ private val EMPTY_DOUBLE_ARRAY: DoubleArray = doubleArrayOf()
  * [ImmutableArrayWrapperForDataType] so that they have the same memory footprint since they're compared against each
  * other in benchmarks that measure the performance of the underlying collections.
  */
-@Suppress("UNCHECKED_CAST")
-class ArrayWrapperForDataType<T>(
+class ArrayWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    createArray: (Random, size: Int) -> Array<T>,
+    createArray: (Random, size: Int) -> Array<String>,
     createBooleanArray: (Random, size: Int) -> BooleanArray,
     createByteArray: (Random, size: Int) -> ByteArray,
     createCharArray: (Random, size: Int) -> CharArray,
@@ -39,7 +38,7 @@ class ArrayWrapperForDataType<T>(
     createLongArray: (Random, size: Int) -> LongArray,
     createDoubleArray: (Random, size: Int) -> DoubleArray,
 ) {
-    var referenceArray: Array<T> = EMPTY_ARRAY as Array<T>
+    var referenceArray: Array<String> = EMPTY_ARRAY
         private set
 
     var booleanArray: BooleanArray = EMPTY_BOOLEAN_ARRAY

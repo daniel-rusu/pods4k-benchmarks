@@ -16,11 +16,11 @@ private val EMPTY_LIST: List<Nothing> = emptyList()
  * [ImmutableArrayWrapperForDataType] so that they have the same memory footprint since they're compared against each
  * other in benchmarks that measure the performance of the underlying collections.
  */
-class ListWrapperForDataType<T>(
+class ListWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    createList: (Random, size: Int) -> List<T>,
+    createList: (Random, size: Int) -> List<String>,
     createBooleanList: (Random, size: Int) -> List<Boolean>,
     createByteList: (Random, size: Int) -> List<Byte>,
     createCharList: (Random, size: Int) -> List<Char>,
@@ -30,7 +30,7 @@ class ListWrapperForDataType<T>(
     createLongList: (Random, size: Int) -> List<Long>,
     createDoubleList: (Random, size: Int) -> List<Double>,
 ) {
-    var referenceList: List<T> = EMPTY_LIST
+    var referenceList: List<String> = EMPTY_LIST
         private set
 
     var booleanList: List<Boolean> = EMPTY_LIST

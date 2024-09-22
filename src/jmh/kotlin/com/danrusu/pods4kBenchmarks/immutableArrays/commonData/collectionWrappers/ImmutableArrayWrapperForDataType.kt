@@ -42,11 +42,11 @@ private val EMPTY_IMMUTABLE_DOUBLE_ARRAY: ImmutableDoubleArray = emptyImmutableD
  * that they have the same memory footprint since they're compared against each other in benchmarks that measure the
  * performance of the underlying collections.
  */
-class ImmutableArrayWrapperForDataType<T>(
+class ImmutableArrayWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    createImmutableArray: (Random, size: Int) -> ImmutableArray<T>,
+    createImmutableArray: (Random, size: Int) -> ImmutableArray<String>,
     createImmutableBooleanArray: (Random, size: Int) -> ImmutableBooleanArray,
     createImmutableByteArray: (Random, size: Int) -> ImmutableByteArray,
     createImmutableCharArray: (Random, size: Int) -> ImmutableCharArray,
@@ -56,7 +56,7 @@ class ImmutableArrayWrapperForDataType<T>(
     createImmutableLongArray: (Random, size: Int) -> ImmutableLongArray,
     createImmutableDoubleArray: (Random, size: Int) -> ImmutableDoubleArray,
 ) {
-    var immutableReferenceArray: ImmutableArray<T> = EMPTY_IMMUTABLE_ARRAY
+    var immutableReferenceArray: ImmutableArray<String> = EMPTY_IMMUTABLE_ARRAY
         private set
 
     var immutableBooleanArray: ImmutableBooleanArray = EMPTY_IMMUTABLE_BOOLEAN_ARRAY
