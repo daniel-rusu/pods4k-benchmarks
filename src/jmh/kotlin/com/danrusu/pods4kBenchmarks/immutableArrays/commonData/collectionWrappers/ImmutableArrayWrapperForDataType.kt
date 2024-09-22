@@ -92,42 +92,42 @@ class ImmutableArrayWrapperForDataType(
 
             DataType.BOOLEAN -> {
                 immutableBooleanArray = createImmutableBooleanArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableBooleanArray.size == size)
             }
 
             DataType.BYTE -> {
                 immutableByteArray = createImmutableByteArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableByteArray.size == size)
             }
 
             DataType.CHAR -> {
                 immutableCharArray = createImmutableCharArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableCharArray.size == size)
             }
 
             DataType.SHORT -> {
                 immutableShortArray = createImmutableShortArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableShortArray.size == size)
             }
 
             DataType.INT -> {
                 immutableIntArray = createImmutableIntArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableIntArray.size == size)
             }
 
             DataType.FLOAT -> {
                 immutableFloatArray = createImmutableFloatArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableFloatArray.size == size)
             }
 
             DataType.LONG -> {
                 immutableLongArray = createImmutableLongArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableLongArray.size == size)
             }
 
             DataType.DOUBLE -> {
                 immutableDoubleArray = createImmutableDoubleArray(random, size)
-                check(immutableReferenceArray.size == size)
+                check(immutableDoubleArray.size == size)
             }
         }
     }
