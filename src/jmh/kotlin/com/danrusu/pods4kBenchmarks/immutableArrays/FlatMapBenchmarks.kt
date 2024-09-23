@@ -31,12 +31,12 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 250
 
-@BenchmarkMode(Mode.Throughput) // Measure operations per second
+@BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@OperationsPerInvocation(NUM_COLLECTIONS) // The # of operations being performed for each invocation
-@Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS) // Warmup each benchmark for 1 second 10 times
-@Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS) // Run each benchmark for 1 second 7 times
-@Fork(2) // Create 2 JVM processes to isolate and repeat the entire benchmark
+@OperationsPerInvocation(NUM_COLLECTIONS)
+@Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
+@Fork(2)
 @State(Scope.Benchmark)
 open class FlatMapBenchmarks {
     @Param("REFERENCE", "BOOLEAN", "BYTE", "CHAR", "SHORT", "INT", "FLOAT", "LONG", "DOUBLE")
