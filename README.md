@@ -8,6 +8,41 @@ The benchmarks use the [Java Microbenchmark Harness](https://github.com/openjdk/
 the [JMH Gradle Plugin](https://github.com/melix/jmh-gradle-plugin). JMH helps us avoid JVM benchmarking pitfalls
 and produce more realistic results.
 
+## Running Benchmarks
+
+1. Clone this repo
+    * `git clone git@github.com:daniel-rusu/pods4k-benchmarks.git`
+2. Choose the benchmarks to be run
+    * The benchmark classes are located in `/src/jmh/kotlin/...` (not `/src/main/kotlin`).
+    * Configure the `includes` list in the `jmh` block of [build.gradle.kts](build.gradle.kts) to specify the names of
+      the benchmark classes to run.
+
+   ```kotlin
+   jmh {
+       jmhVersion = libs.versions.jmh
+   
+       includes = listOf("MapBenchmarks", "FlatMapBenchmarks")
+   }
+   ```
+3. Prepare your machine
+    * If using a laptop, make sure it's plugged in and the power profile set to performance.
+    * Change your computer sleep timeouts to be at least as long as the benchmark duration.
+    * Save and close all applications to minimize interference.
+4. Compile and execute benchmarks
+    * Using your Linux shell (or `Git Bash` on Windows), navigate to the directory where this repo is cloned
+    * Run `./gradlew jmh`
+5. Wait for results
+    * A benchmark class can easily last 10 minutes even though each iteration might only be configured to last 1 second.
+    * A class with 3 benchmarks parameterized with 8 possible data types, configured with 10 warmup iterations, 5
+      benchmark iterations, and 2 JVM forks takes 3 * 8 * (10 + 5) * 2 * (1 second/iteration) = 720 seconds = 12
+      minutes!
+6. Analyze results
+    * The results will be saved in `./build/results/jmh/results.txt`
+    * Check the error value of each benchmark. A good (or bad) result with a high relative error might be misleading as
+      it may have been affected by other factors such as interference from other processes.
+    * If necessary, run the benchmarks again ensuring that all other applications have been closed to reduce
+      interference.
+
 ## Benchmark Configuration
 
 The benchmarks are configured with the following JMH annotations:
