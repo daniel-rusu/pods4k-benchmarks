@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
@@ -20,15 +21,7 @@ class ListWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    createList: (Random, size: Int) -> List<String>,
-    createBooleanList: (Random, size: Int) -> List<Boolean>,
-    createByteList: (Random, size: Int) -> List<Byte>,
-    createCharList: (Random, size: Int) -> List<Char>,
-    createShortList: (Random, size: Int) -> List<Short>,
-    createIntList: (Random, size: Int) -> List<Int>,
-    createFloatList: (Random, size: Int) -> List<Float>,
-    createLongList: (Random, size: Int) -> List<Long>,
-    createDoubleList: (Random, size: Int) -> List<Double>,
+    dataProducer: DataProducer,
 ) {
     var referenceList: List<String> = EMPTY_LIST
         private set
@@ -58,50 +51,42 @@ class ListWrapperForDataType(
         private set
 
     init {
+        dataProducer.startNewCollection(size)
         when (dataType) {
             DataType.REFERENCE -> {
-                referenceList = createList(random, size)
-                check(referenceList.size == size)
+                referenceList = (0..<size).map { dataProducer.nextReference(it, random) }
             }
 
             DataType.BOOLEAN -> {
-                booleanList = createBooleanList(random, size)
-                check(booleanList.size == size)
+                booleanList = (0..<size).map { dataProducer.nextBoolean(it, random) }
             }
 
             DataType.BYTE -> {
-                byteList = createByteList(random, size)
-                check(byteList.size == size)
+                byteList = (0..<size).map { dataProducer.nextByte(it, random) }
             }
 
             DataType.CHAR -> {
-                charList = createCharList(random, size)
-                check(charList.size == size)
+                charList = (0..<size).map { dataProducer.nextChar(it, random) }
             }
 
             DataType.SHORT -> {
-                shortList = createShortList(random, size)
-                check(shortList.size == size)
+                shortList = (0..<size).map { dataProducer.nextShort(it, random) }
             }
 
             DataType.INT -> {
-                intList = createIntList(random, size)
-                check(intList.size == size)
+                intList = (0..<size).map { dataProducer.nextInt(it, random) }
             }
 
             DataType.FLOAT -> {
-                floatList = createFloatList(random, size)
-                check(floatList.size == size)
+                floatList = (0..<size).map { dataProducer.nextFloat(it, random) }
             }
 
             DataType.LONG -> {
-                longList = createLongList(random, size)
-                check(longList.size == size)
+                longList = (0..<size).map { dataProducer.nextLong(it, random) }
             }
 
             DataType.DOUBLE -> {
-                doubleList = createDoubleList(random, size)
-                check(doubleList.size == size)
+                doubleList = (0..<size).map { dataProducer.nextDouble(it, random) }
             }
         }
     }

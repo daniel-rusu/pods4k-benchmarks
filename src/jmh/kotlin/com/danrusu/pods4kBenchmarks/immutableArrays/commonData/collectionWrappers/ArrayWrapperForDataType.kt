@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
@@ -28,15 +29,7 @@ class ArrayWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    createArray: (Random, size: Int) -> Array<String>,
-    createBooleanArray: (Random, size: Int) -> BooleanArray,
-    createByteArray: (Random, size: Int) -> ByteArray,
-    createCharArray: (Random, size: Int) -> CharArray,
-    createShortArray: (Random, size: Int) -> ShortArray,
-    createIntArray: (Random, size: Int) -> IntArray,
-    createFloatArray: (Random, size: Int) -> FloatArray,
-    createLongArray: (Random, size: Int) -> LongArray,
-    createDoubleArray: (Random, size: Int) -> DoubleArray,
+    dataProducer: DataProducer,
 ) {
     var referenceArray: Array<String> = EMPTY_ARRAY
         private set
@@ -66,51 +59,67 @@ class ArrayWrapperForDataType(
         private set
 
     init {
+        dataProducer.startNewCollection(size)
         when (dataType) {
             DataType.REFERENCE -> {
-                referenceArray = createArray(random, size)
-                check(referenceArray.size == size)
+                referenceArray = Array(size) { dataProducer.nextReference(it, random) }
             }
 
             DataType.BOOLEAN -> {
-                booleanArray = createBooleanArray(random, size)
-                check(booleanArray.size == size)
+                booleanArray = BooleanArray(size) { dataProducer.nextBoolean(it, random) }
             }
 
             DataType.BYTE -> {
-                byteArray = createByteArray(random, size)
-                check(byteArray.size == size)
+                byteArray = ByteArray(size) { dataProducer.nextByte(it, random) }
             }
 
             DataType.CHAR -> {
-                charArray = createCharArray(random, size)
-                check(charArray.size == size)
+                charArray = CharArray(size) { dataProducer.nextChar(it, random) }
             }
 
             DataType.SHORT -> {
-                shortArray = createShortArray(random, size)
-                check(shortArray.size == size)
+                shortArray = ShortArray(size) { dataProducer.nextShort(it, random) }
             }
 
             DataType.INT -> {
-                intArray = createIntArray(random, size)
-                check(intArray.size == size)
+                intArray = IntArray(size) { dataProducer.nextInt(it, random) }
             }
 
             DataType.FLOAT -> {
-                floatArray = createFloatArray(random, size)
-                check(floatArray.size == size)
+                floatArray = FloatArray(size) { dataProducer.nextFloat(it, random) }
             }
 
             DataType.LONG -> {
-                longArray = createLongArray(random, size)
-                check(longArray.size == size)
+                longArray = LongArray(size) { dataProducer.nextLong(it, random) }
             }
 
             DataType.DOUBLE -> {
-                doubleArray = createDoubleArray(random, size)
-                check(doubleArray.size == size)
+                doubleArray = DoubleArray(size) { dataProducer.nextDouble(it, random) }
             }
         }
+    }
+
+    fun copyData(): DataProducer = object : DataProducer {
+        override fun startNewCollection(size: Int) {
+            require(size == this@ArrayWrapperForDataType.size)
+        }
+
+        override fun nextReference(index: Int, random: Random): String = referenceArray[index]
+
+        override fun nextBoolean(index: Int, random: Random): Boolean = booleanArray[index]
+
+        override fun nextByte(index: Int, random: Random): Byte = byteArray[index]
+
+        override fun nextChar(index: Int, random: Random): Char = charArray[index]
+
+        override fun nextShort(index: Int, random: Random): Short = shortArray[index]
+
+        override fun nextInt(index: Int, random: Random): Int = intArray[index]
+
+        override fun nextFloat(index: Int, random: Random): Float = floatArray[index]
+
+        override fun nextLong(index: Int, random: Random): Long = longArray[index]
+
+        override fun nextDouble(index: Int, random: Random): Double = doubleArray[index]
     }
 }

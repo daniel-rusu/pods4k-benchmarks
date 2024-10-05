@@ -9,12 +9,10 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
-import com.danrusu.pods4k.immutableArrays.toImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.infra.Blackhole
 import kotlin.random.Random
@@ -38,33 +36,7 @@ class CollectionsByDataType(
     numCollections: Int,
     dataType: DataType,
     sizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,
-    createArray: (Random, size: Int) -> Array<String> = { random, size ->
-        Array(size) { DataGenerator.randomString(random = random) }
-    },
-    createBooleanArray: (Random, size: Int) -> BooleanArray = { random, size ->
-        BooleanArray(size) { random.nextBoolean() }
-    },
-    createByteArray: (Random, size: Int) -> ByteArray = { random, size ->
-        ByteArray(size) { DataGenerator.randomByte(random) }
-    },
-    createCharArray: (Random, size: Int) -> CharArray = { random, size ->
-        CharArray(size) { DataGenerator.randomChar(random) }
-    },
-    createShortArray: (Random, size: Int) -> ShortArray = { random, size ->
-        ShortArray(size) { DataGenerator.randomShort(random) }
-    },
-    createIntArray: (Random, size: Int) -> IntArray = { random, size ->
-        IntArray(size) { random.nextInt() }
-    },
-    createFloatArray: (Random, size: Int) -> FloatArray = { random, size ->
-        FloatArray(size) { random.nextFloat() }
-    },
-    createLongArray: (Random, size: Int) -> LongArray = { random, size ->
-        LongArray(size) { random.nextLong() }
-    },
-    createDoubleArray: (Random, size: Int) -> DoubleArray = { random, size ->
-        DoubleArray(size) { random.nextDouble() }
-    },
+    dataProducer: DataProducer = DataProducer.RandomDataProducer,
 ) {
     val arrays: Array<ArrayWrapperForDataType>
     val lists: Array<ListWrapperForDataType>
@@ -76,54 +48,30 @@ class CollectionsByDataType(
 
         arrays = Array(numCollections) {
             ArrayWrapperForDataType(
-                random = random,
                 size = sizeDistribution.nextValue(random),
+                random = random,
                 dataType = dataType,
-                createArray = createArray,
-                createBooleanArray = createBooleanArray,
-                createByteArray = createByteArray,
-                createCharArray = createCharArray,
-                createShortArray = createShortArray,
-                createIntArray = createIntArray,
-                createFloatArray = createFloatArray,
-                createLongArray = createLongArray,
-                createDoubleArray = createDoubleArray,
+                dataProducer = dataProducer,
             )
         }
 
         // copy the data from the regular array so that they are tested against identical data
-        lists = arrays.map {
+        lists = arrays.map { arrayWrapper ->
             ListWrapperForDataType(
+                size = arrayWrapper.size,
                 random = random,
-                size = it.size,
                 dataType = dataType,
-                createList = { _, _ -> it.referenceArray.toList() },
-                createBooleanList = { _, _ -> it.booleanArray.toList() },
-                createByteList = { _, _ -> it.byteArray.toList() },
-                createCharList = { _, _ -> it.charArray.toList() },
-                createShortList = { _, _ -> it.shortArray.toList() },
-                createIntList = { _, _ -> it.intArray.toList() },
-                createFloatList = { _, _ -> it.floatArray.toList() },
-                createLongList = { _, _ -> it.longArray.toList() },
-                createDoubleList = { _, _ -> it.doubleArray.toList() },
+                dataProducer = arrayWrapper.copyData(),
             )
         }.toTypedArray()
 
         // copy the data from the regular array so that they are tested against identical data
-        immutableArrays = arrays.map {
+        immutableArrays = arrays.map { arrayWrapper ->
             ImmutableArrayWrapperForDataType(
+                size = arrayWrapper.size,
                 random = random,
-                size = it.size,
                 dataType = dataType,
-                createImmutableArray = { _, _ -> it.referenceArray.toImmutableArray() },
-                createImmutableBooleanArray = { _, _ -> it.booleanArray.toImmutableArray() },
-                createImmutableByteArray = { _, _ -> it.byteArray.toImmutableArray() },
-                createImmutableCharArray = { _, _ -> it.charArray.toImmutableArray() },
-                createImmutableShortArray = { _, _ -> it.shortArray.toImmutableArray() },
-                createImmutableIntArray = { _, _ -> it.intArray.toImmutableArray() },
-                createImmutableFloatArray = { _, _ -> it.floatArray.toImmutableArray() },
-                createImmutableLongArray = { _, _ -> it.longArray.toImmutableArray() },
-                createImmutableDoubleArray = { _, _ -> it.doubleArray.toImmutableArray() },
+                dataProducer = arrayWrapper.copyData(),
             )
         }.toTypedArray()
     }

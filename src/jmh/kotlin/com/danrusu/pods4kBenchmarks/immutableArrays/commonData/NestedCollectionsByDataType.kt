@@ -6,7 +6,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.NestedCollectionWrapperForDataType
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
 
@@ -26,33 +25,7 @@ class NestedCollectionsByDataType(
     dataType: DataType,
     topLevelSizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,
     nestedCollectionSizeDistribution: Distribution = Distribution.NESTED_LIST_SIZE_DISTRIBUTION,
-    createArray: (Random, size: Int) -> Array<String> = { random, size ->
-        Array(size) { DataGenerator.randomString(random = random) }
-    },
-    createBooleanArray: (Random, size: Int) -> BooleanArray = { random, size ->
-        BooleanArray(size) { random.nextBoolean() }
-    },
-    createByteArray: (Random, size: Int) -> ByteArray = { random, size ->
-        ByteArray(size) { DataGenerator.randomByte(random) }
-    },
-    createCharArray: (Random, size: Int) -> CharArray = { random, size ->
-        CharArray(size) { DataGenerator.randomChar(random) }
-    },
-    createShortArray: (Random, size: Int) -> ShortArray = { random, size ->
-        ShortArray(size) { DataGenerator.randomShort(random) }
-    },
-    createIntArray: (Random, size: Int) -> IntArray = { random, size ->
-        IntArray(size) { random.nextInt() }
-    },
-    createFloatArray: (Random, size: Int) -> FloatArray = { random, size ->
-        FloatArray(size) { random.nextFloat() }
-    },
-    createLongArray: (Random, size: Int) -> LongArray = { random, size ->
-        LongArray(size) { random.nextLong() }
-    },
-    createDoubleArray: (Random, size: Int) -> DoubleArray = { random, size ->
-        DoubleArray(size) { random.nextDouble() }
-    },
+    nestedDataProducer: DataProducer = DataProducer.RandomDataProducer,
 ) {
     val data: Array<NestedCollectionWrapperForDataType>
 
@@ -64,19 +37,11 @@ class NestedCollectionsByDataType(
             val numElements = topLevelSizeDistribution.nextValue(random)
 
             NestedCollectionWrapperForDataType(
-                random = random,
                 size = numElements,
+                random = random,
                 dataType = dataType,
                 nestedCollectionSizeDistribution = nestedCollectionSizeDistribution,
-                createArray = createArray,
-                createBooleanArray = createBooleanArray,
-                createByteArray = createByteArray,
-                createCharArray = createCharArray,
-                createShortArray = createShortArray,
-                createIntArray = createIntArray,
-                createFloatArray = createFloatArray,
-                createLongArray = createLongArray,
-                createDoubleArray = createDoubleArray,
+                dataProducer = nestedDataProducer,
             )
         }
     }

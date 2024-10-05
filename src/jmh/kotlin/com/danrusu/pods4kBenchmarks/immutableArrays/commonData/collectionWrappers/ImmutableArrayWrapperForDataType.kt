@@ -18,6 +18,7 @@ import com.danrusu.pods4k.immutableArrays.emptyImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableShortArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
@@ -46,15 +47,7 @@ class ImmutableArrayWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    createImmutableArray: (Random, size: Int) -> ImmutableArray<String>,
-    createImmutableBooleanArray: (Random, size: Int) -> ImmutableBooleanArray,
-    createImmutableByteArray: (Random, size: Int) -> ImmutableByteArray,
-    createImmutableCharArray: (Random, size: Int) -> ImmutableCharArray,
-    createImmutableShortArray: (Random, size: Int) -> ImmutableShortArray,
-    createImmutableIntArray: (Random, size: Int) -> ImmutableIntArray,
-    createImmutableFloatArray: (Random, size: Int) -> ImmutableFloatArray,
-    createImmutableLongArray: (Random, size: Int) -> ImmutableLongArray,
-    createImmutableDoubleArray: (Random, size: Int) -> ImmutableDoubleArray,
+    dataProducer: DataProducer,
 ) {
     var immutableReferenceArray: ImmutableArray<String> = EMPTY_IMMUTABLE_ARRAY
         private set
@@ -84,50 +77,42 @@ class ImmutableArrayWrapperForDataType(
         private set
 
     init {
+        dataProducer.startNewCollection(size)
         when (dataType) {
             DataType.REFERENCE -> {
-                immutableReferenceArray = createImmutableArray(random, size)
-                check(immutableReferenceArray.size == size)
+                immutableReferenceArray = ImmutableArray(size) { dataProducer.nextReference(it, random) }
             }
 
             DataType.BOOLEAN -> {
-                immutableBooleanArray = createImmutableBooleanArray(random, size)
-                check(immutableBooleanArray.size == size)
+                immutableBooleanArray = ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
             }
 
             DataType.BYTE -> {
-                immutableByteArray = createImmutableByteArray(random, size)
-                check(immutableByteArray.size == size)
+                immutableByteArray = ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
             }
 
             DataType.CHAR -> {
-                immutableCharArray = createImmutableCharArray(random, size)
-                check(immutableCharArray.size == size)
+                immutableCharArray = ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
             }
 
             DataType.SHORT -> {
-                immutableShortArray = createImmutableShortArray(random, size)
-                check(immutableShortArray.size == size)
+                immutableShortArray = ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
             }
 
             DataType.INT -> {
-                immutableIntArray = createImmutableIntArray(random, size)
-                check(immutableIntArray.size == size)
+                immutableIntArray = ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
             }
 
             DataType.FLOAT -> {
-                immutableFloatArray = createImmutableFloatArray(random, size)
-                check(immutableFloatArray.size == size)
+                immutableFloatArray = ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
             }
 
             DataType.LONG -> {
-                immutableLongArray = createImmutableLongArray(random, size)
-                check(immutableLongArray.size == size)
+                immutableLongArray = ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
             }
 
             DataType.DOUBLE -> {
-                immutableDoubleArray = createImmutableDoubleArray(random, size)
-                check(immutableDoubleArray.size == size)
+                immutableDoubleArray = ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }
             }
         }
     }
