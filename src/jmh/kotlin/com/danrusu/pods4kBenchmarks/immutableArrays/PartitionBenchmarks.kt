@@ -1,16 +1,16 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays
 
+import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
+import com.danrusu.pods4k.immutableArrays.ImmutableByteArray
+import com.danrusu.pods4k.immutableArrays.ImmutableCharArray
+import com.danrusu.pods4k.immutableArrays.ImmutableDoubleArray
+import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
+import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
+import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
+import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsByDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.CHAR
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.DOUBLE
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.FLOAT
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.INT
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.LONG
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.REFERENCE
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.SHORT
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -48,125 +48,53 @@ open class PartitionBenchmarks {
     }
 
     @Benchmark
-    fun listPartition(bh: Blackhole) {
-        when (dataType) {
-            REFERENCE -> data.forEachList { wrapper ->
-                bh.consume(wrapper.referenceList.partition { it.length % 2 == 0 })
-            }
-
-            BOOLEAN -> data.forEachList { wrapper ->
-                bh.consume(wrapper.booleanList.partition { it })
-            }
-
-            BYTE -> data.forEachList { wrapper ->
-                bh.consume(wrapper.byteList.partition { it >= 0 })
-            }
-
-            CHAR -> data.forEachList { wrapper ->
-                bh.consume(wrapper.charList.partition { it.code % 2 == 0 })
-            }
-
-            SHORT -> data.forEachList { wrapper ->
-                bh.consume(wrapper.shortList.partition { it >= 0 })
-            }
-
-            INT -> data.forEachList { wrapper ->
-                bh.consume(wrapper.intList.partition { it >= 0 })
-            }
-
-            FLOAT -> data.forEachList { wrapper ->
-                bh.consume(wrapper.floatList.partition { it >= 0.5f })
-            }
-
-            LONG -> data.forEachList { wrapper ->
-                bh.consume(wrapper.longList.partition { it >= 0L })
-            }
-
-            DOUBLE -> data.forEachList { wrapper ->
-                bh.consume(wrapper.doubleList.partition { it >= 0.5 })
-            }
-        }
+    fun list(bh: Blackhole) {
+        data.transformEachListOfDataType(
+            bh,
+            dataType,
+            { list: List<String> -> list.partition { it.length % 2 == 0 } },
+            { list: List<Boolean> -> list.partition { it } },
+            { list: List<Byte> -> list.partition { it >= 0 } },
+            { list: List<Char> -> list.partition { it.code % 2 == 0 } },
+            { list: List<Short> -> list.partition { it >= 0 } },
+            { list: List<Int> -> list.partition { it >= 0 } },
+            { list: List<Float> -> list.partition { it >= 0.5f } },
+            { list: List<Long> -> list.partition { it >= 0L } },
+            { list: List<Double> -> list.partition { it >= 0.5 } },
+        )
     }
 
     @Benchmark
-    fun arrayPartition(bh: Blackhole) {
-        when (dataType) {
-            REFERENCE -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.referenceArray.partition { it.length % 2 == 0 })
-            }
-
-            BOOLEAN -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.booleanArray.partition { it })
-            }
-
-            BYTE -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.byteArray.partition { it >= 0 })
-            }
-
-            CHAR -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.charArray.partition { it.code % 2 == 0 })
-            }
-
-            SHORT -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.shortArray.partition { it >= 0 })
-            }
-
-            INT -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.intArray.partition { it >= 0 })
-            }
-
-            FLOAT -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.floatArray.partition { it >= 0.5f })
-            }
-
-            LONG -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.longArray.partition { it >= 0L })
-            }
-
-            DOUBLE -> data.forEachArray { wrapper ->
-                bh.consume(wrapper.doubleArray.partition { it >= 0.5 })
-            }
-        }
+    fun array(bh: Blackhole) {
+        data.transformEachArrayOfDataType(
+            bh,
+            dataType,
+            { array: Array<String> -> array.partition { it.length % 2 == 0 } },
+            { array: BooleanArray -> array.partition { it } },
+            { array: ByteArray -> array.partition { it >= 0 } },
+            { array: CharArray -> array.partition { it.code % 2 == 0 } },
+            { array: ShortArray -> array.partition { it >= 0 } },
+            { array: IntArray -> array.partition { it >= 0 } },
+            { array: FloatArray -> array.partition { it >= 0.5f } },
+            { array: LongArray -> array.partition { it >= 0L } },
+            { array: DoubleArray -> array.partition { it >= 0.5 } },
+        )
     }
 
     @Benchmark
-    fun immutableArrayPartition(bh: Blackhole) {
-        when (dataType) {
-            REFERENCE -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableReferenceArray.partition { it.length % 2 == 0 })
-            }
-
-            BOOLEAN -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableBooleanArray.partition { it })
-            }
-
-            BYTE -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableByteArray.partition { it >= 0 })
-            }
-
-            CHAR -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableCharArray.partition { it.code % 2 == 0 })
-            }
-
-            SHORT -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableShortArray.partition { it >= 0 })
-            }
-
-            INT -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableIntArray.partition { it >= 0 })
-            }
-
-            FLOAT -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableFloatArray.partition { it >= 0.5f })
-            }
-
-            LONG -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableLongArray.partition { it >= 0L })
-            }
-
-            DOUBLE -> data.forEachImmutableArray { wrapper ->
-                bh.consume(wrapper.immutableDoubleArray.partition { it >= 0.5 })
-            }
-        }
+    fun immutableArray(bh: Blackhole) {
+        data.transformEachImmutableArrayOfDataType(
+            bh,
+            dataType,
+            { array: ImmutableArray<String> -> array.partition { it.length % 2 == 0 } },
+            { array: ImmutableBooleanArray -> array.partition { it } },
+            { array: ImmutableByteArray -> array.partition { it >= 0 } },
+            { array: ImmutableCharArray -> array.partition { it.code % 2 == 0 } },
+            { array: ImmutableShortArray -> array.partition { it >= 0 } },
+            { array: ImmutableIntArray -> array.partition { it >= 0 } },
+            { array: ImmutableFloatArray -> array.partition { it >= 0.5f } },
+            { array: ImmutableLongArray -> array.partition { it >= 0L } },
+            { array: ImmutableDoubleArray -> array.partition { it >= 0.5 } },
+        )
     }
 }
