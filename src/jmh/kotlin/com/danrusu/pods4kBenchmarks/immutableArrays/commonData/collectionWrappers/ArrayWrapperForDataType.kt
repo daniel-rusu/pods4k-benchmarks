@@ -1,6 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
@@ -29,7 +29,7 @@ class ArrayWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    dataProducer: DataProducer,
+    dataProducer: FlatDataProducer,
 ) {
     var referenceArray: Array<String> = EMPTY_ARRAY
         private set
@@ -99,7 +99,7 @@ class ArrayWrapperForDataType(
         }
     }
 
-    fun copyData(): DataProducer = object : DataProducer {
+    fun copyData(): FlatDataProducer = object : FlatDataProducer {
         override fun startNewCollection(size: Int) {
             require(size == this@ArrayWrapperForDataType.size)
         }

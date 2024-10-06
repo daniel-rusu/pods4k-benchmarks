@@ -36,7 +36,7 @@ class CollectionsByDataType(
     numCollections: Int,
     dataType: DataType,
     sizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,
-    dataProducer: DataProducer = DataProducer.RandomDataProducer,
+    dataProducer: FlatDataProducer = FlatDataProducer.RandomDataProducer,
 ) {
     val arrays: Array<ArrayWrapperForDataType>
     val lists: Array<ListWrapperForDataType>

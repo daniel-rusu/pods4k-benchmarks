@@ -25,7 +25,7 @@ class NestedCollectionsByDataType(
     dataType: DataType,
     topLevelSizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,
     nestedCollectionSizeDistribution: Distribution = Distribution.NESTED_LIST_SIZE_DISTRIBUTION,
-    nestedDataProducer: DataProducer = DataProducer.RandomDataProducer,
+    nestedDataProducer: FlatDataProducer = FlatDataProducer.RandomDataProducer,
 ) {
     val data: Array<NestedCollectionWrapperForDataType>
 

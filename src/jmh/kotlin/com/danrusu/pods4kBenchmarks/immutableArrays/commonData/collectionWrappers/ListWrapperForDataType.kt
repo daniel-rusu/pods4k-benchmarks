@@ -1,6 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
@@ -21,7 +21,7 @@ class ListWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    dataProducer: DataProducer,
+    dataProducer: FlatDataProducer,
 ) {
     var referenceList: List<String> = EMPTY_LIST
         private set

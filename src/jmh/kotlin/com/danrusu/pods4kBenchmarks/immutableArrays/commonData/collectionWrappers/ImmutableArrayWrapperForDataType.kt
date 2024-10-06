@@ -18,7 +18,7 @@ import com.danrusu.pods4k.immutableArrays.emptyImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 
@@ -47,7 +47,7 @@ class ImmutableArrayWrapperForDataType(
     val size: Int,
     random: Random,
     dataType: DataType,
-    dataProducer: DataProducer,
+    dataProducer: FlatDataProducer,
 ) {
     var immutableReferenceArray: ImmutableArray<String> = EMPTY_IMMUTABLE_ARRAY
         private set

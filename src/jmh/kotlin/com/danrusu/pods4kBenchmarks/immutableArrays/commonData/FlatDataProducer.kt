@@ -3,7 +3,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import kotlin.random.Random
 
-interface DataProducer {
+interface FlatDataProducer {
     /** Indicates that a new collection is about to be created that will store [size] number of elements */
     fun startNewCollection(size: Int)
 
@@ -34,7 +34,7 @@ interface DataProducer {
     /** Returns the next [Double] element that will be the [index]th element into the collection being created */
     fun nextDouble(index: Int, random: Random): Double
 
-    object RandomDataProducer : DataProducer {
+    object RandomDataProducer : FlatDataProducer {
         override fun startNewCollection(size: Int) {}
 
         override fun nextReference(index: Int, random: Random): String = DataGenerator.randomString(random = random)

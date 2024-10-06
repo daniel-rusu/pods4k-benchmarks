@@ -2,7 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappe
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.toImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.DataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
@@ -32,7 +32,7 @@ class NestedCollectionWrapperForDataType(
     random: Random,
     dataType: DataType,
     nestedCollectionSizeDistribution: Distribution,
-    dataProducer: DataProducer,
+    dataProducer: FlatDataProducer,
 ) {
     val array: Array<ArrayWrapperForDataType> = Array(size) {
         dataProducer.startNewCollection(size)
