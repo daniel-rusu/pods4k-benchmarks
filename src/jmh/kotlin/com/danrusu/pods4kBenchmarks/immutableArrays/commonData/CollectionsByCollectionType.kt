@@ -4,6 +4,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.WrapperForCollectionType
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import org.openjdk.jmh.infra.Blackhole
 import kotlin.random.Random
 
 /**
@@ -48,15 +49,26 @@ class CollectionsByCollectionType<T>(
         }
     }
 
-    inline fun forEachList(body: (List<T>) -> Unit) {
-        data.forEach { body(it.list) }
+    /**
+     * Loops through each list, transforms it with the provided [transform], and consumes the result via the black hole.
+     */
+    inline fun transformEachList(bh: Blackhole, transform: (List<T>) -> Any?) {
+        data.forEach { bh.consume(transform(it.list)) }
     }
 
-    inline fun forEachArray(body: (Array<T>) -> Unit) {
-        data.forEach { body(it.array) }
+    /**
+     * Loops through each array, transforms it with the provided [transform], and consumes the result via the black
+     * hole.
+     */
+    inline fun transformEachArray(bh: Blackhole, transform: (Array<T>) -> Any?) {
+        data.forEach { bh.consume(transform(it.array)) }
     }
 
-    inline fun forEachImmutableArray(body: (ImmutableArray<T>) -> Unit) {
-        data.forEach { body(it.immutableArray) }
+    /**
+     * Loops through each immutable array, transforms it with the provided [transform], and consumes the result via the
+     * black hole.
+     */
+    inline fun transformEachImmutableArray(bh: Blackhole, transform: (ImmutableArray<T>) -> Any?) {
+        data.forEach { bh.consume(transform(it.immutableArray)) }
     }
 }

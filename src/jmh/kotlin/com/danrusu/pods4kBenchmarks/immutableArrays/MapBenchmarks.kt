@@ -57,10 +57,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapReference(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.referenceValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.referenceValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.referenceValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.referenceValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.referenceValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.referenceValue }
             }
         }
     }
@@ -68,10 +68,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapBoolean(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.booleanValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.booleanValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.booleanValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.booleanValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.booleanValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.booleanValue }
             }
         }
     }
@@ -79,10 +79,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapByte(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.byteValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.byteValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.byteValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.byteValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.byteValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.byteValue }
             }
         }
     }
@@ -90,10 +90,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapChar(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.charValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.charValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.charValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.charValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.charValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.charValue }
             }
         }
     }
@@ -101,10 +101,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapShort(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.shortValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.shortValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.shortValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.shortValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.shortValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.shortValue }
             }
         }
     }
@@ -112,10 +112,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapInt(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.intValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.intValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.intValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.intValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.intValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.intValue }
             }
         }
     }
@@ -123,10 +123,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapFloat(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.floatValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.floatValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.floatValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.floatValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.floatValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.floatValue }
             }
         }
     }
@@ -134,10 +134,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapLong(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.longValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.longValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.longValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.longValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.longValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.longValue }
             }
         }
     }
@@ -145,10 +145,10 @@ open class MapBenchmarks {
     @Benchmark
     fun mapDouble(bh: Blackhole) {
         when (collectionType) {
-            LIST -> data.forEachList { list -> bh.consume(list.map { it.doubleValue }) }
-            ARRAY -> data.forEachArray { array -> bh.consume(array.map { it.doubleValue }) }
-            IMMUTABLE_ARRAY -> data.forEachImmutableArray { immutableArray ->
-                bh.consume(immutableArray.map { it.doubleValue })
+            LIST -> data.transformEachList(bh) { list -> list.map { it.doubleValue } }
+            ARRAY -> data.transformEachArray(bh) { array -> array.map { it.doubleValue } }
+            IMMUTABLE_ARRAY -> data.transformEachImmutableArray(bh) { immutableArray ->
+                immutableArray.map { it.doubleValue }
             }
         }
     }
