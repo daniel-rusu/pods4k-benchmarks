@@ -9,7 +9,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsByDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatCollections
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -40,11 +40,11 @@ open class PartitionBenchmarks {
     @Param("REFERENCE", "BOOLEAN", "BYTE", "CHAR", "SHORT", "INT", "FLOAT", "LONG", "DOUBLE")
     private lateinit var dataType: DataType
 
-    private lateinit var data: CollectionsByDataType
+    private lateinit var data: FlatCollections
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        data = CollectionsByDataType(numCollections = NUM_COLLECTIONS, dataType = dataType)
+        data = FlatCollections(numCollections = NUM_COLLECTIONS, dataType = dataType)
     }
 
     @Benchmark

@@ -3,6 +3,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.WrapperForCollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.ObjectProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.infra.Blackhole
 import kotlin.random.Random
@@ -17,7 +18,7 @@ import kotlin.random.Random
  * @param objectProducer Produces the objects that the collections will store
  * @param objectClass The class of the objects being produced.  Needed when instantiating arrays.
  */
-class CollectionsByCollectionType<T>(
+class ObjectCollections<T>(
     numCollections: Int,
     type: CollectionType,
     sizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,

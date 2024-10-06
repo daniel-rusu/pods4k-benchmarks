@@ -18,7 +18,7 @@ import com.danrusu.pods4k.immutableArrays.emptyImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import kotlin.random.Random
 

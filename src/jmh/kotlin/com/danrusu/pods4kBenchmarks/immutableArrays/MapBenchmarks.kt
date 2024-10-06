@@ -1,9 +1,9 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays
 
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsByCollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CompoundElement
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.ObjectProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.ObjectCollections
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.CompoundElement
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.ObjectProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
@@ -38,11 +38,11 @@ open class MapBenchmarks {
     @Param("LIST", "ARRAY", "IMMUTABLE_ARRAY")
     private lateinit var collectionType: CollectionType
 
-    private lateinit var data: CollectionsByCollectionType<CompoundElement>
+    private lateinit var data: ObjectCollections<CompoundElement>
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        data = CollectionsByCollectionType(
+        data = ObjectCollections(
             numCollections = NUM_COLLECTIONS,
             type = collectionType,
             objectProducer = ObjectProducer.CompoundElementProducer,

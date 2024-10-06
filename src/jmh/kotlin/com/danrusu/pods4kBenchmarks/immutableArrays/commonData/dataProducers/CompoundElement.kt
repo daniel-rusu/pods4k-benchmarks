@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
+package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers
 
 /**
  * Represents classes that have multiple types of fields.

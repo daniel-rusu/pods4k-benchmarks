@@ -1,7 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays
 
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.flatMap
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.NestedCollectionsByDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.NestedCollections
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
@@ -42,11 +42,11 @@ open class FlatMapBenchmarks {
     @Param("REFERENCE", "BOOLEAN", "BYTE", "CHAR", "SHORT", "INT", "FLOAT", "LONG", "DOUBLE")
     private lateinit var dataType: DataType
 
-    private lateinit var data: NestedCollectionsByDataType
+    private lateinit var data: NestedCollections
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        data = NestedCollectionsByDataType(numCollections = NUM_COLLECTIONS, dataType = dataType)
+        data = NestedCollections(numCollections = NUM_COLLECTIONS, dataType = dataType)
     }
 
     @TearDown

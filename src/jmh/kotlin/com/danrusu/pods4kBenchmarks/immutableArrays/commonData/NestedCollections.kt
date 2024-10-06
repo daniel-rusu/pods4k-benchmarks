@@ -6,6 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.NestedCollectionWrapperForDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
 
@@ -20,7 +21,7 @@ import kotlin.random.Random
  * @param topLevelSizeDistribution The probability distribution controlling the top-level collection sizes
  * @param nestedCollectionSizeDistribution The probability distribution controlling the nested collection sizes
  */
-class NestedCollectionsByDataType(
+class NestedCollections(
     numCollections: Int,
     dataType: DataType,
     topLevelSizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,

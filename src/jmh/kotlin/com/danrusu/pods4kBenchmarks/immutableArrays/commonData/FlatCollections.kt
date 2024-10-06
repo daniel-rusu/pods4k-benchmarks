@@ -13,6 +13,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParamete
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.infra.Blackhole
 import kotlin.random.Random
@@ -32,7 +33,7 @@ import kotlin.random.Random
  *   - will be an immutable array containing 10 [ImmutableArrayWrapperForDataType] elements
  *   - the wrappers will each store a ImmutableBooleanArray with contents copied from the array wrappers
  */
-class CollectionsByDataType(
+class FlatCollections(
     numCollections: Int,
     dataType: DataType,
     sizeDistribution: Distribution = Distribution.LIST_SIZE_DISTRIBUTION,
