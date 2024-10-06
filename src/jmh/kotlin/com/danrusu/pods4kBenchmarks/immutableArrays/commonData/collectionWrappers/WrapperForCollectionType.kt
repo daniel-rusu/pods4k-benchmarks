@@ -2,7 +2,9 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappe
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.ObjectProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
+import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import kotlin.random.Random
 
 private val EMPTY_LIST: List<Nothing> = emptyList()
@@ -12,13 +14,13 @@ private val EMPTY_IMMUTABLE_ARRAY: ImmutableArray<Nothing> = emptyImmutableArray
 /**
  * Creates and stores a collection of the specified collection type by using the appropriate provided factory.
  */
+
 class WrapperForCollectionType<T>(
     random: Random,
     size: Int,
     collectionType: CollectionType,
-    createList: (Random, size: Int) -> List<T>,
-    createArray: (Random, size: Int) -> Array<T>,
-    createImmutableArray: (Random, size: Int) -> ImmutableArray<T>,
+    objectProducer: ObjectProducer<T>,
+    objectClass: Class<T>,
 ) {
     var list: List<T> = EMPTY_LIST
         private set
@@ -31,20 +33,18 @@ class WrapperForCollectionType<T>(
         private set
 
     init {
+        objectProducer.startNewCollection(size)
         when (collectionType) {
             CollectionType.LIST -> {
-                list = createList(random, size)
-                check(list.size == size)
+                list = (0..<size).map { objectProducer.nextObject(it, random) }
             }
 
             CollectionType.ARRAY -> {
-                array = createArray(random, size)
-                check(array.size == size)
+                array = ArrayCreator.createArray(objectClass, size) { objectProducer.nextObject(it, random) }
             }
 
             CollectionType.IMMUTABLE_ARRAY -> {
-                immutableArray = createImmutableArray(random, size)
-                check(immutableArray.size == size)
+                immutableArray = ImmutableArray(size) { objectProducer.nextObject(it, random) }
             }
         }
     }

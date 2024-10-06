@@ -1,8 +1,5 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
-import kotlin.random.Random
-
 /**
  * Represents classes that have multiple types of fields.
  */
@@ -16,18 +13,4 @@ class CompoundElement(
     val floatValue: Float,
     val longValue: Long,
     val doubleValue: Double,
-) {
-    companion object {
-        fun create(random: Random): CompoundElement = CompoundElement(
-            referenceValue = DataGenerator.randomString(random = random),
-            booleanValue = random.nextBoolean(),
-            byteValue = DataGenerator.randomByte(random),
-            charValue = DataGenerator.randomChar(random),
-            shortValue = DataGenerator.randomShort(random),
-            intValue = random.nextInt(),
-            floatValue = random.nextFloat(),
-            longValue = random.nextLong(),
-            doubleValue = random.nextDouble(),
-        )
-    }
-}
+)

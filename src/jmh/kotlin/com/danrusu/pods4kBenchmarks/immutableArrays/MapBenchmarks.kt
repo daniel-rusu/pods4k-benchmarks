@@ -1,14 +1,13 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays
 
-import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CollectionsByCollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.CompoundElement
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.ObjectProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.LIST
-import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -46,16 +45,8 @@ open class MapBenchmarks {
         data = CollectionsByCollectionType(
             numCollections = NUM_COLLECTIONS,
             type = collectionType,
-            sizeDistribution = Distribution.LIST_SIZE_DISTRIBUTION,
-            createList = { random, size ->
-                (1..size).map { CompoundElement.create(random) }
-            },
-            createArray = { random, size ->
-                Array(size) { CompoundElement.create(random) }
-            },
-            createImmutableArray = { random, size ->
-                ImmutableArray(size) { CompoundElement.create(random) }
-            }
+            objectProducer = ObjectProducer.CompoundElementProducer,
+            objectClass = CompoundElement::class.java,
         )
     }
 
