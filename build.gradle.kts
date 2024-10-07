@@ -37,7 +37,7 @@ jmh {
     jmhVersion = libs.versions.jmh
 
     // Uncomment this when you want to specify which benchmark classes to run
-    // includes = listOf("MapBenchmarks")
+    includes = listOf("immutableArrays.MapBenchmarks")
 }
 
 // Consider the output of the JMH task always out of date to allow running benchmarks again even if no code changed

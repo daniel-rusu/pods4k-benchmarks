@@ -2,6 +2,9 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.WrapperForCollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.ObjectProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
@@ -51,25 +54,23 @@ class ObjectCollections<T>(
     }
 
     /**
-     * Loops through each list, transforms it with the provided [transform], and consumes the result via the black hole.
+     * Loops through all the collections of the specified [collectionType] and performs the associated operation
+     * consuming each result with the [Blackhole].
+     *
+     * E.g. If the specified collectionType is [CollectionType.ARRAY], then it loops through all the collection
+     * wrappers and calls [transformArray] on each [WrapperForCollectionType.array].
      */
-    inline fun transformEachList(bh: Blackhole, transform: (List<T>) -> Any?) {
-        data.forEach { bh.consume(transform(it.list)) }
-    }
-
-    /**
-     * Loops through each array, transforms it with the provided [transform], and consumes the result via the black
-     * hole.
-     */
-    inline fun transformEachArray(bh: Blackhole, transform: (Array<T>) -> Any?) {
-        data.forEach { bh.consume(transform(it.array)) }
-    }
-
-    /**
-     * Loops through each immutable array, transforms it with the provided [transform], and consumes the result via the
-     * black hole.
-     */
-    inline fun transformEachImmutableArray(bh: Blackhole, transform: (ImmutableArray<T>) -> Any?) {
-        data.forEach { bh.consume(transform(it.immutableArray)) }
+    inline fun transformEachCollectionOfCollectionType(
+        bh: Blackhole,
+        collectionType: CollectionType,
+        transformList: (List<T>) -> Any?,
+        transformArray: (Array<T>) -> Any?,
+        transformImmutableArray: (ImmutableArray<T>) -> Any?,
+    ) {
+        when (collectionType) {
+            LIST -> data.forEach { bh.consume(transformList(it.list)) }
+            ARRAY -> data.forEach { bh.consume(transformArray(it.array)) }
+            IMMUTABLE_ARRAY -> data.forEach { bh.consume(transformImmutableArray(it.immutableArray)) }
+        }
     }
 }
