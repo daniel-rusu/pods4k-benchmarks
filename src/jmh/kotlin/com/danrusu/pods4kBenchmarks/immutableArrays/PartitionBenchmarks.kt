@@ -37,7 +37,7 @@ private const val NUM_COLLECTIONS = 1000
 @Fork(2)
 @State(Scope.Benchmark)
 open class PartitionBenchmarks {
-    @Param("REFERENCE", "BOOLEAN", "BYTE", "CHAR", "SHORT", "INT", "FLOAT", "LONG", "DOUBLE")
+    @Param
     private lateinit var dataType: DataType
 
     private lateinit var data: FlatCollections

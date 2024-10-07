@@ -33,7 +33,7 @@ private const val NUM_COLLECTIONS = 1000
 @Fork(2)
 @State(Scope.Benchmark)
 open class MapBenchmarks {
-    @Param("LIST", "ARRAY", "IMMUTABLE_ARRAY")
+    @Param
     private lateinit var collectionType: CollectionType
 
     private lateinit var data: ObjectCollections<CompoundElement>
