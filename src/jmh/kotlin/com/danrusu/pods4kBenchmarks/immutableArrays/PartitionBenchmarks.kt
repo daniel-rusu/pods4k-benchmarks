@@ -9,20 +9,14 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.FlatCollections
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.FlatCollectionBenchmark
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
-import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Measurement
 import org.openjdk.jmh.annotations.Mode
 import org.openjdk.jmh.annotations.OperationsPerInvocation
 import org.openjdk.jmh.annotations.OutputTimeUnit
-import org.openjdk.jmh.annotations.Param
-import org.openjdk.jmh.annotations.Scope
-import org.openjdk.jmh.annotations.Setup
-import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
@@ -35,23 +29,14 @@ private const val NUM_COLLECTIONS = 1000
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-@State(Scope.Benchmark)
-open class PartitionBenchmarks {
-    @Param
-    private lateinit var dataType: DataType
-
-    private lateinit var data: FlatCollections
-
-    @Setup(Level.Trial)
-    fun setupCollections() {
-        data = FlatCollections(numCollections = NUM_COLLECTIONS, dataType = dataType)
-    }
+open class PartitionBenchmarks : FlatCollectionBenchmark() {
+    override val numCollections: Int
+        get() = NUM_COLLECTIONS
 
     @Benchmark
     fun list(bh: Blackhole) {
-        data.transformEachListOfDataType(
+        transformEachList(
             bh,
-            dataType,
             { list: List<String> -> list.partition { it.length % 2 == 0 } },
             { list: List<Boolean> -> list.partition { it } },
             { list: List<Byte> -> list.partition { it >= 0 } },
@@ -66,9 +51,8 @@ open class PartitionBenchmarks {
 
     @Benchmark
     fun array(bh: Blackhole) {
-        data.transformEachArrayOfDataType(
+        transformEachArray(
             bh,
-            dataType,
             { array: Array<String> -> array.partition { it.length % 2 == 0 } },
             { array: BooleanArray -> array.partition { it } },
             { array: ByteArray -> array.partition { it >= 0 } },
@@ -83,9 +67,8 @@ open class PartitionBenchmarks {
 
     @Benchmark
     fun immutableArray(bh: Blackhole) {
-        data.transformEachImmutableArrayOfDataType(
+        transformEachImmutableArray(
             bh,
-            dataType,
             { array: ImmutableArray<String> -> array.partition { it.length % 2 == 0 } },
             { array: ImmutableBooleanArray -> array.partition { it } },
             { array: ImmutableByteArray -> array.partition { it >= 0 } },
