@@ -1,7 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import kotlin.random.Random
 
 private val EMPTY_LIST: List<Nothing> = emptyList()
@@ -23,71 +23,46 @@ class ListWrapperForDataType(
     dataType: DataType,
     dataProducer: FlatDataProducer,
 ) {
-    var referenceList: List<String> = EMPTY_LIST
-        private set
-
-    var booleanList: List<Boolean> = EMPTY_LIST
-        private set
-
-    var byteList: List<Byte> = EMPTY_LIST
-        private set
-
-    var charList: List<Char> = EMPTY_LIST
-        private set
-
-    var shortList: List<Short> = EMPTY_LIST
-        private set
-
-    var intList: List<Int> = EMPTY_LIST
-        private set
-
-    var floatList: List<Float> = EMPTY_LIST
-        private set
-
-    var longList: List<Long> = EMPTY_LIST
-        private set
-
-    var doubleList: List<Double> = EMPTY_LIST
-        private set
-
     init {
+        // IMPORTANT: This init block is defined above the properties because the data producer needs to be notified
+        // that a new collection is about to be created before the properties are initialized.
         dataProducer.startNewCollection(size)
-        when (dataType) {
-            DataType.REFERENCE -> {
-                referenceList = (0..<size).map { dataProducer.nextReference(it, random) }
-            }
+    }
 
-            DataType.BOOLEAN -> {
-                booleanList = (0..<size).map { dataProducer.nextBoolean(it, random) }
-            }
-
-            DataType.BYTE -> {
-                byteList = (0..<size).map { dataProducer.nextByte(it, random) }
-            }
-
-            DataType.CHAR -> {
-                charList = (0..<size).map { dataProducer.nextChar(it, random) }
-            }
-
-            DataType.SHORT -> {
-                shortList = (0..<size).map { dataProducer.nextShort(it, random) }
-            }
-
-            DataType.INT -> {
-                intList = (0..<size).map { dataProducer.nextInt(it, random) }
-            }
-
-            DataType.FLOAT -> {
-                floatList = (0..<size).map { dataProducer.nextFloat(it, random) }
-            }
-
-            DataType.LONG -> {
-                longList = (0..<size).map { dataProducer.nextLong(it, random) }
-            }
-
-            DataType.DOUBLE -> {
-                doubleList = (0..<size).map { dataProducer.nextDouble(it, random) }
-            }
-        }
+    val referenceList: List<String> = when (dataType) {
+        DataType.REFERENCE -> (0..<size).map { dataProducer.nextReference(it, random) }
+        else -> EMPTY_LIST
+    }
+    val booleanList: List<Boolean> = when (dataType) {
+        DataType.BOOLEAN -> (0..<size).map { dataProducer.nextBoolean(it, random) }
+        else -> EMPTY_LIST
+    }
+    val byteList: List<Byte> = when (dataType) {
+        DataType.BYTE -> (0..<size).map { dataProducer.nextByte(it, random) }
+        else -> EMPTY_LIST
+    }
+    val charList: List<Char> = when (dataType) {
+        DataType.CHAR -> (0..<size).map { dataProducer.nextChar(it, random) }
+        else -> EMPTY_LIST
+    }
+    val shortList: List<Short> = when (dataType) {
+        DataType.SHORT -> (0..<size).map { dataProducer.nextShort(it, random) }
+        else -> EMPTY_LIST
+    }
+    val intList: List<Int> = when (dataType) {
+        DataType.INT -> (0..<size).map { dataProducer.nextInt(it, random) }
+        else -> EMPTY_LIST
+    }
+    val floatList: List<Float> = when (dataType) {
+        DataType.FLOAT -> (0..<size).map { dataProducer.nextFloat(it, random) }
+        else -> EMPTY_LIST
+    }
+    val longList: List<Long> = when (dataType) {
+        DataType.LONG -> (0..<size).map { dataProducer.nextLong(it, random) }
+        else -> EMPTY_LIST
+    }
+    val doubleList: List<Double> = when (dataType) {
+        DataType.DOUBLE -> (0..<size).map { dataProducer.nextDouble(it, random) }
+        else -> EMPTY_LIST
     }
 }

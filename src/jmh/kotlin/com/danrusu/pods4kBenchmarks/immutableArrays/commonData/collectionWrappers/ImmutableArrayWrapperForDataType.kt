@@ -18,8 +18,8 @@ import com.danrusu.pods4k.immutableArrays.emptyImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import kotlin.random.Random
 
 private val EMPTY_IMMUTABLE_ARRAY: ImmutableArray<Nothing> = emptyImmutableArray()
@@ -49,71 +49,54 @@ class ImmutableArrayWrapperForDataType(
     dataType: DataType,
     dataProducer: FlatDataProducer,
 ) {
-    var immutableReferenceArray: ImmutableArray<String> = EMPTY_IMMUTABLE_ARRAY
-        private set
-
-    var immutableBooleanArray: ImmutableBooleanArray = EMPTY_IMMUTABLE_BOOLEAN_ARRAY
-        private set
-
-    var immutableByteArray: ImmutableByteArray = EMPTY_IMMUTABLE_BYTE_ARRAY
-        private set
-
-    var immutableCharArray: ImmutableCharArray = EMPTY_IMMUTABLE_CHAR_ARRAY
-        private set
-
-    var immutableShortArray: ImmutableShortArray = EMPTY_IMMUTABLE_SHORT_ARRAY
-        private set
-
-    var immutableIntArray: ImmutableIntArray = EMPTY_IMMUTABLE_INT_ARRAY
-        private set
-
-    var immutableFloatArray: ImmutableFloatArray = EMPTY_IMMUTABLE_FLOAT_ARRAY
-        private set
-
-    var immutableLongArray: ImmutableLongArray = EMPTY_IMMUTABLE_LONG_ARRAY
-        private set
-
-    var immutableDoubleArray: ImmutableDoubleArray = EMPTY_IMMUTABLE_DOUBLE_ARRAY
-        private set
-
     init {
+        // IMPORTANT: This init block is defined above the properties because the data producer needs to be notified
+        // that a new collection is about to be created before the properties are initialized.
         dataProducer.startNewCollection(size)
-        when (dataType) {
-            DataType.REFERENCE -> {
-                immutableReferenceArray = ImmutableArray(size) { dataProducer.nextReference(it, random) }
-            }
+    }
 
-            DataType.BOOLEAN -> {
-                immutableBooleanArray = ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
-            }
+    val immutableReferenceArray: ImmutableArray<String> = when (dataType) {
+        DataType.REFERENCE -> ImmutableArray(size) { dataProducer.nextReference(it, random) }
+        else -> EMPTY_IMMUTABLE_ARRAY
+    }
 
-            DataType.BYTE -> {
-                immutableByteArray = ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
-            }
+    val immutableBooleanArray: ImmutableBooleanArray = when (dataType) {
+        DataType.BOOLEAN -> ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
+        else -> EMPTY_IMMUTABLE_BOOLEAN_ARRAY
+    }
 
-            DataType.CHAR -> {
-                immutableCharArray = ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
-            }
+    val immutableByteArray: ImmutableByteArray = when (dataType) {
+        DataType.BYTE -> ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
+        else -> EMPTY_IMMUTABLE_BYTE_ARRAY
+    }
 
-            DataType.SHORT -> {
-                immutableShortArray = ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
-            }
+    val immutableCharArray: ImmutableCharArray = when (dataType) {
+        DataType.CHAR -> ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
+        else -> EMPTY_IMMUTABLE_CHAR_ARRAY
+    }
 
-            DataType.INT -> {
-                immutableIntArray = ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
-            }
+    val immutableShortArray: ImmutableShortArray = when (dataType) {
+        DataType.SHORT -> ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
+        else -> EMPTY_IMMUTABLE_SHORT_ARRAY
+    }
 
-            DataType.FLOAT -> {
-                immutableFloatArray = ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
-            }
+    val immutableIntArray: ImmutableIntArray = when (dataType) {
+        DataType.INT -> ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
+        else -> EMPTY_IMMUTABLE_INT_ARRAY
+    }
 
-            DataType.LONG -> {
-                immutableLongArray = ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
-            }
+    val immutableFloatArray: ImmutableFloatArray = when (dataType) {
+        DataType.FLOAT -> ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
+        else -> EMPTY_IMMUTABLE_FLOAT_ARRAY
+    }
 
-            DataType.DOUBLE -> {
-                immutableDoubleArray = ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }
-            }
-        }
+    val immutableLongArray: ImmutableLongArray = when (dataType) {
+        DataType.LONG -> ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
+        else -> EMPTY_IMMUTABLE_LONG_ARRAY
+    }
+
+    val immutableDoubleArray: ImmutableDoubleArray = when (dataType) {
+        DataType.DOUBLE -> ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }
+        else -> EMPTY_IMMUTABLE_DOUBLE_ARRAY
     }
 }

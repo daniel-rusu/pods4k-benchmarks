@@ -1,7 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import kotlin.random.Random
 
 private val EMPTY_ARRAY: Array<String> = emptyArray()
@@ -31,72 +31,47 @@ class ArrayWrapperForDataType(
     dataType: DataType,
     dataProducer: FlatDataProducer,
 ) {
-    var referenceArray: Array<String> = EMPTY_ARRAY
-        private set
-
-    var booleanArray: BooleanArray = EMPTY_BOOLEAN_ARRAY
-        private set
-
-    var byteArray: ByteArray = EMPTY_BYTE_ARRAY
-        private set
-
-    var charArray: CharArray = EMPTY_CHAR_ARRAY
-        private set
-
-    var shortArray: ShortArray = EMPTY_SHORT_ARRAY
-        private set
-
-    var intArray: IntArray = EMPTY_INT_ARRAY
-        private set
-
-    var floatArray: FloatArray = EMPTY_FLOAT_ARRAY
-        private set
-
-    var longArray: LongArray = EMPTY_LONG_ARRAY
-        private set
-
-    var doubleArray: DoubleArray = EMPTY_DOUBLE_ARRAY
-        private set
-
     init {
+        // IMPORTANT: This init block is defined above the properties because the data producer needs to be notified
+        // that a new collection is about to be created before the properties are initialized.
         dataProducer.startNewCollection(size)
-        when (dataType) {
-            DataType.REFERENCE -> {
-                referenceArray = Array(size) { dataProducer.nextReference(it, random) }
-            }
+    }
 
-            DataType.BOOLEAN -> {
-                booleanArray = BooleanArray(size) { dataProducer.nextBoolean(it, random) }
-            }
-
-            DataType.BYTE -> {
-                byteArray = ByteArray(size) { dataProducer.nextByte(it, random) }
-            }
-
-            DataType.CHAR -> {
-                charArray = CharArray(size) { dataProducer.nextChar(it, random) }
-            }
-
-            DataType.SHORT -> {
-                shortArray = ShortArray(size) { dataProducer.nextShort(it, random) }
-            }
-
-            DataType.INT -> {
-                intArray = IntArray(size) { dataProducer.nextInt(it, random) }
-            }
-
-            DataType.FLOAT -> {
-                floatArray = FloatArray(size) { dataProducer.nextFloat(it, random) }
-            }
-
-            DataType.LONG -> {
-                longArray = LongArray(size) { dataProducer.nextLong(it, random) }
-            }
-
-            DataType.DOUBLE -> {
-                doubleArray = DoubleArray(size) { dataProducer.nextDouble(it, random) }
-            }
-        }
+    val referenceArray: Array<String> = when (dataType) {
+        DataType.REFERENCE -> Array(size) { dataProducer.nextReference(it, random) }
+        else -> EMPTY_ARRAY
+    }
+    val booleanArray: BooleanArray = when (dataType) {
+        DataType.BOOLEAN -> BooleanArray(size) { dataProducer.nextBoolean(it, random) }
+        else -> EMPTY_BOOLEAN_ARRAY
+    }
+    val byteArray: ByteArray = when (dataType) {
+        DataType.BYTE -> ByteArray(size) { dataProducer.nextByte(it, random) }
+        else -> EMPTY_BYTE_ARRAY
+    }
+    val charArray: CharArray = when (dataType) {
+        DataType.CHAR -> CharArray(size) { dataProducer.nextChar(it, random) }
+        else -> EMPTY_CHAR_ARRAY
+    }
+    val shortArray: ShortArray = when (dataType) {
+        DataType.SHORT -> ShortArray(size) { dataProducer.nextShort(it, random) }
+        else -> EMPTY_SHORT_ARRAY
+    }
+    val intArray: IntArray = when (dataType) {
+        DataType.INT -> IntArray(size) { dataProducer.nextInt(it, random) }
+        else -> EMPTY_INT_ARRAY
+    }
+    val floatArray: FloatArray = when (dataType) {
+        DataType.FLOAT -> FloatArray(size) { dataProducer.nextFloat(it, random) }
+        else -> EMPTY_FLOAT_ARRAY
+    }
+    val longArray: LongArray = when (dataType) {
+        DataType.LONG -> LongArray(size) { dataProducer.nextLong(it, random) }
+        else -> EMPTY_LONG_ARRAY
+    }
+    val doubleArray: DoubleArray = when (dataType) {
+        DataType.DOUBLE -> DoubleArray(size) { dataProducer.nextDouble(it, random) }
+        else -> EMPTY_DOUBLE_ARRAY
     }
 
     fun copyData(): FlatDataProducer = object : FlatDataProducer {
