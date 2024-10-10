@@ -9,6 +9,10 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
@@ -20,6 +24,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParamete
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapperForDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.CollectionWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
@@ -40,21 +45,21 @@ import kotlin.random.Random
  * A flat collection represents a collection that stores one of the 8 base types, such as a collection of [Boolean]
  * values, or a collection containing simple reference types (with the most common reference type being [String]).
  *
- * Benchmarks are parameterized by each of the 8 base types, like [Boolean] / [Int] / [Float] / etc. plus [String].
+ * Benchmarks are parameterized by every combination of [CollectionType] and [DataType].  Subclasses should create a
+ * benchmark method that calls [transformEachCollection] to measure the performance of each scenario.
  *
- * Subclasses should create 3 benchmark methods for measuring the performance of each of the 3 types of collections
- * and call the appropriate transformation function, like [transformEachList], providing the operations to be performed
- * for each collection of each data type.
- *
- * For example, if [numCollections] returns 500, and the data type being measured is [DataType.BOOLEAN], then 500
- * List<Boolean>, 500 BooleanArray, and 500 ImmutableBooleanArray collections will be created.  The provided boolean
- * collection transform, defined in the subclass benchmark, will be called for each of the 500 collections.
+ * For example, if [numCollections] returns 500, and the collection type & data type pair being measured is
+ * [CollectionType.LIST] & [DataType.BOOLEAN], then 500 List<Boolean> collections will be created.  When the subclass
+ * calls [transformEachCollection], the provided boolean collection transform will be called for each of the 500
+ * collections.
  */
 @State(Scope.Benchmark)
 abstract class FlatCollectionBenchmark {
-    /**
-     * Repeat the benchmark for each of the 8 base data types plus a String reference type.
-     */
+    /** Repeat the benchmark for each collection type */
+    @Param
+    protected lateinit var collectionType: CollectionType
+
+    /** Repeat the benchmark for each of the 8 base data types plus a String reference type */
     @Param
     protected lateinit var dataType: DataType
 
@@ -67,89 +72,75 @@ abstract class FlatCollectionBenchmark {
      */
     abstract val numCollections: Int
 
-    /**
-     * Controls the sizes of the collections that will be generated.
-     *
-     * Try to use a distribution that represents sizes that are expected in the real world for the type of operation
-     * being performed.
-     */
+    /** Controls the sizes of the collections that will be generated */
     open val sizeDistribution: Distribution
         get() = Distribution.LIST_SIZE_DISTRIBUTION
 
-    /**
-     * Responsible for generated the element data that the collections will contain.
-     */
+    /** Responsible for generating the element data that the collections will contain */
     open val dataProducer: FlatDataProducer
         get() = FlatDataProducer.RandomDataProducer
 
-    protected lateinit var arrays: Array<ArrayWrapperForDataType>
-
-    protected lateinit var lists: Array<ListWrapperForDataType>
-
-    protected lateinit var immutableArrays: Array<ImmutableArrayWrapperForDataType>
+    protected lateinit var data: Array<out CollectionWrapperForDataType>
 
     @Setup(Level.Trial)
     fun setupCollections() {
         // Use constant seed so the data is identical for all benchmarks since they're compared against each other
         val random = Random(0)
 
-        /*
-        Add the appropriate collection-wrapper to each of the 3 arrays before continuing to add the next element so that
-        none of them get an unfair cache boost from being populated more recently.  This is in contrast to creating
-        an entire array of a particular collection wrapper
-
-        Eg. Populate arrays[0], lists[0], immutableArrays[0], followed by arrays[1], lists[1], immutableArrays[1], etc.
-
-        Since we c
-         */
-        @Suppress("UNCHECKED_CAST")
-        arrays = arrayOfNulls<ArrayWrapperForDataType>(numCollections) as Array<ArrayWrapperForDataType>
-
-        @Suppress("UNCHECKED_CAST")
-        lists = arrayOfNulls<ListWrapperForDataType>(numCollections) as Array<ListWrapperForDataType>
-
-        @Suppress("UNCHECKED_CAST")
-        immutableArrays =
-            arrayOfNulls<ImmutableArrayWrapperForDataType>(numCollections) as Array<ImmutableArrayWrapperForDataType>
-
-        for (i in 0..<numCollections) {
-            val size = sizeDistribution.nextValue(random)
-            val arrayData = ArrayWrapperForDataType(
-                size = size,
-                random = random,
-                dataType = dataType,
-                dataProducer = dataProducer,
-            )
-
-            arrays[i] = arrayData
-            immutableArrays[i] = ImmutableArrayWrapperForDataType(
-                size = size,
-                random = random,
-                dataType = dataType,
-                // copy the data from the regular array so that they are tested against identical data
-                dataProducer = arrayData.copyData(),
-            )
-            lists[i] = ListWrapperForDataType(
-                size = size,
-                random = random,
-                dataType = dataType,
-                // copy the data from the regular array so that they are tested against identical data
-                dataProducer = arrayData.copyData(),
-            )
+        data = when (collectionType) {
+            LIST -> createLists(random)
+            ARRAY -> createArrays(random)
+            IMMUTABLE_ARRAY -> createImmutableArrays(random)
         }
+
     }
 
     @TearDown
     fun tearDown() {
+        data = emptyArray()
+    }
+
+    private fun createLists(
+        random: Random
+    ): Array<ListWrapperForDataType> = Array(numCollections) {
+        ListWrapperForDataType(
+            size = sizeDistribution.nextValue(random),
+            random = random,
+            dataType = dataType,
+            dataProducer = dataProducer,
+        )
+    }
+
+    private fun createArrays(
+        random: Random
+    ): Array<ArrayWrapperForDataType> = Array(numCollections) {
+        ArrayWrapperForDataType(
+            size = sizeDistribution.nextValue(random),
+            random = random,
+            dataType = dataType,
+            dataProducer = dataProducer,
+        )
+    }
+
+    private fun createImmutableArrays(
+        random: Random
+    ): Array<ImmutableArrayWrapperForDataType> = Array(numCollections) {
+        ImmutableArrayWrapperForDataType(
+            size = sizeDistribution.nextValue(random),
+            random = random,
+            dataType = dataType,
+            dataProducer = dataProducer,
+        )
     }
 
     /**
-     * Loops through all the lists of the current [dataType] and performs the associated operation consuming each result
-     * with the [Blackhole].
+     * Loops through all the collections of the current [CollectionType] and current [dataType] and performs the
+     * associated operation consuming each result with the [Blackhole].
      *
-     * E.g. If the current dataType is [DataType.BOOLEAN], then it calls [transformBooleanList] on each boolean list.
+     * E.g. If the current collectionType is [CollectionType.LIST] and dataType is [DataType.BOOLEAN], then it calls
+     * [transformBooleanList] on each boolean list.
      */
-    protected inline fun transformEachList(
+    protected inline fun transformEachCollection(
         bh: Blackhole,
         transformList: (List<String>) -> Any?,
         transformBooleanList: (List<Boolean>) -> Any?,
@@ -160,28 +151,6 @@ abstract class FlatCollectionBenchmark {
         transformFloatList: (List<Float>) -> Any?,
         transformLongList: (List<Long>) -> Any?,
         transformDoubleList: (List<Double>) -> Any?,
-    ) {
-        when (dataType) {
-            REFERENCE -> lists.forEach { bh.consume(transformList(it.referenceList)) }
-            BOOLEAN -> lists.forEach { bh.consume(transformBooleanList(it.booleanList)) }
-            BYTE -> lists.forEach { bh.consume(transformByteList(it.byteList)) }
-            CHAR -> lists.forEach { bh.consume(transformCharList(it.charList)) }
-            SHORT -> lists.forEach { bh.consume(transformShortList(it.shortList)) }
-            INT -> lists.forEach { bh.consume(transformIntList(it.intList)) }
-            FLOAT -> lists.forEach { bh.consume(transformFloatList(it.floatList)) }
-            LONG -> lists.forEach { bh.consume(transformLongList(it.longList)) }
-            DOUBLE -> lists.forEach { bh.consume(transformDoubleList(it.doubleList)) }
-        }
-    }
-
-    /**
-     * Loops through all the arrays of the current [dataType] and performs the associated operation consuming each
-     * result with the [Blackhole].
-     *
-     * E.g. If the current dataType is [DataType.BOOLEAN], then it calls [transformBooleanArray] on each BooleanArray.
-     */
-    protected inline fun transformEachArray(
-        bh: Blackhole,
         transformArray: (Array<String>) -> Any?,
         transformBooleanArray: (BooleanArray) -> Any?,
         transformByteArray: (ByteArray) -> Any?,
@@ -191,29 +160,6 @@ abstract class FlatCollectionBenchmark {
         transformFloatArray: (FloatArray) -> Any?,
         transformLongArray: (LongArray) -> Any?,
         transformDoubleArray: (DoubleArray) -> Any?,
-    ) {
-        when (dataType) {
-            REFERENCE -> arrays.forEach { bh.consume(transformArray(it.referenceArray)) }
-            BOOLEAN -> arrays.forEach { bh.consume(transformBooleanArray(it.booleanArray)) }
-            BYTE -> arrays.forEach { bh.consume(transformByteArray(it.byteArray)) }
-            CHAR -> arrays.forEach { bh.consume(transformCharArray(it.charArray)) }
-            SHORT -> arrays.forEach { bh.consume(transformShortArray(it.shortArray)) }
-            INT -> arrays.forEach { bh.consume(transformIntArray(it.intArray)) }
-            FLOAT -> arrays.forEach { bh.consume(transformFloatArray(it.floatArray)) }
-            LONG -> arrays.forEach { bh.consume(transformLongArray(it.longArray)) }
-            DOUBLE -> arrays.forEach { bh.consume(transformDoubleArray(it.doubleArray)) }
-        }
-    }
-
-    /**
-     * Loops through all the immutable arrays for the current [dataType] and performs the associated operation
-     * consuming each result with the [Blackhole].
-     *
-     * E.g. If the current dataType is [DataType.BOOLEAN], then it calls [transformImmutableBooleanArray] on each
-     * ImmutableBooleanArray.
-     */
-    protected inline fun transformEachImmutableArray(
-        bh: Blackhole,
         transformImmutableArray: (ImmutableArray<String>) -> Any?,
         transformImmutableBooleanArray: (ImmutableBooleanArray) -> Any?,
         transformImmutableByteArray: (ImmutableByteArray) -> Any?,
@@ -224,16 +170,42 @@ abstract class FlatCollectionBenchmark {
         transformImmutableLongArray: (ImmutableLongArray) -> Any?,
         transformImmutableDoubleArray: (ImmutableDoubleArray) -> Any?,
     ) {
-        when (dataType) {
-            REFERENCE -> immutableArrays.forEach { bh.consume(transformImmutableArray(it.immutableReferenceArray)) }
-            BOOLEAN -> immutableArrays.forEach { bh.consume(transformImmutableBooleanArray(it.immutableBooleanArray)) }
-            BYTE -> immutableArrays.forEach { bh.consume(transformImmutableByteArray(it.immutableByteArray)) }
-            CHAR -> immutableArrays.forEach { bh.consume(transformImmutableCharArray(it.immutableCharArray)) }
-            SHORT -> immutableArrays.forEach { bh.consume(transformImmutableShortArray(it.immutableShortArray)) }
-            INT -> immutableArrays.forEach { bh.consume(transformImmutableIntArray(it.immutableIntArray)) }
-            FLOAT -> immutableArrays.forEach { bh.consume(transformImmutableFloatArray(it.immutableFloatArray)) }
-            LONG -> immutableArrays.forEach { bh.consume(transformImmutableLongArray(it.immutableLongArray)) }
-            DOUBLE -> immutableArrays.forEach { bh.consume(transformImmutableDoubleArray(it.immutableDoubleArray)) }
+        when (collectionType) {
+            LIST -> when (dataType) {
+                REFERENCE -> data.forEach { bh.consume(transformList(it.referenceList)) }
+                BOOLEAN -> data.forEach { bh.consume(transformBooleanList(it.booleanList)) }
+                BYTE -> data.forEach { bh.consume(transformByteList(it.byteList)) }
+                CHAR -> data.forEach { bh.consume(transformCharList(it.charList)) }
+                SHORT -> data.forEach { bh.consume(transformShortList(it.shortList)) }
+                INT -> data.forEach { bh.consume(transformIntList(it.intList)) }
+                FLOAT -> data.forEach { bh.consume(transformFloatList(it.floatList)) }
+                LONG -> data.forEach { bh.consume(transformLongList(it.longList)) }
+                DOUBLE -> data.forEach { bh.consume(transformDoubleList(it.doubleList)) }
+            }
+
+            ARRAY -> when (dataType) {
+                REFERENCE -> data.forEach { bh.consume(transformArray(it.referenceArray)) }
+                BOOLEAN -> data.forEach { bh.consume(transformBooleanArray(it.booleanArray)) }
+                BYTE -> data.forEach { bh.consume(transformByteArray(it.byteArray)) }
+                CHAR -> data.forEach { bh.consume(transformCharArray(it.charArray)) }
+                SHORT -> data.forEach { bh.consume(transformShortArray(it.shortArray)) }
+                INT -> data.forEach { bh.consume(transformIntArray(it.intArray)) }
+                FLOAT -> data.forEach { bh.consume(transformFloatArray(it.floatArray)) }
+                LONG -> data.forEach { bh.consume(transformLongArray(it.longArray)) }
+                DOUBLE -> data.forEach { bh.consume(transformDoubleArray(it.doubleArray)) }
+            }
+
+            IMMUTABLE_ARRAY -> when (dataType) {
+                REFERENCE -> data.forEach { bh.consume(transformImmutableArray(it.immutableReferenceArray)) }
+                BOOLEAN -> data.forEach { bh.consume(transformImmutableBooleanArray(it.immutableBooleanArray)) }
+                BYTE -> data.forEach { bh.consume(transformImmutableByteArray(it.immutableByteArray)) }
+                CHAR -> data.forEach { bh.consume(transformImmutableCharArray(it.immutableCharArray)) }
+                SHORT -> data.forEach { bh.consume(transformImmutableShortArray(it.immutableShortArray)) }
+                INT -> data.forEach { bh.consume(transformImmutableIntArray(it.immutableIntArray)) }
+                FLOAT -> data.forEach { bh.consume(transformImmutableFloatArray(it.immutableFloatArray)) }
+                LONG -> data.forEach { bh.consume(transformImmutableLongArray(it.immutableLongArray)) }
+                DOUBLE -> data.forEach { bh.consume(transformImmutableDoubleArray(it.immutableDoubleArray)) }
+            }
         }
     }
 }

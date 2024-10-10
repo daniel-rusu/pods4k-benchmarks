@@ -48,54 +48,54 @@ class ImmutableArrayWrapperForDataType(
     random: Random,
     dataType: DataType,
     dataProducer: FlatDataProducer,
-) {
+) : CollectionWrapperForDataType() {
     init {
         // IMPORTANT: This init block is defined above the properties because the data producer needs to be notified
         // that a new collection is about to be created before the properties are initialized.
         dataProducer.startNewCollection(size)
     }
 
-    val immutableReferenceArray: ImmutableArray<String> = when (dataType) {
+    override val immutableReferenceArray: ImmutableArray<String> = when (dataType) {
         DataType.REFERENCE -> ImmutableArray(size) { dataProducer.nextReference(it, random) }
         else -> EMPTY_IMMUTABLE_ARRAY
     }
 
-    val immutableBooleanArray: ImmutableBooleanArray = when (dataType) {
+    override val immutableBooleanArray: ImmutableBooleanArray = when (dataType) {
         DataType.BOOLEAN -> ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
         else -> EMPTY_IMMUTABLE_BOOLEAN_ARRAY
     }
 
-    val immutableByteArray: ImmutableByteArray = when (dataType) {
+    override val immutableByteArray: ImmutableByteArray = when (dataType) {
         DataType.BYTE -> ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
         else -> EMPTY_IMMUTABLE_BYTE_ARRAY
     }
 
-    val immutableCharArray: ImmutableCharArray = when (dataType) {
+    override val immutableCharArray: ImmutableCharArray = when (dataType) {
         DataType.CHAR -> ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
         else -> EMPTY_IMMUTABLE_CHAR_ARRAY
     }
 
-    val immutableShortArray: ImmutableShortArray = when (dataType) {
+    override val immutableShortArray: ImmutableShortArray = when (dataType) {
         DataType.SHORT -> ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
         else -> EMPTY_IMMUTABLE_SHORT_ARRAY
     }
 
-    val immutableIntArray: ImmutableIntArray = when (dataType) {
+    override val immutableIntArray: ImmutableIntArray = when (dataType) {
         DataType.INT -> ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
         else -> EMPTY_IMMUTABLE_INT_ARRAY
     }
 
-    val immutableFloatArray: ImmutableFloatArray = when (dataType) {
+    override val immutableFloatArray: ImmutableFloatArray = when (dataType) {
         DataType.FLOAT -> ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
         else -> EMPTY_IMMUTABLE_FLOAT_ARRAY
     }
 
-    val immutableLongArray: ImmutableLongArray = when (dataType) {
+    override val immutableLongArray: ImmutableLongArray = when (dataType) {
         DataType.LONG -> ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
         else -> EMPTY_IMMUTABLE_LONG_ARRAY
     }
 
-    val immutableDoubleArray: ImmutableDoubleArray = when (dataType) {
+    override val immutableDoubleArray: ImmutableDoubleArray = when (dataType) {
         DataType.DOUBLE -> ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }
         else -> EMPTY_IMMUTABLE_DOUBLE_ARRAY
     }

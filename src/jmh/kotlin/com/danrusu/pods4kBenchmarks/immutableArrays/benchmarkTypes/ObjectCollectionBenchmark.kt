@@ -50,18 +50,11 @@ abstract class ObjectCollectionBenchmark<T> {
      */
     abstract val numCollections: Int
 
-    /**
-     * Controls the sizes of the collections that will be generated.
-     *
-     * Try to use a distribution that represents sizes that are expected in the real world for the type of operation
-     * being performed.
-     */
+    /** Controls the sizes of the collections that will be generated */
     open val sizeDistribution: Distribution
         get() = Distribution.LIST_SIZE_DISTRIBUTION
 
-    /**
-     * Responsible for generated the element data that the collections will contain.
-     */
+    /** Responsible for generated the element data that the collections will contain */
     abstract val elementProducer: Pair<ObjectProducer<T>, Class<T>>
 
     /**
