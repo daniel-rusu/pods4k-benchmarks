@@ -30,46 +30,46 @@ class ArrayWrapperForDataType(
     random: Random,
     dataType: DataType,
     dataProducer: FlatDataProducer,
-) {
+) : CollectionWrapperForDataType() {
     init {
         // IMPORTANT: This init block is defined above the properties because the data producer needs to be notified
         // that a new collection is about to be created before the properties are initialized.
         dataProducer.startNewCollection(size)
     }
 
-    val referenceArray: Array<String> = when (dataType) {
+    override val referenceArray: Array<String> = when (dataType) {
         DataType.REFERENCE -> Array(size) { dataProducer.nextReference(it, random) }
         else -> EMPTY_ARRAY
     }
-    val booleanArray: BooleanArray = when (dataType) {
+    override val booleanArray: BooleanArray = when (dataType) {
         DataType.BOOLEAN -> BooleanArray(size) { dataProducer.nextBoolean(it, random) }
         else -> EMPTY_BOOLEAN_ARRAY
     }
-    val byteArray: ByteArray = when (dataType) {
+    override val byteArray: ByteArray = when (dataType) {
         DataType.BYTE -> ByteArray(size) { dataProducer.nextByte(it, random) }
         else -> EMPTY_BYTE_ARRAY
     }
-    val charArray: CharArray = when (dataType) {
+    override val charArray: CharArray = when (dataType) {
         DataType.CHAR -> CharArray(size) { dataProducer.nextChar(it, random) }
         else -> EMPTY_CHAR_ARRAY
     }
-    val shortArray: ShortArray = when (dataType) {
+    override val shortArray: ShortArray = when (dataType) {
         DataType.SHORT -> ShortArray(size) { dataProducer.nextShort(it, random) }
         else -> EMPTY_SHORT_ARRAY
     }
-    val intArray: IntArray = when (dataType) {
+    override val intArray: IntArray = when (dataType) {
         DataType.INT -> IntArray(size) { dataProducer.nextInt(it, random) }
         else -> EMPTY_INT_ARRAY
     }
-    val floatArray: FloatArray = when (dataType) {
+    override val floatArray: FloatArray = when (dataType) {
         DataType.FLOAT -> FloatArray(size) { dataProducer.nextFloat(it, random) }
         else -> EMPTY_FLOAT_ARRAY
     }
-    val longArray: LongArray = when (dataType) {
+    override val longArray: LongArray = when (dataType) {
         DataType.LONG -> LongArray(size) { dataProducer.nextLong(it, random) }
         else -> EMPTY_LONG_ARRAY
     }
-    val doubleArray: DoubleArray = when (dataType) {
+    override val doubleArray: DoubleArray = when (dataType) {
         DataType.DOUBLE -> DoubleArray(size) { dataProducer.nextDouble(it, random) }
         else -> EMPTY_DOUBLE_ARRAY
     }

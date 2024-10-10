@@ -22,46 +22,46 @@ class ListWrapperForDataType(
     random: Random,
     dataType: DataType,
     dataProducer: FlatDataProducer,
-) {
+) : CollectionWrapperForDataType() {
     init {
         // IMPORTANT: This init block is defined above the properties because the data producer needs to be notified
         // that a new collection is about to be created before the properties are initialized.
         dataProducer.startNewCollection(size)
     }
 
-    val referenceList: List<String> = when (dataType) {
+    override val referenceList: List<String> = when (dataType) {
         DataType.REFERENCE -> (0..<size).map { dataProducer.nextReference(it, random) }
         else -> EMPTY_LIST
     }
-    val booleanList: List<Boolean> = when (dataType) {
+    override val booleanList: List<Boolean> = when (dataType) {
         DataType.BOOLEAN -> (0..<size).map { dataProducer.nextBoolean(it, random) }
         else -> EMPTY_LIST
     }
-    val byteList: List<Byte> = when (dataType) {
+    override val byteList: List<Byte> = when (dataType) {
         DataType.BYTE -> (0..<size).map { dataProducer.nextByte(it, random) }
         else -> EMPTY_LIST
     }
-    val charList: List<Char> = when (dataType) {
+    override val charList: List<Char> = when (dataType) {
         DataType.CHAR -> (0..<size).map { dataProducer.nextChar(it, random) }
         else -> EMPTY_LIST
     }
-    val shortList: List<Short> = when (dataType) {
+    override val shortList: List<Short> = when (dataType) {
         DataType.SHORT -> (0..<size).map { dataProducer.nextShort(it, random) }
         else -> EMPTY_LIST
     }
-    val intList: List<Int> = when (dataType) {
+    override val intList: List<Int> = when (dataType) {
         DataType.INT -> (0..<size).map { dataProducer.nextInt(it, random) }
         else -> EMPTY_LIST
     }
-    val floatList: List<Float> = when (dataType) {
+    override val floatList: List<Float> = when (dataType) {
         DataType.FLOAT -> (0..<size).map { dataProducer.nextFloat(it, random) }
         else -> EMPTY_LIST
     }
-    val longList: List<Long> = when (dataType) {
+    override val longList: List<Long> = when (dataType) {
         DataType.LONG -> (0..<size).map { dataProducer.nextLong(it, random) }
         else -> EMPTY_LIST
     }
-    val doubleList: List<Double> = when (dataType) {
+    override val doubleList: List<Double> = when (dataType) {
         DataType.DOUBLE -> (0..<size).map { dataProducer.nextDouble(it, random) }
         else -> EMPTY_LIST
     }

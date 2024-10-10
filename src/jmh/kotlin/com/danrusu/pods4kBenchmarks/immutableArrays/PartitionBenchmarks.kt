@@ -34,9 +34,10 @@ open class PartitionBenchmarks : FlatCollectionBenchmark() {
         get() = NUM_COLLECTIONS
 
     @Benchmark
-    fun list(bh: Blackhole) {
-        transformEachList(
+    fun partition(bh: Blackhole) {
+        transformEachCollection(
             bh,
+            // lists
             { list: List<String> -> list.partition { it.length % 2 == 0 } },
             { list: List<Boolean> -> list.partition { it } },
             { list: List<Byte> -> list.partition { it >= 0 } },
@@ -46,13 +47,8 @@ open class PartitionBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.partition { it >= 0.5f } },
             { list: List<Long> -> list.partition { it >= 0L } },
             { list: List<Double> -> list.partition { it >= 0.5 } },
-        )
-    }
 
-    @Benchmark
-    fun array(bh: Blackhole) {
-        transformEachArray(
-            bh,
+            // arrays
             { array: Array<String> -> array.partition { it.length % 2 == 0 } },
             { array: BooleanArray -> array.partition { it } },
             { array: ByteArray -> array.partition { it >= 0 } },
@@ -62,13 +58,8 @@ open class PartitionBenchmarks : FlatCollectionBenchmark() {
             { array: FloatArray -> array.partition { it >= 0.5f } },
             { array: LongArray -> array.partition { it >= 0L } },
             { array: DoubleArray -> array.partition { it >= 0.5 } },
-        )
-    }
 
-    @Benchmark
-    fun immutableArray(bh: Blackhole) {
-        transformEachImmutableArray(
-            bh,
+            // immutable arrays
             { array: ImmutableArray<String> -> array.partition { it.length % 2 == 0 } },
             { array: ImmutableBooleanArray -> array.partition { it } },
             { array: ImmutableByteArray -> array.partition { it >= 0 } },
