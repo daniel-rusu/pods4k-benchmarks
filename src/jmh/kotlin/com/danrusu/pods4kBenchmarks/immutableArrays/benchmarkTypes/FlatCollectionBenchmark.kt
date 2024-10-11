@@ -23,10 +23,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParamete
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapperForDataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.CollectionWrapperForDataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.CollectionWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Level
@@ -80,7 +80,7 @@ abstract class FlatCollectionBenchmark {
     open val dataProducer: FlatDataProducer
         get() = FlatDataProducer.RandomDataProducer
 
-    protected lateinit var data: Array<out CollectionWrapperForDataType>
+    protected lateinit var data: Array<out CollectionWrapper>
 
     @Setup(Level.Trial)
     fun setupCollections() {
@@ -102,33 +102,33 @@ abstract class FlatCollectionBenchmark {
 
     private fun createLists(
         random: Random
-    ): Array<ListWrapperForDataType> = Array(numCollections) {
-        ListWrapperForDataType(
-            size = sizeDistribution.nextValue(random),
+    ): Array<ListWrapper> = Array(numCollections) {
+        ListWrapper.create(
             random = random,
             dataType = dataType,
+            size = sizeDistribution.nextValue(random),
             dataProducer = dataProducer,
         )
     }
 
     private fun createArrays(
         random: Random
-    ): Array<ArrayWrapperForDataType> = Array(numCollections) {
-        ArrayWrapperForDataType(
-            size = sizeDistribution.nextValue(random),
+    ): Array<ArrayWrapper> = Array(numCollections) {
+        ArrayWrapper.create(
             random = random,
             dataType = dataType,
+            size = sizeDistribution.nextValue(random),
             dataProducer = dataProducer,
         )
     }
 
     private fun createImmutableArrays(
         random: Random
-    ): Array<ImmutableArrayWrapperForDataType> = Array(numCollections) {
-        ImmutableArrayWrapperForDataType(
-            size = sizeDistribution.nextValue(random),
+    ): Array<ImmutableArrayWrapper> = Array(numCollections) {
+        ImmutableArrayWrapper.create(
             random = random,
             dataType = dataType,
+            size = sizeDistribution.nextValue(random),
             dataProducer = dataProducer,
         )
     }

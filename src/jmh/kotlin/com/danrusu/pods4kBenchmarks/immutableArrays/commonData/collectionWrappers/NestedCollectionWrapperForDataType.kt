@@ -18,13 +18,13 @@ import kotlin.random.Random
  *
  * For example, for a size of 10 with a data type of [DataType.BOOLEAN] then:
  * - [array]
- *   - will be an array containing 10 [ArrayWrapperForDataType] elements
+ *   - will be an array containing 10 [ArrayWrapper] elements
  *   - the wrappers will each store a primitive BooleanArray with size controlled by the specified distribution
  * - [list]
- *   - will be a list containing 10 [ListWrapperForDataType] elements
+ *   - will be a list containing 10 [ListWrapper] elements
  *   - the wrappers will each store a List<Boolean> with contents copied from the array wrappers
  * - [immutableArray]
- *   - will be an immutable array containing 10 [ImmutableArrayWrapperForDataType] elements
+ *   - will be an immutable array containing 10 [ImmutableArrayWrapper] elements
  *   - the wrappers will each store a ImmutableBooleanArray with contents copied from the array wrappers
  */
 class NestedCollectionWrapperForDataType(
@@ -34,31 +34,31 @@ class NestedCollectionWrapperForDataType(
     nestedCollectionSizeDistribution: Distribution,
     dataProducer: FlatDataProducer,
 ) {
-    val array: Array<ArrayWrapperForDataType> = Array(size) {
-        ArrayWrapperForDataType(
-            size = nestedCollectionSizeDistribution.nextValue(random),
+    val array: Array<ArrayWrapper> = Array(size) {
+        ArrayWrapper.create(
             random = random,
             dataType = dataType,
+            size = nestedCollectionSizeDistribution.nextValue(random),
             dataProducer = dataProducer,
         )
     }
 
     // copy the data from the regular array so that they are tested against identical data
-    val list: List<ListWrapperForDataType> = array.map { arrayWrapper ->
-        ListWrapperForDataType(
-            size = arrayWrapper.size,
+    val list: List<ListWrapper> = array.map { arrayWrapper ->
+        ListWrapper.create(
             random = random,
             dataType = dataType,
+            size = arrayWrapper.size,
             dataProducer = arrayWrapper.copyData(),
         )
     }
 
     // copy the data from the regular array so that they are tested against identical data
-    val immutableArray: ImmutableArray<ImmutableArrayWrapperForDataType> = array.map { arrayWrapper ->
-        ImmutableArrayWrapperForDataType(
-            size = arrayWrapper.size,
+    val immutableArray: ImmutableArray<ImmutableArrayWrapper> = array.map { arrayWrapper ->
+        ImmutableArrayWrapper.create(
             random = random,
             dataType = dataType,
+            size = arrayWrapper.size,
             dataProducer = arrayWrapper.copyData(),
         )
     }.toImmutableArray()

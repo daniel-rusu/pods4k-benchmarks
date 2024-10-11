@@ -2,9 +2,9 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.commonData
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapperForDataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapperForDataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapperForDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.NestedCollectionWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
@@ -47,15 +47,15 @@ class NestedCollections(
         }
     }
 
-    inline fun forEachList(body: (List<ListWrapperForDataType>) -> Unit) {
+    inline fun forEachList(body: (List<ListWrapper>) -> Unit) {
         data.forEach { body(it.list) }
     }
 
-    inline fun forEachArray(body: (Array<ArrayWrapperForDataType>) -> Unit) {
+    inline fun forEachArray(body: (Array<ArrayWrapper>) -> Unit) {
         data.forEach { body(it.array) }
     }
 
-    inline fun forEachImmutableArray(body: (ImmutableArray<ImmutableArrayWrapperForDataType>) -> Unit) {
+    inline fun forEachImmutableArray(body: (ImmutableArray<ImmutableArrayWrapper>) -> Unit) {
         data.forEach { body(it.immutableArray) }
     }
 }

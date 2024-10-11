@@ -10,7 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 
-abstract class CollectionWrapperForDataType {
+abstract class CollectionWrapper {
     open val referenceArray: Array<String>
         get() = throw UnsupportedOperationException()
 
