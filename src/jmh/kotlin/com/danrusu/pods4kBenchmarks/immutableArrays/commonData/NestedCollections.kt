@@ -8,6 +8,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.NestedCollectionWrapperForDataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import org.openjdk.jmh.infra.Blackhole
 import kotlin.random.Random
 
 /**
@@ -47,15 +48,15 @@ class NestedCollections(
         }
     }
 
-    inline fun forEachList(body: (List<ListWrapper>) -> Unit) {
-        data.forEach { body(it.list) }
+    inline fun transformEachList(bh: Blackhole, body: (List<ListWrapper>) -> Any?) {
+        data.forEach { bh.consume(body(it.list)) }
     }
 
-    inline fun forEachArray(body: (Array<ArrayWrapper>) -> Unit) {
-        data.forEach { body(it.array) }
+    inline fun transformEachArray(bh: Blackhole, body: (Array<ArrayWrapper>) -> Any?) {
+        data.forEach { bh.consume(body(it.array)) }
     }
 
-    inline fun forEachImmutableArray(body: (ImmutableArray<ImmutableArrayWrapper>) -> Unit) {
-        data.forEach { body(it.immutableArray) }
+    inline fun transformEachImmutableArray(bh: Blackhole, body: (ImmutableArray<ImmutableArrayWrapper>) -> Any?) {
+        data.forEach { bh.consume(body(it.immutableArray)) }
     }
 }

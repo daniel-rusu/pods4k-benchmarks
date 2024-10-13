@@ -56,15 +56,15 @@ open class FlatMapBenchmarks {
     @Benchmark
     fun listFlatMap(bh: Blackhole) {
         when (dataType) {
-            REFERENCE -> data.forEachList { list -> bh.consume(list.flatMap { it.referenceList }) }
-            BOOLEAN -> data.forEachList { list -> bh.consume(list.flatMap { it.booleanList }) }
-            BYTE -> data.forEachList { list -> bh.consume(list.flatMap { it.byteList }) }
-            CHAR -> data.forEachList { list -> bh.consume(list.flatMap { it.charList }) }
-            SHORT -> data.forEachList { list -> bh.consume(list.flatMap { it.shortList }) }
-            INT -> data.forEachList { list -> bh.consume(list.flatMap { it.intList }) }
-            FLOAT -> data.forEachList { list -> bh.consume(list.flatMap { it.floatList }) }
-            LONG -> data.forEachList { list -> bh.consume(list.flatMap { it.longList }) }
-            DOUBLE -> data.forEachList { list -> bh.consume(list.flatMap { it.doubleList }) }
+            REFERENCE -> data.transformEachList(bh) { list -> list.flatMap { it.referenceList } }
+            BOOLEAN -> data.transformEachList(bh) { list -> list.flatMap { it.booleanList } }
+            BYTE -> data.transformEachList(bh) { list -> list.flatMap { it.byteList } }
+            CHAR -> data.transformEachList(bh) { list -> list.flatMap { it.charList } }
+            SHORT -> data.transformEachList(bh) { list -> list.flatMap { it.shortList } }
+            INT -> data.transformEachList(bh) { list -> list.flatMap { it.intList } }
+            FLOAT -> data.transformEachList(bh) { list -> list.flatMap { it.floatList } }
+            LONG -> data.transformEachList(bh) { list -> list.flatMap { it.longList } }
+            DOUBLE -> data.transformEachList(bh) { list -> list.flatMap { it.doubleList } }
         }
     }
 
@@ -73,33 +73,30 @@ open class FlatMapBenchmarks {
         // array.flatMap requires a nested iterable, so we need to call asList() on each nested array
         // Note that asList() wraps the array without copying the data as it uses the same array as the backing data
         when (dataType) {
-            REFERENCE -> data.forEachArray { array -> bh.consume(array.flatMap { it.referenceArray.asList() }) }
-            BOOLEAN -> data.forEachArray { array -> bh.consume(array.flatMap { it.booleanArray.asList() }) }
-            BYTE -> data.forEachArray { array -> bh.consume(array.flatMap { it.byteArray.asList() }) }
-            CHAR -> data.forEachArray { array -> bh.consume(array.flatMap { it.charArray.asList() }) }
-            SHORT -> data.forEachArray { array -> bh.consume(array.flatMap { it.shortArray.asList() }) }
-            INT -> data.forEachArray { array -> bh.consume(array.flatMap { it.intArray.asList() }) }
-            FLOAT -> data.forEachArray { array -> bh.consume(array.flatMap { it.floatArray.asList() }) }
-            LONG -> data.forEachArray { array -> bh.consume(array.flatMap { it.longArray.asList() }) }
-            DOUBLE -> data.forEachArray { array -> bh.consume(array.flatMap { it.doubleArray.asList() }) }
+            REFERENCE -> data.transformEachArray(bh) { array -> array.flatMap { it.referenceArray.asList() } }
+            BOOLEAN -> data.transformEachArray(bh) { array -> array.flatMap { it.booleanArray.asList() } }
+            BYTE -> data.transformEachArray(bh) { array -> array.flatMap { it.byteArray.asList() } }
+            CHAR -> data.transformEachArray(bh) { array -> array.flatMap { it.charArray.asList() } }
+            SHORT -> data.transformEachArray(bh) { array -> array.flatMap { it.shortArray.asList() } }
+            INT -> data.transformEachArray(bh) { array -> array.flatMap { it.intArray.asList() } }
+            FLOAT -> data.transformEachArray(bh) { array -> array.flatMap { it.floatArray.asList() } }
+            LONG -> data.transformEachArray(bh) { array -> array.flatMap { it.longArray.asList() } }
+            DOUBLE -> data.transformEachArray(bh) { array -> array.flatMap { it.doubleArray.asList() } }
         }
     }
 
     @Benchmark
     fun immutableArrayFlatMap(bh: Blackhole) {
         when (dataType) {
-            REFERENCE -> data.forEachImmutableArray { array ->
-                bh.consume(array.flatMap { it.immutableReferenceArray })
-            }
-
-            BOOLEAN -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableBooleanArray }) }
-            BYTE -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableByteArray }) }
-            CHAR -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableCharArray }) }
-            SHORT -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableShortArray }) }
-            INT -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableIntArray }) }
-            FLOAT -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableFloatArray }) }
-            LONG -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableLongArray }) }
-            DOUBLE -> data.forEachImmutableArray { array -> bh.consume(array.flatMap { it.immutableDoubleArray }) }
+            REFERENCE -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableReferenceArray } }
+            BOOLEAN -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableBooleanArray } }
+            BYTE -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableByteArray } }
+            CHAR -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableCharArray } }
+            SHORT -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableShortArray } }
+            INT -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableIntArray } }
+            FLOAT -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableFloatArray } }
+            LONG -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableLongArray } }
+            DOUBLE -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableDoubleArray } }
         }
     }
 }
