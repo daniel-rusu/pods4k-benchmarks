@@ -25,13 +25,13 @@ import kotlin.random.Random
  *
  * Benchmarks are parameterized by each of the 3 [CollectionType] values.
  *
- * Subclasses should create 3 benchmark methods for measuring the performance of each of the 3 types of collections
- * and call the appropriate transformation function, like [transformEachList], providing the operations to be performed
- * for each collection of each data type.
+ * Subclasses should create 9 benchmark methods for measuring the performance of an operation for each of the 8 base
+ * types (like Boolean, Int, etc.) plus the most common reference type, String.  The benchmark methods should call
+ * [transformEachCollection] providing the operations to be performed for each collection type.
  *
  * For example, if [numCollections] returns 500, and the data type being measured is [DataType.BOOLEAN], then 500
- * List<Boolean>, 500 BooleanArray, and 500 ImmutableBooleanArray collections will be created.  The provided boolean
- * collection transform, defined in the subclass benchmark, will be called for each of the 500 collections.
+ * List<Boolean>, 500 BooleanArray, and 500 ImmutableBooleanArray collections will be created.  The provided list
+ * transform, defined in [transformEachCollection], will be called for each of the 500 lists.
  */
 @State(Scope.Benchmark)
 abstract class ObjectCollectionBenchmark<T> {

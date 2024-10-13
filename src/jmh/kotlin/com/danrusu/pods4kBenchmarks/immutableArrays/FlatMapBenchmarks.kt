@@ -1,8 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays
 
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.flatMap
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.NestedCollections
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.NestedCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.CHAR
@@ -15,16 +14,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParamete
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
-import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Measurement
 import org.openjdk.jmh.annotations.Mode
 import org.openjdk.jmh.annotations.OperationsPerInvocation
 import org.openjdk.jmh.annotations.OutputTimeUnit
-import org.openjdk.jmh.annotations.Param
-import org.openjdk.jmh.annotations.Scope
-import org.openjdk.jmh.annotations.Setup
-import org.openjdk.jmh.annotations.State
-import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
@@ -37,34 +30,22 @@ private const val NUM_COLLECTIONS = 250
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-@State(Scope.Benchmark)
-open class FlatMapBenchmarks {
-    @Param
-    private lateinit var dataType: DataType
-
-    private lateinit var data: NestedCollections
-
-    @Setup(Level.Trial)
-    fun setupCollections() {
-        data = NestedCollections(numCollections = NUM_COLLECTIONS, dataType = dataType)
-    }
-
-    @TearDown
-    fun tearDown() {
-    }
+open class FlatMapBenchmarks : NestedCollectionBenchmark() {
+    override val numCollections: Int
+        get() = NUM_COLLECTIONS
 
     @Benchmark
     fun listFlatMap(bh: Blackhole) {
         when (dataType) {
-            REFERENCE -> data.transformEachList(bh) { list -> list.flatMap { it.referenceList } }
-            BOOLEAN -> data.transformEachList(bh) { list -> list.flatMap { it.booleanList } }
-            BYTE -> data.transformEachList(bh) { list -> list.flatMap { it.byteList } }
-            CHAR -> data.transformEachList(bh) { list -> list.flatMap { it.charList } }
-            SHORT -> data.transformEachList(bh) { list -> list.flatMap { it.shortList } }
-            INT -> data.transformEachList(bh) { list -> list.flatMap { it.intList } }
-            FLOAT -> data.transformEachList(bh) { list -> list.flatMap { it.floatList } }
-            LONG -> data.transformEachList(bh) { list -> list.flatMap { it.longList } }
-            DOUBLE -> data.transformEachList(bh) { list -> list.flatMap { it.doubleList } }
+            REFERENCE -> transformEachList(bh) { list -> list.flatMap { it.referenceList } }
+            BOOLEAN -> transformEachList(bh) { list -> list.flatMap { it.booleanList } }
+            BYTE -> transformEachList(bh) { list -> list.flatMap { it.byteList } }
+            CHAR -> transformEachList(bh) { list -> list.flatMap { it.charList } }
+            SHORT -> transformEachList(bh) { list -> list.flatMap { it.shortList } }
+            INT -> transformEachList(bh) { list -> list.flatMap { it.intList } }
+            FLOAT -> transformEachList(bh) { list -> list.flatMap { it.floatList } }
+            LONG -> transformEachList(bh) { list -> list.flatMap { it.longList } }
+            DOUBLE -> transformEachList(bh) { list -> list.flatMap { it.doubleList } }
         }
     }
 
@@ -73,30 +54,30 @@ open class FlatMapBenchmarks {
         // array.flatMap requires a nested iterable, so we need to call asList() on each nested array
         // Note that asList() wraps the array without copying the data as it uses the same array as the backing data
         when (dataType) {
-            REFERENCE -> data.transformEachArray(bh) { array -> array.flatMap { it.referenceArray.asList() } }
-            BOOLEAN -> data.transformEachArray(bh) { array -> array.flatMap { it.booleanArray.asList() } }
-            BYTE -> data.transformEachArray(bh) { array -> array.flatMap { it.byteArray.asList() } }
-            CHAR -> data.transformEachArray(bh) { array -> array.flatMap { it.charArray.asList() } }
-            SHORT -> data.transformEachArray(bh) { array -> array.flatMap { it.shortArray.asList() } }
-            INT -> data.transformEachArray(bh) { array -> array.flatMap { it.intArray.asList() } }
-            FLOAT -> data.transformEachArray(bh) { array -> array.flatMap { it.floatArray.asList() } }
-            LONG -> data.transformEachArray(bh) { array -> array.flatMap { it.longArray.asList() } }
-            DOUBLE -> data.transformEachArray(bh) { array -> array.flatMap { it.doubleArray.asList() } }
+            REFERENCE -> transformEachArray(bh) { array -> array.flatMap { it.referenceArray.asList() } }
+            BOOLEAN -> transformEachArray(bh) { array -> array.flatMap { it.booleanArray.asList() } }
+            BYTE -> transformEachArray(bh) { array -> array.flatMap { it.byteArray.asList() } }
+            CHAR -> transformEachArray(bh) { array -> array.flatMap { it.charArray.asList() } }
+            SHORT -> transformEachArray(bh) { array -> array.flatMap { it.shortArray.asList() } }
+            INT -> transformEachArray(bh) { array -> array.flatMap { it.intArray.asList() } }
+            FLOAT -> transformEachArray(bh) { array -> array.flatMap { it.floatArray.asList() } }
+            LONG -> transformEachArray(bh) { array -> array.flatMap { it.longArray.asList() } }
+            DOUBLE -> transformEachArray(bh) { array -> array.flatMap { it.doubleArray.asList() } }
         }
     }
 
     @Benchmark
     fun immutableArrayFlatMap(bh: Blackhole) {
         when (dataType) {
-            REFERENCE -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableReferenceArray } }
-            BOOLEAN -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableBooleanArray } }
-            BYTE -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableByteArray } }
-            CHAR -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableCharArray } }
-            SHORT -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableShortArray } }
-            INT -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableIntArray } }
-            FLOAT -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableFloatArray } }
-            LONG -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableLongArray } }
-            DOUBLE -> data.transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableDoubleArray } }
+            REFERENCE -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableReferenceArray } }
+            BOOLEAN -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableBooleanArray } }
+            BYTE -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableByteArray } }
+            CHAR -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableCharArray } }
+            SHORT -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableShortArray } }
+            INT -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableIntArray } }
+            FLOAT -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableFloatArray } }
+            LONG -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableLongArray } }
+            DOUBLE -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableDoubleArray } }
         }
     }
 }
