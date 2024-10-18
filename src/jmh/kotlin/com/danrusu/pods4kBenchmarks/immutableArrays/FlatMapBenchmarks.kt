@@ -1,16 +1,35 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays
 
+import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.flatMap
 import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.NestedCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.CHAR
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.DOUBLE
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.FLOAT
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.INT
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.LONG
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.REFERENCE
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.SHORT
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.BooleanArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.BooleanListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ByteArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ByteListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.CharArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.CharListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.DoubleArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.DoubleListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.FloatArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.FloatListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableBooleanArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableByteArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableCharArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableDoubleArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableFloatArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableIntArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableLongArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableReferenceArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ImmutableShortArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.IntArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.IntListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.LongArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.LongListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ReferenceArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ReferenceListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ShortArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ShortListWrapper
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -35,49 +54,53 @@ open class FlatMapBenchmarks : NestedCollectionBenchmark() {
         get() = NUM_COLLECTIONS
 
     @Benchmark
-    fun listFlatMap(bh: Blackhole) {
-        when (dataType) {
-            REFERENCE -> transformEachList(bh) { list -> list.flatMap { it.referenceList } }
-            BOOLEAN -> transformEachList(bh) { list -> list.flatMap { it.booleanList } }
-            BYTE -> transformEachList(bh) { list -> list.flatMap { it.byteList } }
-            CHAR -> transformEachList(bh) { list -> list.flatMap { it.charList } }
-            SHORT -> transformEachList(bh) { list -> list.flatMap { it.shortList } }
-            INT -> transformEachList(bh) { list -> list.flatMap { it.intList } }
-            FLOAT -> transformEachList(bh) { list -> list.flatMap { it.floatList } }
-            LONG -> transformEachList(bh) { list -> list.flatMap { it.longList } }
-            DOUBLE -> transformEachList(bh) { list -> list.flatMap { it.doubleList } }
-        }
+    fun list(bh: Blackhole) {
+        transformEachList(
+            bh,
+            { list: List<ReferenceListWrapper> -> list.flatMap { it.referenceList } },
+            { list: List<BooleanListWrapper> -> list.flatMap { it.booleanList } },
+            { list: List<ByteListWrapper> -> list.flatMap { it.byteList } },
+            { list: List<CharListWrapper> -> list.flatMap { it.charList } },
+            { list: List<ShortListWrapper> -> list.flatMap { it.shortList } },
+            { list: List<IntListWrapper> -> list.flatMap { it.intList } },
+            { list: List<FloatListWrapper> -> list.flatMap { it.floatList } },
+            { list: List<LongListWrapper> -> list.flatMap { it.longList } },
+            { list: List<DoubleListWrapper> -> list.flatMap { it.doubleList } },
+        )
+    }
+
+
+    @Benchmark
+    fun array(bh: Blackhole) {
+        // Note that array.flatMap requires a nested iterable, so we need to call asList() on each nested array.  The
+        // asList() function wraps the array without copying the data by using the same array as the backing data
+        transformEachArray(
+            bh,
+            { array: Array<ReferenceArrayWrapper> -> array.flatMap { it.referenceArray.asList() } },
+            { array: Array<BooleanArrayWrapper> -> array.flatMap { it.booleanArray.asList() } },
+            { array: Array<ByteArrayWrapper> -> array.flatMap { it.byteArray.asList() } },
+            { array: Array<CharArrayWrapper> -> array.flatMap { it.charArray.asList() } },
+            { array: Array<ShortArrayWrapper> -> array.flatMap { it.shortArray.asList() } },
+            { array: Array<IntArrayWrapper> -> array.flatMap { it.intArray.asList() } },
+            { array: Array<FloatArrayWrapper> -> array.flatMap { it.floatArray.asList() } },
+            { array: Array<LongArrayWrapper> -> array.flatMap { it.longArray.asList() } },
+            { array: Array<DoubleArrayWrapper> -> array.flatMap { it.doubleArray.asList() } },
+        )
     }
 
     @Benchmark
-    fun arrayFlatMap(bh: Blackhole) {
-        // array.flatMap requires a nested iterable, so we need to call asList() on each nested array
-        // Note that asList() wraps the array without copying the data as it uses the same array as the backing data
-        when (dataType) {
-            REFERENCE -> transformEachArray(bh) { array -> array.flatMap { it.referenceArray.asList() } }
-            BOOLEAN -> transformEachArray(bh) { array -> array.flatMap { it.booleanArray.asList() } }
-            BYTE -> transformEachArray(bh) { array -> array.flatMap { it.byteArray.asList() } }
-            CHAR -> transformEachArray(bh) { array -> array.flatMap { it.charArray.asList() } }
-            SHORT -> transformEachArray(bh) { array -> array.flatMap { it.shortArray.asList() } }
-            INT -> transformEachArray(bh) { array -> array.flatMap { it.intArray.asList() } }
-            FLOAT -> transformEachArray(bh) { array -> array.flatMap { it.floatArray.asList() } }
-            LONG -> transformEachArray(bh) { array -> array.flatMap { it.longArray.asList() } }
-            DOUBLE -> transformEachArray(bh) { array -> array.flatMap { it.doubleArray.asList() } }
-        }
-    }
-
-    @Benchmark
-    fun immutableArrayFlatMap(bh: Blackhole) {
-        when (dataType) {
-            REFERENCE -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableReferenceArray } }
-            BOOLEAN -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableBooleanArray } }
-            BYTE -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableByteArray } }
-            CHAR -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableCharArray } }
-            SHORT -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableShortArray } }
-            INT -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableIntArray } }
-            FLOAT -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableFloatArray } }
-            LONG -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableLongArray } }
-            DOUBLE -> transformEachImmutableArray(bh) { array -> array.flatMap { it.immutableDoubleArray } }
-        }
+    fun immutableArray(bh: Blackhole) {
+        transformEachImmutableArray(
+            bh,
+            { array: ImmutableArray<ImmutableReferenceArrayWrapper> -> array.flatMap { it.immutableReferenceArray } },
+            { array: ImmutableArray<ImmutableBooleanArrayWrapper> -> array.flatMap { it.immutableBooleanArray } },
+            { array: ImmutableArray<ImmutableByteArrayWrapper> -> array.flatMap { it.immutableByteArray } },
+            { array: ImmutableArray<ImmutableCharArrayWrapper> -> array.flatMap { it.immutableCharArray } },
+            { array: ImmutableArray<ImmutableShortArrayWrapper> -> array.flatMap { it.immutableShortArray } },
+            { array: ImmutableArray<ImmutableIntArrayWrapper> -> array.flatMap { it.immutableIntArray } },
+            { array: ImmutableArray<ImmutableFloatArrayWrapper> -> array.flatMap { it.immutableFloatArray } },
+            { array: ImmutableArray<ImmutableLongArrayWrapper> -> array.flatMap { it.immutableLongArray } },
+            { array: ImmutableArray<ImmutableDoubleArrayWrapper> -> array.flatMap { it.immutableDoubleArray } },
+        )
     }
 }

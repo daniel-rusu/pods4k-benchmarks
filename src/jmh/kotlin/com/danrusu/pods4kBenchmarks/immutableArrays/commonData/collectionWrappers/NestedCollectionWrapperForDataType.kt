@@ -34,14 +34,13 @@ class NestedCollectionWrapperForDataType(
     nestedCollectionSizeDistribution: Distribution,
     dataProducer: FlatDataProducer,
 ) {
-    val array: Array<ArrayWrapper> = Array(size) {
-        ArrayWrapper.create(
-            random = random,
-            dataType = dataType,
-            size = nestedCollectionSizeDistribution.nextValue(random),
-            dataProducer = dataProducer,
-        )
-    }
+    val array: Array<out ArrayWrapper> = ArrayWrapper.createWrappers(
+        random = random,
+        dataType = dataType,
+        size = size,
+        nestedCollectionSizeDistribution = nestedCollectionSizeDistribution,
+        dataProducer = dataProducer,
+    )
 
     // copy the data from the regular array so that they are tested against identical data
     val list: List<ListWrapper> = array.map { arrayWrapper ->
