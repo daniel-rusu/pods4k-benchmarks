@@ -10,6 +10,15 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.CHAR
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.DOUBLE
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.FLOAT
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.INT
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.LONG
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.REFERENCE
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import kotlin.random.Random
 
@@ -21,20 +30,17 @@ sealed class ImmutableArrayWrapper : CollectionWrapper() {
             dataType: DataType,
             size: Int,
             dataProducer: FlatDataProducer
-        ): ImmutableArrayWrapper {
-            dataProducer.startNewCollection(size)
+        ): ImmutableArrayWrapper = when (dataType) {
+            REFERENCE -> ImmutableReferenceArrayWrapper(random, size, dataProducer)
+            BOOLEAN -> ImmutableBooleanArrayWrapper(random, size, dataProducer)
+            BYTE -> ImmutableByteArrayWrapper(random, size, dataProducer)
+            CHAR -> ImmutableCharArrayWrapper(random, size, dataProducer)
+            SHORT -> ImmutableShortArrayWrapper(random, size, dataProducer)
+            INT -> ImmutableIntArrayWrapper(random, size, dataProducer)
+            FLOAT -> ImmutableFloatArrayWrapper(random, size, dataProducer)
+            LONG -> ImmutableLongArrayWrapper(random, size, dataProducer)
+            DOUBLE -> ImmutableDoubleArrayWrapper(random, size, dataProducer)
 
-            return when (dataType) {
-                DataType.REFERENCE -> ImmutableReferenceArrayWrapper(random, size, dataProducer)
-                DataType.BOOLEAN -> ImmutableBooleanArrayWrapper(random, size, dataProducer)
-                DataType.BYTE -> ImmutableByteArrayWrapper(random, size, dataProducer)
-                DataType.CHAR -> ImmutableCharArrayWrapper(random, size, dataProducer)
-                DataType.SHORT -> ImmutableShortArrayWrapper(random, size, dataProducer)
-                DataType.INT -> ImmutableIntArrayWrapper(random, size, dataProducer)
-                DataType.FLOAT -> ImmutableFloatArrayWrapper(random, size, dataProducer)
-                DataType.LONG -> ImmutableLongArrayWrapper(random, size, dataProducer)
-                DataType.DOUBLE -> ImmutableDoubleArrayWrapper(random, size, dataProducer)
-            }
         }
     }
 }
@@ -44,6 +50,10 @@ class ImmutableReferenceArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableReferenceArray: ImmutableArray<String> =
         ImmutableArray(size) { dataProducer.nextReference(it, random) }
 }
@@ -53,6 +63,10 @@ class ImmutableBooleanArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableBooleanArray: ImmutableBooleanArray =
         ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
 }
@@ -62,6 +76,10 @@ class ImmutableByteArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableByteArray: ImmutableByteArray =
         ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
 }
@@ -71,6 +89,10 @@ class ImmutableCharArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableCharArray: ImmutableCharArray =
         ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
 }
@@ -80,6 +102,10 @@ class ImmutableShortArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableShortArray: ImmutableShortArray =
         ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
 }
@@ -89,6 +115,10 @@ class ImmutableIntArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableIntArray: ImmutableIntArray = ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
 }
 
@@ -97,6 +127,10 @@ class ImmutableFloatArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableFloatArray: ImmutableFloatArray =
         ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
 }
@@ -106,6 +140,10 @@ class ImmutableLongArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableLongArray: ImmutableLongArray =
         ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
 }
@@ -115,6 +153,10 @@ class ImmutableDoubleArrayWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val immutableDoubleArray: ImmutableDoubleArray =
         ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }
 }

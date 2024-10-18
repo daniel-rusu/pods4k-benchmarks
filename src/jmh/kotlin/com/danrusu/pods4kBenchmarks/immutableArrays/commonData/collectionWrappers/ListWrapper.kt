@@ -1,6 +1,15 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
 
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.CHAR
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.DOUBLE
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.FLOAT
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.INT
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.LONG
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.REFERENCE
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.FlatDataProducer
 import kotlin.random.Random
 
@@ -12,20 +21,16 @@ sealed class ListWrapper : CollectionWrapper() {
             dataType: DataType,
             size: Int,
             dataProducer: FlatDataProducer
-        ): ListWrapper {
-            dataProducer.startNewCollection(size)
-
-            return when (dataType) {
-                DataType.REFERENCE -> ReferenceListWrapper(random, size, dataProducer)
-                DataType.BOOLEAN -> BooleanListWrapper(random, size, dataProducer)
-                DataType.BYTE -> ByteListWrapper(random, size, dataProducer)
-                DataType.CHAR -> CharListWrapper(random, size, dataProducer)
-                DataType.SHORT -> ShortListWrapper(random, size, dataProducer)
-                DataType.INT -> IntListWrapper(random, size, dataProducer)
-                DataType.FLOAT -> FloatListWrapper(random, size, dataProducer)
-                DataType.LONG -> LongListWrapper(random, size, dataProducer)
-                DataType.DOUBLE -> DoubleListWrapper(random, size, dataProducer)
-            }
+        ): ListWrapper = when (dataType) {
+            REFERENCE -> ReferenceListWrapper(random, size, dataProducer)
+            BOOLEAN -> BooleanListWrapper(random, size, dataProducer)
+            BYTE -> ByteListWrapper(random, size, dataProducer)
+            CHAR -> CharListWrapper(random, size, dataProducer)
+            SHORT -> ShortListWrapper(random, size, dataProducer)
+            INT -> IntListWrapper(random, size, dataProducer)
+            FLOAT -> FloatListWrapper(random, size, dataProducer)
+            LONG -> LongListWrapper(random, size, dataProducer)
+            DOUBLE -> DoubleListWrapper(random, size, dataProducer)
         }
     }
 }
@@ -35,6 +40,10 @@ class ReferenceListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val referenceList: List<String> = (0..<size).map { dataProducer.nextReference(it, random) }
 }
 
@@ -43,6 +52,10 @@ class BooleanListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val booleanList: List<Boolean> = (0..<size).map { dataProducer.nextBoolean(it, random) }
 }
 
@@ -51,6 +64,10 @@ class ByteListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val byteList: List<Byte> = (0..<size).map { dataProducer.nextByte(it, random) }
 }
 
@@ -59,6 +76,10 @@ class CharListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val charList: List<Char> = (0..<size).map { dataProducer.nextChar(it, random) }
 }
 
@@ -67,6 +88,10 @@ class ShortListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val shortList: List<Short> = (0..<size).map { dataProducer.nextShort(it, random) }
 }
 
@@ -75,6 +100,10 @@ class IntListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val intList: List<Int> = (0..<size).map { dataProducer.nextInt(it, random) }
 }
 
@@ -83,6 +112,10 @@ class FloatListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val floatList: List<Float> = (0..<size).map { dataProducer.nextFloat(it, random) }
 }
 
@@ -91,6 +124,10 @@ class LongListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val longList: List<Long> = (0..<size).map { dataProducer.nextLong(it, random) }
 }
 
@@ -99,5 +136,9 @@ class DoubleListWrapper(
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ListWrapper() {
+    init {
+        dataProducer.startNewCollection(size)
+    }
+
     override val doubleList: List<Double> = (0..<size).map { dataProducer.nextDouble(it, random) }
 }
