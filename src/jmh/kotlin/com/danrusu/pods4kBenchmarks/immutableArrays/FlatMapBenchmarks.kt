@@ -54,9 +54,10 @@ open class FlatMapBenchmarks : NestedCollectionBenchmark() {
         get() = NUM_COLLECTIONS
 
     @Benchmark
-    fun list(bh: Blackhole) {
-        transformEachList(
+    fun flatMap(bh: Blackhole) {
+        transformEachCollection(
             bh,
+            // lists
             { list: List<ReferenceListWrapper> -> list.flatMap { it.referenceList } },
             { list: List<BooleanListWrapper> -> list.flatMap { it.booleanList } },
             { list: List<ByteListWrapper> -> list.flatMap { it.byteList } },
@@ -66,16 +67,10 @@ open class FlatMapBenchmarks : NestedCollectionBenchmark() {
             { list: List<FloatListWrapper> -> list.flatMap { it.floatList } },
             { list: List<LongListWrapper> -> list.flatMap { it.longList } },
             { list: List<DoubleListWrapper> -> list.flatMap { it.doubleList } },
-        )
-    }
 
-
-    @Benchmark
-    fun array(bh: Blackhole) {
-        // Note that array.flatMap requires a nested iterable, so we need to call asList() on each nested array.  The
-        // asList() function wraps the array without copying the data by using the same array as the backing data
-        transformEachArray(
-            bh,
+            // arrays
+            // Note that array.flatMap requires a nested iterable, so we need to call asList() on each nested array. The
+            // asList() function wraps the array without copying the data by using the same array as the backing data
             { array: Array<ReferenceArrayWrapper> -> array.flatMap { it.referenceArray.asList() } },
             { array: Array<BooleanArrayWrapper> -> array.flatMap { it.booleanArray.asList() } },
             { array: Array<ByteArrayWrapper> -> array.flatMap { it.byteArray.asList() } },
@@ -85,13 +80,8 @@ open class FlatMapBenchmarks : NestedCollectionBenchmark() {
             { array: Array<FloatArrayWrapper> -> array.flatMap { it.floatArray.asList() } },
             { array: Array<LongArrayWrapper> -> array.flatMap { it.longArray.asList() } },
             { array: Array<DoubleArrayWrapper> -> array.flatMap { it.doubleArray.asList() } },
-        )
-    }
 
-    @Benchmark
-    fun immutableArray(bh: Blackhole) {
-        transformEachImmutableArray(
-            bh,
+            // immutable arrays
             { array: ImmutableArray<ImmutableReferenceArrayWrapper> -> array.flatMap { it.immutableReferenceArray } },
             { array: ImmutableArray<ImmutableBooleanArrayWrapper> -> array.flatMap { it.immutableBooleanArray } },
             { array: ImmutableArray<ImmutableByteArrayWrapper> -> array.flatMap { it.immutableByteArray } },

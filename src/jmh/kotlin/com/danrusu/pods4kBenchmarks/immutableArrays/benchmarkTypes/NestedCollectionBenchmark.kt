@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType.BYTE
@@ -57,6 +58,10 @@ import kotlin.random.Random
  */
 @State(Scope.Benchmark)
 abstract class NestedCollectionBenchmark {
+    /** Repeat the benchmarks for each collection type */
+    @Param
+    protected lateinit var collectionType: CollectionType
+
     /**
      * Repeat the benchmarks for each of the 8 base data types plus a String reference type.  Each scenario will
      * prepare the data to have nested collections of this type.
@@ -109,8 +114,11 @@ abstract class NestedCollectionBenchmark {
     fun tearDown() {
     }
 
-    protected inline fun transformEachList(
+    @Suppress("UNCHECKED_CAST")
+    protected inline fun transformEachCollection(
         bh: Blackhole,
+
+        // lists
         transformNestedLists: (List<ReferenceListWrapper>) -> Any?,
         transformNestedBooleanLists: (List<BooleanListWrapper>) -> Any?,
         transformNestedByteLists: (List<ByteListWrapper>) -> Any?,
@@ -120,49 +128,8 @@ abstract class NestedCollectionBenchmark {
         transformNestedFloatLists: (List<FloatListWrapper>) -> Any?,
         transformNestedLongLists: (List<LongListWrapper>) -> Any?,
         transformNestedDoubleLists: (List<DoubleListWrapper>) -> Any?,
-    ) {
-        @Suppress("UNCHECKED_CAST")
-        when (dataType) {
-            REFERENCE -> {
-                data.forEach { bh.consume(transformNestedLists(it.list as List<ReferenceListWrapper>)) }
-            }
 
-            BOOLEAN -> {
-                data.forEach { bh.consume(transformNestedBooleanLists(it.list as List<BooleanListWrapper>)) }
-            }
-
-            BYTE -> {
-                data.forEach { bh.consume(transformNestedByteLists(it.list as List<ByteListWrapper>)) }
-            }
-
-            CHAR -> {
-                data.forEach { bh.consume(transformNestedCharLists(it.list as List<CharListWrapper>)) }
-            }
-
-            SHORT -> {
-                data.forEach { bh.consume(transformNestedShortLists(it.list as List<ShortListWrapper>)) }
-            }
-
-            INT -> {
-                data.forEach { bh.consume(transformNestedIntLists(it.list as List<IntListWrapper>)) }
-            }
-
-            FLOAT -> {
-                data.forEach { bh.consume(transformNestedFloatLists(it.list as List<FloatListWrapper>)) }
-            }
-
-            LONG -> {
-                data.forEach { bh.consume(transformNestedLongLists(it.list as List<LongListWrapper>)) }
-            }
-
-            DOUBLE -> {
-                data.forEach { bh.consume(transformNestedDoubleLists(it.list as List<DoubleListWrapper>)) }
-            }
-        }
-    }
-
-    protected inline fun transformEachArray(
-        bh: Blackhole,
+        // arrays
         transformNestedArrays: (Array<ReferenceArrayWrapper>) -> Any?,
         transformNestedBooleanArrays: (Array<BooleanArrayWrapper>) -> Any?,
         transformNestedByteArrays: (Array<ByteArrayWrapper>) -> Any?,
@@ -172,131 +139,86 @@ abstract class NestedCollectionBenchmark {
         transformNestedFloatArrays: (Array<FloatArrayWrapper>) -> Any?,
         transformNestedLongArrays: (Array<LongArrayWrapper>) -> Any?,
         transformNestedDoubleArrays: (Array<DoubleArrayWrapper>) -> Any?,
-    ) {
-        @Suppress("UNCHECKED_CAST")
-        when (dataType) {
-            REFERENCE -> {
-                data.forEach { bh.consume(transformNestedArrays(it.array as Array<ReferenceArrayWrapper>)) }
-            }
 
-            BOOLEAN -> {
-                data.forEach { bh.consume(transformNestedBooleanArrays(it.array as Array<BooleanArrayWrapper>)) }
-            }
-
-            BYTE -> {
-                data.forEach { bh.consume(transformNestedByteArrays(it.array as Array<ByteArrayWrapper>)) }
-            }
-
-            CHAR -> {
-                data.forEach { bh.consume(transformNestedCharArrays(it.array as Array<CharArrayWrapper>)) }
-            }
-
-            SHORT -> {
-                data.forEach { bh.consume(transformNestedShortArrays(it.array as Array<ShortArrayWrapper>)) }
-            }
-
-            INT -> {
-                data.forEach { bh.consume(transformNestedIntArrays(it.array as Array<IntArrayWrapper>)) }
-            }
-
-            FLOAT -> {
-                data.forEach { bh.consume(transformNestedFloatArrays(it.array as Array<FloatArrayWrapper>)) }
-            }
-
-            LONG -> {
-                data.forEach { bh.consume(transformNestedLongArrays(it.array as Array<LongArrayWrapper>)) }
-            }
-
-            DOUBLE -> {
-                data.forEach { bh.consume(transformNestedDoubleArrays(it.array as Array<DoubleArrayWrapper>)) }
-            }
+        // immutable arrays
+        transformNestedImmutableArrays: (ImmutableArray<ImmutableReferenceArrayWrapper>) -> Any?,
+        transformNestedImmutableBooleanArrays: (ImmutableArray<ImmutableBooleanArrayWrapper>) -> Any?,
+        transformNestedImmutableByteArrays: (ImmutableArray<ImmutableByteArrayWrapper>) -> Any?,
+        transformNestedImmutableCharArrays: (ImmutableArray<ImmutableCharArrayWrapper>) -> Any?,
+        transformNestedImmutableShortArrays: (ImmutableArray<ImmutableShortArrayWrapper>) -> Any?,
+        transformNestedImmutableIntArrays: (ImmutableArray<ImmutableIntArrayWrapper>) -> Any?,
+        transformNestedImmutableFloatArrays: (ImmutableArray<ImmutableFloatArrayWrapper>) -> Any?,
+        transformNestedImmutableLongArrays: (ImmutableArray<ImmutableLongArrayWrapper>) -> Any?,
+        transformNestedImmutableDoubleArrays: (ImmutableArray<ImmutableDoubleArrayWrapper>) -> Any?,
+    ) = when (collectionType) {
+        CollectionType.LIST -> when (dataType) {
+            REFERENCE -> data.forEach { bh.consume(transformNestedLists(it.list as List<ReferenceListWrapper>)) }
+            BOOLEAN -> data.forEach { bh.consume(transformNestedBooleanLists(it.list as List<BooleanListWrapper>)) }
+            BYTE -> data.forEach { bh.consume(transformNestedByteLists(it.list as List<ByteListWrapper>)) }
+            CHAR -> data.forEach { bh.consume(transformNestedCharLists(it.list as List<CharListWrapper>)) }
+            SHORT -> data.forEach { bh.consume(transformNestedShortLists(it.list as List<ShortListWrapper>)) }
+            INT -> data.forEach { bh.consume(transformNestedIntLists(it.list as List<IntListWrapper>)) }
+            FLOAT -> data.forEach { bh.consume(transformNestedFloatLists(it.list as List<FloatListWrapper>)) }
+            LONG -> data.forEach { bh.consume(transformNestedLongLists(it.list as List<LongListWrapper>)) }
+            DOUBLE -> data.forEach { bh.consume(transformNestedDoubleLists(it.list as List<DoubleListWrapper>)) }
         }
-    }
 
-    protected inline fun transformEachImmutableArray(
-        bh: Blackhole,
-        transformNestedArrays: (ImmutableArray<ImmutableReferenceArrayWrapper>) -> Any?,
-        transformNestedBooleanArrays: (ImmutableArray<ImmutableBooleanArrayWrapper>) -> Any?,
-        transformNestedByteArrays: (ImmutableArray<ImmutableByteArrayWrapper>) -> Any?,
-        transformNestedCharArrays: (ImmutableArray<ImmutableCharArrayWrapper>) -> Any?,
-        transformNestedShortArrays: (ImmutableArray<ImmutableShortArrayWrapper>) -> Any?,
-        transformNestedIntArrays: (ImmutableArray<ImmutableIntArrayWrapper>) -> Any?,
-        transformNestedFloatArrays: (ImmutableArray<ImmutableFloatArrayWrapper>) -> Any?,
-        transformNestedLongArrays: (ImmutableArray<ImmutableLongArrayWrapper>) -> Any?,
-        transformNestedDoubleArrays: (ImmutableArray<ImmutableDoubleArrayWrapper>) -> Any?,
-    ) {
-        @Suppress("UNCHECKED_CAST")
-        when (dataType) {
-            REFERENCE -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedArrays(it.immutableArray as ImmutableArray<ImmutableReferenceArrayWrapper>)
-                    )
-                }
+        CollectionType.ARRAY -> when (dataType) {
+            REFERENCE -> data.forEach { bh.consume(transformNestedArrays(it.array as Array<ReferenceArrayWrapper>)) }
+            BOOLEAN -> data.forEach { bh.consume(transformNestedBooleanArrays(it.array as Array<BooleanArrayWrapper>)) }
+            BYTE -> data.forEach { bh.consume(transformNestedByteArrays(it.array as Array<ByteArrayWrapper>)) }
+            CHAR -> data.forEach { bh.consume(transformNestedCharArrays(it.array as Array<CharArrayWrapper>)) }
+            SHORT -> data.forEach { bh.consume(transformNestedShortArrays(it.array as Array<ShortArrayWrapper>)) }
+            INT -> data.forEach { bh.consume(transformNestedIntArrays(it.array as Array<IntArrayWrapper>)) }
+            FLOAT -> data.forEach { bh.consume(transformNestedFloatArrays(it.array as Array<FloatArrayWrapper>)) }
+            LONG -> data.forEach { bh.consume(transformNestedLongArrays(it.array as Array<LongArrayWrapper>)) }
+            DOUBLE -> data.forEach { bh.consume(transformNestedDoubleArrays(it.array as Array<DoubleArrayWrapper>)) }
+        }
+
+        CollectionType.IMMUTABLE_ARRAY -> when (dataType) {
+            REFERENCE -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableReferenceArrayWrapper>
+                bh.consume(transformNestedImmutableArrays(array))
             }
 
-            BOOLEAN -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedBooleanArrays(it.immutableArray as ImmutableArray<ImmutableBooleanArrayWrapper>)
-                    )
-                }
+            BOOLEAN -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableBooleanArrayWrapper>
+                bh.consume(transformNestedImmutableBooleanArrays(array))
             }
 
-            BYTE -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedByteArrays(it.immutableArray as ImmutableArray<ImmutableByteArrayWrapper>)
-                    )
-                }
+            BYTE -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableByteArrayWrapper>
+                bh.consume(transformNestedImmutableByteArrays(array))
             }
 
-            CHAR -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedCharArrays(it.immutableArray as ImmutableArray<ImmutableCharArrayWrapper>)
-                    )
-                }
+            CHAR -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableCharArrayWrapper>
+                bh.consume(transformNestedImmutableCharArrays(array))
             }
 
-            SHORT -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedShortArrays(it.immutableArray as ImmutableArray<ImmutableShortArrayWrapper>)
-                    )
-                }
+            SHORT -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableShortArrayWrapper>
+                bh.consume(transformNestedImmutableShortArrays(array))
             }
 
-            INT -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedIntArrays(it.immutableArray as ImmutableArray<ImmutableIntArrayWrapper>)
-                    )
-                }
+            INT -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableIntArrayWrapper>
+                bh.consume(transformNestedImmutableIntArrays(array))
             }
 
-            FLOAT -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedFloatArrays(it.immutableArray as ImmutableArray<ImmutableFloatArrayWrapper>)
-                    )
-                }
+            FLOAT -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableFloatArrayWrapper>
+                bh.consume(transformNestedImmutableFloatArrays(array))
             }
 
-            LONG -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedLongArrays(it.immutableArray as ImmutableArray<ImmutableLongArrayWrapper>)
-                    )
-                }
+            LONG -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableLongArrayWrapper>
+                bh.consume(transformNestedImmutableLongArrays(array))
             }
 
-            DOUBLE -> {
-                data.forEach {
-                    bh.consume(
-                        transformNestedDoubleArrays(it.immutableArray as ImmutableArray<ImmutableDoubleArrayWrapper>)
-                    )
-                }
+            DOUBLE -> data.forEach {
+                val array = it.immutableArray as ImmutableArray<ImmutableDoubleArrayWrapper>
+                bh.consume(transformNestedImmutableDoubleArrays(array))
             }
         }
     }
