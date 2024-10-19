@@ -35,7 +35,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.IntListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.LongArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.LongListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.NestedCollectionWrapperForDataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.NestedCollectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ReferenceArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ReferenceListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.ShortArrayWrapper
@@ -90,7 +90,7 @@ abstract class NestedCollectionBenchmark {
     open val nestedDataProducer: FlatDataProducer
         get() = FlatDataProducer.RandomDataProducer
 
-    protected lateinit var data: Array<NestedCollectionWrapperForDataType>
+    protected lateinit var data: Array<NestedCollectionWrapper>
 
     @Setup(Level.Trial)
     fun setupCollections() {
@@ -100,7 +100,7 @@ abstract class NestedCollectionBenchmark {
         data = Array(numCollections) {
             val numElements = topLevelSizeDistribution.nextValue(random)
 
-            NestedCollectionWrapperForDataType(
+            NestedCollectionWrapper(
                 size = numElements,
                 random = random,
                 dataType = dataType,

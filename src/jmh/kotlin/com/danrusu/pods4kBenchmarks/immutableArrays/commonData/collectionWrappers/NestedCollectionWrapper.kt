@@ -27,7 +27,7 @@ import kotlin.random.Random
  *   - will be an immutable array containing 10 [ImmutableArrayWrapper] elements
  *   - the wrappers will each store a ImmutableBooleanArray with contents copied from the array wrappers
  */
-class NestedCollectionWrapperForDataType(
+class NestedCollectionWrapper(
     size: Int,
     random: Random,
     dataType: DataType,
@@ -42,12 +42,17 @@ class NestedCollectionWrapperForDataType(
         dataProducer = dataProducer,
     )
 
-    // copy the data from the regular array so that they are tested against identical data
+    /*
+    Note that instead of copying the data, I tried accepting the collection type as a  parameter and using empty
+    collections when it's not of this type but strangely that made the benchmarks significantly slower so be sure to
+    run the benchmarks before & after to ensure such a change doesn't prevent some JVM optimization.
+     */
     val list: List<ListWrapper> = array.map { arrayWrapper ->
         ListWrapper.create(
             random = random,
             dataType = dataType,
             size = arrayWrapper.size,
+            // copy the data from the regular array so that they are tested against identical data
             dataProducer = arrayWrapper.copyData(),
         )
     }
