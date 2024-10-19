@@ -1,13 +1,13 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.CollectionType.LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers.WrapperForCollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.ObjectProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.collectionWrappers.WrapperForCollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.ObjectProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param

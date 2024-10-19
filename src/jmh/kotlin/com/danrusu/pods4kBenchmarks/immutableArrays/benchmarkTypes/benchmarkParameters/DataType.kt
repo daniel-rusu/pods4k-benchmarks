@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.benchmarkParameters
+package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters
 
 enum class DataType {
     REFERENCE,

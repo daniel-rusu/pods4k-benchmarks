@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.commonData.collectionWrappers
+package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.collectionWrappers
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray

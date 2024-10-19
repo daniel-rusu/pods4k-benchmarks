@@ -3,8 +3,8 @@ package com.danrusu.pods4kBenchmarks.immutableArrays
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.ObjectCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.CompoundElement
-import com.danrusu.pods4kBenchmarks.immutableArrays.commonData.dataProducers.ObjectProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.CompoundElement
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.ObjectProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
