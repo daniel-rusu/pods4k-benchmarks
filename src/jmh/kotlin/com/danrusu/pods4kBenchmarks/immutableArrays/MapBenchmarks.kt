@@ -33,7 +33,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         get() = CompoundElementProducer
 
     @Benchmark
-    fun mapReference(bh: Blackhole) {
+    fun benchmarkReferences(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.referenceValue } },
@@ -43,7 +43,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapBoolean(bh: Blackhole) {
+    fun benchmarkBooleans(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.booleanValue } },
@@ -53,7 +53,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapByte(bh: Blackhole) {
+    fun benchmarkBytes(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.byteValue } },
@@ -63,7 +63,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapChar(bh: Blackhole) {
+    fun benchmarkChars(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.charValue } },
@@ -73,7 +73,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapShort(bh: Blackhole) {
+    fun benchmarkShorts(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.shortValue } },
@@ -83,7 +83,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapInt(bh: Blackhole) {
+    fun benchmarkInts(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.intValue } },
@@ -93,7 +93,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapFloat(bh: Blackhole) {
+    fun benchmarkFloats(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.floatValue } },
@@ -103,7 +103,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapLong(bh: Blackhole) {
+    fun benchmarkLongs(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.longValue } },
@@ -113,7 +113,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun mapDouble(bh: Blackhole) {
+    fun benchmarkDoubles(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.doubleValue } },
