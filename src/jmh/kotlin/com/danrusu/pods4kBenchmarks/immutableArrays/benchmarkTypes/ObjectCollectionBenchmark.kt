@@ -55,7 +55,7 @@ abstract class ObjectCollectionBenchmark<T> {
         get() = Distribution.LIST_SIZE_DISTRIBUTION
 
     /** Responsible for generated the element data that the collections will contain */
-    abstract val elementProducer: Pair<ObjectProducer<T>, Class<T>>
+    abstract val objectProducer: ObjectProducer<T>
 
     /**
      * Note: We're storing an array of [WrapperForCollectionType] instances with each wrapper storing the appropriate
@@ -70,8 +70,6 @@ abstract class ObjectCollectionBenchmark<T> {
         // Use constant seed so the data is identical for all benchmarks since they're compared against each other
         val random = Random(0)
 
-        val (objectProducer, objectClass) = elementProducer
-
         data = Array(numCollections) {
             val numElements = sizeDistribution.nextValue(random)
 
@@ -80,7 +78,7 @@ abstract class ObjectCollectionBenchmark<T> {
                 size = numElements,
                 collectionType = collectionType,
                 objectProducer = objectProducer,
-                objectClass = objectClass,
+                objectClass = objectProducer.objectClass,
             )
         }
     }

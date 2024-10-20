@@ -4,6 +4,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.CompoundElement
+import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.CompoundElementProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.ObjectProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -28,8 +29,8 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val elementProducer: Pair<ObjectProducer<CompoundElement>, Class<CompoundElement>>
-        get() = Pair(ObjectProducer.CompoundElementProducer, CompoundElement::class.java)
+    override val objectProducer: ObjectProducer<CompoundElement>
+        get() = CompoundElementProducer
 
     @Benchmark
     fun mapReference(bh: Blackhole) {
