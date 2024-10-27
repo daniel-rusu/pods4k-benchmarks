@@ -14,14 +14,14 @@ and produce more realistic results.
     * `git clone git@github.com:daniel-rusu/pods4k-benchmarks.git`
 2. Choose the benchmarks to be run
     * The benchmark classes are located in `/src/jmh/kotlin/...` (not `/src/main/kotlin`).
-    * Configure the `includes` list in the `jmh` block of [build.gradle.kts](build.gradle.kts) to specify the names of
-      the benchmark classes to run.
+    * Configure the `includes` list in the `jmh` block of [build.gradle.kts](build.gradle.kts) to specify regular
+      expressions that all benchmark class paths must match or comment it out to run all benchmark classes.
 
    ```kotlin
    jmh {
        jmhVersion = libs.versions.jmh
    
-       includes = listOf("MapBenchmarks", "FlatMapBenchmarks")
+       includes = listOf("immutableArrays.MapBenchmarks")
    }
    ```
 3. Prepare your machine

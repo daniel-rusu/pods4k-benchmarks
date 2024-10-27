@@ -36,7 +36,7 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
 jmh {
     jmhVersion = libs.versions.jmh
 
-    // Uncomment this when you want to specify which benchmark classes to run
+    // A list of regular expressions that all benchmark class paths must match.  Comment out to run all benchmarks
     includes = listOf("immutableArrays.MapBenchmarks")
 }
 
