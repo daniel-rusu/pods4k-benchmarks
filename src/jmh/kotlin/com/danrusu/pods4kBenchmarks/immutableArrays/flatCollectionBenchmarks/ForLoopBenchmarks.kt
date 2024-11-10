@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays
+package com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
@@ -29,74 +29,74 @@ private const val NUM_COLLECTIONS = 1000
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class ForEachBenchmarks : FlatCollectionBenchmark() {
+open class ForLoopBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
     @Benchmark
-    fun regularForLoop(bh: Blackhole) {
+    fun forLoop(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
             { list: List<String> ->
                 var result = 0
-                list.forEach { string ->
+                for (string in list) {
                     result += string.length
                 }
                 result
             },
             { list: List<Boolean> ->
                 var result = false
-                list.forEach { value ->
+                for (value in list) {
                     result = result xor value
                 }
                 result
             },
             { list: List<Byte> ->
                 var result = 0
-                list.forEach { value ->
+                for (value in list) {
                     result += value
                 }
                 result
             },
             { list: List<Char> ->
                 var result = 0
-                list.forEach { value ->
+                for (value in list) {
                     result += value.code
                 }
                 result
             },
             { list: List<Short> ->
                 var result = 0
-                list.forEach { value ->
+                for (value in list) {
                     result += value
                 }
                 result
             },
             { list: List<Int> ->
                 var result = 0
-                list.forEach { value ->
+                for (value in list) {
                     result += value
                 }
                 result
             },
             { list: List<Float> ->
                 var result = 0.0f
-                list.forEach { value ->
+                for (value in list) {
                     result += value
                 }
                 result
             },
             { list: List<Long> ->
                 var result = 0L
-                list.forEach { value ->
+                for (value in list) {
                     result += value
                 }
                 result
             },
             { list: List<Double> ->
                 var result = 0.0
-                list.forEach { value ->
+                for (value in list) {
                     result += value
                 }
                 result
@@ -105,63 +105,63 @@ open class ForEachBenchmarks : FlatCollectionBenchmark() {
             // arrays
             { array: Array<String> ->
                 var result = 0
-                array.forEach { string ->
+                for (string in array) {
                     result += string.length
                 }
                 result
             },
             { array: BooleanArray ->
                 var result = false
-                array.forEach { value ->
+                for (value in array) {
                     result = result xor value
                 }
                 result
             },
             { array: ByteArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: CharArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value.code
                 }
                 result
             },
             { array: ShortArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: IntArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: FloatArray ->
                 var result = 0.0f
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: LongArray ->
                 var result = 0L
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: DoubleArray ->
                 var result = 0.0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
@@ -170,63 +170,63 @@ open class ForEachBenchmarks : FlatCollectionBenchmark() {
             // immutable arrays
             { array: ImmutableArray<String> ->
                 var result = 0
-                array.forEach { string ->
+                for (string in array) {
                     result += string.length
                 }
                 result
             },
             { array: ImmutableBooleanArray ->
                 var result = false
-                array.forEach { value ->
+                for (value in array) {
                     result = result xor value
                 }
                 result
             },
             { array: ImmutableByteArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: ImmutableCharArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value.code
                 }
                 result
             },
             { array: ImmutableShortArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: ImmutableIntArray ->
                 var result = 0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: ImmutableFloatArray ->
                 var result = 0.0f
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: ImmutableLongArray ->
                 var result = 0L
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result
             },
             { array: ImmutableDoubleArray ->
                 var result = 0.0
-                array.forEach { value ->
+                for (value in array) {
                     result += value
                 }
                 result

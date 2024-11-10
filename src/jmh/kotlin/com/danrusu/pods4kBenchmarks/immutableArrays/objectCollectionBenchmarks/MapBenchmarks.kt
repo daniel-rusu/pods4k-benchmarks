@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays
+package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
