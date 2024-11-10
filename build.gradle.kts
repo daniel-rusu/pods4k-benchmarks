@@ -37,7 +37,7 @@ jmh {
     jmhVersion = libs.versions.jmh
 
     // A list of regular expressions that all benchmark class paths must match.  Comment out to run all benchmarks
-    includes = listOf("immutableArrays.MapBenchmarks")
+//    includes = listOf("immutableArrays.MapBenchmarks")
 }
 
 // Consider the output of the JMH task always out of date to allow running benchmarks again even if no code changed

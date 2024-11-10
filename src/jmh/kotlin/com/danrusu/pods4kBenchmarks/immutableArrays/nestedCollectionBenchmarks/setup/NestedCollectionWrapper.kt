@@ -1,9 +1,12 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.collectionWrappers
+package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.toImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
 

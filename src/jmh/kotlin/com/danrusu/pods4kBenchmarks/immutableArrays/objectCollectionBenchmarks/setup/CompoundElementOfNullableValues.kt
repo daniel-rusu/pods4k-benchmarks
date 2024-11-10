@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers
+package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
 /** Represents classes that have multiple types of nullable fields */
 class CompoundElementOfNullableValues(

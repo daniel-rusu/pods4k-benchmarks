@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers
+package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import kotlin.random.Random

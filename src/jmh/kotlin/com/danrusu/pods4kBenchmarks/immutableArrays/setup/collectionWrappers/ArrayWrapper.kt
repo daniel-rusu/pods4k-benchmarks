@@ -1,16 +1,16 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.collectionWrappers
+package com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers
 
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.BOOLEAN
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.BYTE
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.CHAR
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.DOUBLE
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.FLOAT
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.INT
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.LONG
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.REFERENCE
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.CHAR
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.DOUBLE
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.FLOAT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
 

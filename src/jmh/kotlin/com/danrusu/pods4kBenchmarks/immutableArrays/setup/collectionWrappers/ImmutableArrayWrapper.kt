@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.collectionWrappers
+package com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
@@ -9,17 +9,17 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.BOOLEAN
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.BYTE
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.CHAR
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.DOUBLE
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.FLOAT
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.INT
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.LONG
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.REFERENCE
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.benchmarkParameters.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.benchmarkTypes.dataProducers.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.CHAR
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.DOUBLE
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.FLOAT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import kotlin.random.Random
 
 /** Represents a wrapper class that stores a single immutable array of the appropriate [DataType] */
