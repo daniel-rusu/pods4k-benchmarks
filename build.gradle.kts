@@ -36,8 +36,18 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
 jmh {
     jmhVersion = libs.versions.jmh
 
-    // A list of regular expressions that all benchmark class paths must match.  Comment out to run all benchmarks
-//    includes = listOf("immutableArrays.MapBenchmarks")
+    // ### Specify which benchmarks to run ###
+
+    // Don't specify any "includes" filter if you want to run all benchmarks (takes several hours)
+
+    // Or specify a category of benchmarks that you're interested in
+    //includes = listOf("immutableArrays")
+
+    // Or specify a sub-category of benchmarks that better resembles your use-case or includes common operations
+    //includes = listOf("immutableArrays.scenarioBenchmarks")
+
+    // Or specify an individual benchmark class
+    includes = listOf("scenarioBenchmarks.matrixOperations.MatrixBenchmarks")
 }
 
 // Consider the output of the JMH task always out of date to allow running benchmarks again even if no code changed
