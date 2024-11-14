@@ -36,17 +36,21 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
 jmh {
     jmhVersion = libs.versions.jmh
 
-    // ### Specify which benchmarks to run ###
+    /*
+    ### Specify which benchmarks to run ###
+    =======================================
+    - Specify an individual benchmark class to run
+    includes = listOf("immutableArrays.nestedCollectionBenchmarks.FlatMapBenchmarks")
 
-    // Don't specify any "includes" filter if you want to run all benchmarks (takes several hours)
+    - Or specify a sub-category of benchmarks that includes common operations or which better resembles your use-case
+    includes = listOf("immutableArrays.scenarioBenchmarks")
 
-    // Or specify a category of benchmarks that you're interested in
-    //includes = listOf("immutableArrays")
+    - Or specify a main category of benchmarks that you're interested in (can take several hours!):
+    includes = listOf("immutableArrays")
 
-    // Or specify a sub-category of benchmarks that better resembles your use-case or includes common operations
-    //includes = listOf("immutableArrays.scenarioBenchmarks")
-
-    // Or specify an individual benchmark class
+    - Or comment out the "includes" filter if you want to run all benchmarks (takes many hours!)
+    // includes = ...
+     */
     includes = listOf("scenarioBenchmarks.matrixOperations.MatrixBenchmarks")
 }
 
