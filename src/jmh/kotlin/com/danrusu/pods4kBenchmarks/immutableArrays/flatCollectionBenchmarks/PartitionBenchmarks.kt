@@ -10,6 +10,8 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -33,42 +35,48 @@ open class PartitionBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
+    override val dataProducer: FlatDataProducer
+        get() = FlatDataFilter.generateData(
+            // statistically, about half of the values will be on the left and the other half on the right on average
+            acceptRatio = 0.5,
+        )
+
     @Benchmark
     fun partition(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.partition { it.length % 2 == 0 } },
-            { list: List<Boolean> -> list.partition { it } },
-            { list: List<Byte> -> list.partition { it >= 0 } },
-            { list: List<Char> -> list.partition { it.code % 2 == 0 } },
-            { list: List<Short> -> list.partition { it >= 0 } },
-            { list: List<Int> -> list.partition { it >= 0 } },
-            { list: List<Float> -> list.partition { it >= 0.5f } },
-            { list: List<Long> -> list.partition { it >= 0L } },
-            { list: List<Double> -> list.partition { it >= 0.5 } },
+            { list: List<String> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Boolean> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Byte> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Char> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Short> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Int> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Float> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Long> -> list.partition { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Double> -> list.partition { FlatDataFilter.shouldAccept(it) } },
 
             // arrays
-            { array: Array<String> -> array.partition { it.length % 2 == 0 } },
-            { array: BooleanArray -> array.partition { it } },
-            { array: ByteArray -> array.partition { it >= 0 } },
-            { array: CharArray -> array.partition { it.code % 2 == 0 } },
-            { array: ShortArray -> array.partition { it >= 0 } },
-            { array: IntArray -> array.partition { it >= 0 } },
-            { array: FloatArray -> array.partition { it >= 0.5f } },
-            { array: LongArray -> array.partition { it >= 0L } },
-            { array: DoubleArray -> array.partition { it >= 0.5 } },
+            { array: Array<String> -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: BooleanArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ByteArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: CharArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ShortArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: IntArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: FloatArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: LongArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: DoubleArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.partition { it.length % 2 == 0 } },
-            { array: ImmutableBooleanArray -> array.partition { it } },
-            { array: ImmutableByteArray -> array.partition { it >= 0 } },
-            { array: ImmutableCharArray -> array.partition { it.code % 2 == 0 } },
-            { array: ImmutableShortArray -> array.partition { it >= 0 } },
-            { array: ImmutableIntArray -> array.partition { it >= 0 } },
-            { array: ImmutableFloatArray -> array.partition { it >= 0.5f } },
-            { array: ImmutableLongArray -> array.partition { it >= 0L } },
-            { array: ImmutableDoubleArray -> array.partition { it >= 0.5 } },
+            { array: ImmutableArray<String> -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableBooleanArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableByteArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableCharArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableShortArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableIntArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableFloatArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableLongArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableDoubleArray -> array.partition { FlatDataFilter.shouldAccept(it) } },
         )
     }
 }

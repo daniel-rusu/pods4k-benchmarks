@@ -5,15 +5,9 @@ import kotlin.random.Random
 private val alphanumericCharacters = ('A'..'Z') + ('a'..'z') + ('0'..'9')
 
 internal object DataGenerator {
-    val DEFAULT_MIN_STRING_LENGTH = 3
-    val DEFAULT_MAX_STRING_LENGTH = 10
-    val DEFAULT_MEDIAN_STRING_LENGTH = (DEFAULT_MAX_STRING_LENGTH - DEFAULT_MIN_STRING_LENGTH) / 2
-
-    val MEDIAN_CHARACTER = alphanumericCharacters.sorted()[alphanumericCharacters.size / 2]
-
     fun randomString(
-        minLength: Int = DEFAULT_MIN_STRING_LENGTH,
-        maxLength: Int = DEFAULT_MAX_STRING_LENGTH,
+        minLength: Int = 3,
+        maxLength: Int = 10,
         random: Random
     ): String {
         require(minLength >= 0) { "minLength ($minLength) cannot be negative" }

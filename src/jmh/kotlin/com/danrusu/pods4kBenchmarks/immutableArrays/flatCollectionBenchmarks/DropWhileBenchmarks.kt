@@ -10,7 +10,8 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -34,42 +35,48 @@ open class DropWhileBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
+    override val dataProducer: FlatDataProducer
+        get() = FlatDataFilter.generateData(
+            // statistically, `dropWhile` will drop about 34 values on average since (0.98)^34 = 50%
+            acceptRatio = 0.98,
+        )
+
     @Benchmark
     fun dropWhile(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.dropWhile { it.length > DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { list: List<Boolean> -> list.dropWhile { it } },
-            { list: List<Byte> -> list.dropWhile { it >= 0 } },
-            { list: List<Char> -> list.dropWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { list: List<Short> -> list.dropWhile { it >= 0 } },
-            { list: List<Int> -> list.dropWhile { it >= 0 } },
-            { list: List<Float> -> list.dropWhile { it >= 0.5f } },
-            { list: List<Long> -> list.dropWhile { it >= 0 } },
-            { list: List<Double> -> list.dropWhile { it >= 0.5 } },
+            { list: List<String> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Boolean> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Byte> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Char> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Short> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Int> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Float> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Long> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Double> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
 
             // arrays
-            { array: Array<String> -> array.dropWhile { it.length >= DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { array: BooleanArray -> array.dropWhile { it } },
-            { array: ByteArray -> array.dropWhile { it >= 0 } },
-            { array: CharArray -> array.dropWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { array: ShortArray -> array.dropWhile { it >= 0 } },
-            { array: IntArray -> array.dropWhile { it >= 0 } },
-            { array: FloatArray -> array.dropWhile { it >= 0.5f } },
-            { array: LongArray -> array.dropWhile { it >= 0 } },
-            { array: DoubleArray -> array.dropWhile { it >= 0.5 } },
+            { array: Array<String> -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: BooleanArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ByteArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: CharArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ShortArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: IntArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: FloatArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: LongArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: DoubleArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.dropWhile { it.length >= DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { array: ImmutableBooleanArray -> array.dropWhile { it } },
-            { array: ImmutableByteArray -> array.dropWhile { it >= 0 } },
-            { array: ImmutableCharArray -> array.dropWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { array: ImmutableShortArray -> array.dropWhile { it >= 0 } },
-            { array: ImmutableIntArray -> array.dropWhile { it >= 0 } },
-            { array: ImmutableFloatArray -> array.dropWhile { it >= 0.5f } },
-            { array: ImmutableLongArray -> array.dropWhile { it >= 0 } },
-            { array: ImmutableDoubleArray -> array.dropWhile { it >= 0.5 } },
+            { array: ImmutableArray<String> -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableBooleanArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableByteArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableCharArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableShortArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableIntArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableFloatArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableLongArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableDoubleArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
         )
     }
 }

@@ -10,7 +10,8 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -34,42 +35,48 @@ open class TakeWhileBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
+    override val dataProducer: FlatDataProducer
+        get() = FlatDataFilter.generateData(
+            // statistically, `takeWhile` will take about 34 values on average since (0.98)^34 = 50%
+            acceptRatio = 0.98,
+        )
+
     @Benchmark
     fun takeWhile(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.takeWhile { it.length > DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { list: List<Boolean> -> list.takeWhile { it } },
-            { list: List<Byte> -> list.takeWhile { it >= 0 } },
-            { list: List<Char> -> list.takeWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { list: List<Short> -> list.takeWhile { it >= 0 } },
-            { list: List<Int> -> list.takeWhile { it >= 0 } },
-            { list: List<Float> -> list.takeWhile { it >= 0.5f } },
-            { list: List<Long> -> list.takeWhile { it >= 0 } },
-            { list: List<Double> -> list.takeWhile { it >= 0.5 } },
+            { list: List<String> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Boolean> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Byte> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Char> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Short> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Int> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Float> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Long> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Double> -> list.takeWhile { FlatDataFilter.shouldAccept(it) } },
 
             // arrays
-            { array: Array<String> -> array.takeWhile { it.length >= DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { array: BooleanArray -> array.takeWhile { it } },
-            { array: ByteArray -> array.takeWhile { it >= 0 } },
-            { array: CharArray -> array.takeWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { array: ShortArray -> array.takeWhile { it >= 0 } },
-            { array: IntArray -> array.takeWhile { it >= 0 } },
-            { array: FloatArray -> array.takeWhile { it >= 0.5f } },
-            { array: LongArray -> array.takeWhile { it >= 0 } },
-            { array: DoubleArray -> array.takeWhile { it >= 0.5 } },
+            { array: Array<String> -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: BooleanArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ByteArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: CharArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ShortArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: IntArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: FloatArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: LongArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: DoubleArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.takeWhile { it.length >= DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { array: ImmutableBooleanArray -> array.takeWhile { it } },
-            { array: ImmutableByteArray -> array.takeWhile { it >= 0 } },
-            { array: ImmutableCharArray -> array.takeWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { array: ImmutableShortArray -> array.takeWhile { it >= 0 } },
-            { array: ImmutableIntArray -> array.takeWhile { it >= 0 } },
-            { array: ImmutableFloatArray -> array.takeWhile { it >= 0.5f } },
-            { array: ImmutableLongArray -> array.takeWhile { it >= 0 } },
-            { array: ImmutableDoubleArray -> array.takeWhile { it >= 0.5 } },
+            { array: ImmutableArray<String> -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableBooleanArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableByteArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableCharArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableShortArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableIntArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableFloatArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableLongArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableDoubleArray -> array.takeWhile { FlatDataFilter.shouldAccept(it) } },
         )
     }
 }

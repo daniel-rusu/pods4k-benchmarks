@@ -10,7 +10,8 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -34,42 +35,48 @@ open class TakeLastWhileBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
+    override val dataProducer: FlatDataProducer
+        get() = FlatDataFilter.generateData(
+            // statistically, `takeLastWhile` will take about 34 values on average since (0.98)^34 = 50%
+            acceptRatio = 0.98,
+        )
+
     @Benchmark
     fun takeLastWhile(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.takeLastWhile { it.length > DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { list: List<Boolean> -> list.takeLastWhile { it } },
-            { list: List<Byte> -> list.takeLastWhile { it >= 0 } },
-            { list: List<Char> -> list.takeLastWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { list: List<Short> -> list.takeLastWhile { it >= 0 } },
-            { list: List<Int> -> list.takeLastWhile { it >= 0 } },
-            { list: List<Float> -> list.takeLastWhile { it >= 0.5f } },
-            { list: List<Long> -> list.takeLastWhile { it >= 0 } },
-            { list: List<Double> -> list.takeLastWhile { it >= 0.5 } },
+            { list: List<String> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Boolean> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Byte> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Char> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Short> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Int> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Float> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Long> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<Double> -> list.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
 
             // arrays
-            { array: Array<String> -> array.takeLastWhile { it.length >= DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { array: BooleanArray -> array.takeLastWhile { it } },
-            { array: ByteArray -> array.takeLastWhile { it >= 0 } },
-            { array: CharArray -> array.takeLastWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { array: ShortArray -> array.takeLastWhile { it >= 0 } },
-            { array: IntArray -> array.takeLastWhile { it >= 0 } },
-            { array: FloatArray -> array.takeLastWhile { it >= 0.5f } },
-            { array: LongArray -> array.takeLastWhile { it >= 0 } },
-            { array: DoubleArray -> array.takeLastWhile { it >= 0.5 } },
+            { array: Array<String> -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: BooleanArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ByteArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: CharArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ShortArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: IntArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: FloatArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: LongArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: DoubleArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.takeLastWhile { it.length >= DataGenerator.DEFAULT_MEDIAN_STRING_LENGTH } },
-            { array: ImmutableBooleanArray -> array.takeLastWhile { it } },
-            { array: ImmutableByteArray -> array.takeLastWhile { it >= 0 } },
-            { array: ImmutableCharArray -> array.takeLastWhile { it >= DataGenerator.MEDIAN_CHARACTER } },
-            { array: ImmutableShortArray -> array.takeLastWhile { it >= 0 } },
-            { array: ImmutableIntArray -> array.takeLastWhile { it >= 0 } },
-            { array: ImmutableFloatArray -> array.takeLastWhile { it >= 0.5f } },
-            { array: ImmutableLongArray -> array.takeLastWhile { it >= 0 } },
-            { array: ImmutableDoubleArray -> array.takeLastWhile { it >= 0.5 } },
+            { array: ImmutableArray<String> -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableBooleanArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableByteArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableCharArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableShortArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableIntArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableFloatArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableLongArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableDoubleArray -> array.takeLastWhile { FlatDataFilter.shouldAccept(it) } },
         )
     }
 }
