@@ -30,6 +30,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Imm
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Level
+import org.openjdk.jmh.annotations.OperationsPerInvocation
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
@@ -205,6 +206,263 @@ abstract class FlatCollectionBenchmark {
                 FLOAT -> data.forEach { bh.consume(transformImmutableFloatArray(it.immutableFloatArray)) }
                 LONG -> data.forEach { bh.consume(transformImmutableLongArray(it.immutableLongArray)) }
                 DOUBLE -> data.forEach { bh.consume(transformImmutableDoubleArray(it.immutableDoubleArray)) }
+            }
+        }
+    }
+
+    /**
+     * Loops through all pairs of collections of the current [CollectionType] and current [dataType] and performs the
+     * associated operation consuming each result with the [Blackhole].
+     *
+     * E.g. If the current collectionType is [CollectionType.LIST] and dataType is [DataType.BOOLEAN], then it calls
+     * [transformBooleanLists] on each pair of boolean lists.
+     *
+     * IMPORTANT:
+     * Since this processes 2 collections at a time without re-using any of them, the number of operations per
+     * benchmark iteration is half of [numCollections] so [OperationsPerInvocation] should be divided by 2.
+     */
+    protected inline fun transformEachPairOfCollections(
+        bh: Blackhole,
+        transformLists: (List<String>, List<String>) -> Any?,
+        transformBooleanLists: (List<Boolean>, List<Boolean>) -> Any?,
+        transformByteLists: (List<Byte>, List<Byte>) -> Any?,
+        transformCharLists: (List<Char>, List<Char>) -> Any?,
+        transformShortLists: (List<Short>, List<Short>) -> Any?,
+        transformIntLists: (List<Int>, List<Int>) -> Any?,
+        transformFloatLists: (List<Float>, List<Float>) -> Any?,
+        transformLongLists: (List<Long>, List<Long>) -> Any?,
+        transformDoubleLists: (List<Double>, List<Double>) -> Any?,
+        transformArrays: (Array<String>, Array<String>) -> Any?,
+        transformBooleanArrays: (BooleanArray, BooleanArray) -> Any?,
+        transformByteArrays: (ByteArray, ByteArray) -> Any?,
+        transformCharArrays: (CharArray, CharArray) -> Any?,
+        transformShortArrays: (ShortArray, ShortArray) -> Any?,
+        transformIntArrays: (IntArray, IntArray) -> Any?,
+        transformFloatArrays: (FloatArray, FloatArray) -> Any?,
+        transformLongArrays: (LongArray, LongArray) -> Any?,
+        transformDoubleArrays: (DoubleArray, DoubleArray) -> Any?,
+        transformImmutableArrays: (ImmutableArray<String>, ImmutableArray<String>) -> Any?,
+        transformImmutableBooleanArrays: (ImmutableBooleanArray, ImmutableBooleanArray) -> Any?,
+        transformImmutableByteArrays: (ImmutableByteArray, ImmutableByteArray) -> Any?,
+        transformImmutableCharArrays: (ImmutableCharArray, ImmutableCharArray) -> Any?,
+        transformImmutableShortArrays: (ImmutableShortArray, ImmutableShortArray) -> Any?,
+        transformImmutableIntArrays: (ImmutableIntArray, ImmutableIntArray) -> Any?,
+        transformImmutableFloatArrays: (ImmutableFloatArray, ImmutableFloatArray) -> Any?,
+        transformImmutableLongArrays: (ImmutableLongArray, ImmutableLongArray) -> Any?,
+        transformImmutableDoubleArrays: (ImmutableDoubleArray, ImmutableDoubleArray) -> Any?,
+    ) {
+        when (collectionType) {
+            LIST -> when (dataType) {
+                REFERENCE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformLists(data[i].referenceList, data[i + 1].referenceList))
+                    }
+                }
+
+                BOOLEAN -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformBooleanLists(data[i].booleanList, data[i + 1].booleanList))
+                    }
+                }
+
+                BYTE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformByteLists(data[i].byteList, data[i + 1].byteList))
+                    }
+                }
+
+                CHAR -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformCharLists(data[i].charList, data[i + 1].charList))
+                    }
+                }
+
+                SHORT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformShortLists(data[i].shortList, data[i + 1].shortList))
+                    }
+                }
+
+                INT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformIntLists(data[i].intList, data[i + 1].intList))
+                    }
+                }
+
+                FLOAT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformFloatLists(data[i].floatList, data[i + 1].floatList))
+                    }
+                }
+
+                LONG -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformLongLists(data[i].longList, data[i + 1].longList))
+                    }
+                }
+
+                DOUBLE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformDoubleLists(data[i].doubleList, data[i + 1].doubleList))
+                    }
+                }
+            }
+
+            ARRAY -> when (dataType) {
+                REFERENCE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformArrays(data[i].referenceArray, data[i + 1].referenceArray))
+                    }
+                }
+
+                BOOLEAN -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformBooleanArrays(data[i].booleanArray, data[i + 1].booleanArray))
+                    }
+                }
+
+                BYTE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformByteArrays(data[i].byteArray, data[i + 1].byteArray))
+                    }
+                }
+
+                CHAR -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformCharArrays(data[i].charArray, data[i + 1].charArray))
+                    }
+                }
+
+                SHORT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformShortArrays(data[i].shortArray, data[i + 1].shortArray))
+                    }
+                }
+
+                INT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformIntArrays(data[i].intArray, data[i + 1].intArray))
+                    }
+                }
+
+                FLOAT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformFloatArrays(data[i].floatArray, data[i + 1].floatArray))
+                    }
+                }
+
+                LONG -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformLongArrays(data[i].longArray, data[i + 1].longArray))
+                    }
+                }
+
+                DOUBLE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(transformDoubleArrays(data[i].doubleArray, data[i + 1].doubleArray))
+                    }
+                }
+            }
+
+            IMMUTABLE_ARRAY -> when (dataType) {
+                REFERENCE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableArrays(
+                                data[i].immutableReferenceArray,
+                                data[i + 1].immutableReferenceArray,
+                            )
+                        )
+                    }
+                }
+
+                BOOLEAN -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableBooleanArrays(
+                                data[i].immutableBooleanArray,
+                                data[i + 1].immutableBooleanArray,
+                            )
+                        )
+                    }
+                }
+
+                BYTE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableByteArrays(
+                                data[i].immutableByteArray,
+                                data[i + 1].immutableByteArray,
+                            )
+                        )
+                    }
+                }
+
+                CHAR -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableCharArrays(
+                                data[i].immutableCharArray,
+                                data[i + 1].immutableCharArray,
+                            )
+                        )
+                    }
+                }
+
+                SHORT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableShortArrays(
+                                data[i].immutableShortArray,
+                                data[i + 1].immutableShortArray,
+                            )
+                        )
+                    }
+                }
+
+                INT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableIntArrays(
+                                data[i].immutableIntArray,
+                                data[i + 1].immutableIntArray,
+                            )
+                        )
+                    }
+                }
+
+                FLOAT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableFloatArrays(
+                                data[i].immutableFloatArray,
+                                data[i + 1].immutableFloatArray,
+                            )
+                        )
+                    }
+                }
+
+                LONG -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableLongArrays(
+                                data[i].immutableLongArray,
+                                data[i + 1].immutableLongArray,
+                            )
+                        )
+                    }
+                }
+
+                DOUBLE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformImmutableDoubleArrays(
+                                data[i].immutableDoubleArray,
+                                data[i + 1].immutableDoubleArray,
+                            )
+                        )
+                    }
+                }
             }
         }
     }

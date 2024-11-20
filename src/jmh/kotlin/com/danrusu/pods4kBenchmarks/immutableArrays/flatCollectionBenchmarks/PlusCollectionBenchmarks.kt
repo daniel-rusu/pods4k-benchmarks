@@ -26,7 +26,7 @@ private const val NUM_COLLECTIONS = 1000
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@OperationsPerInvocation(NUM_COLLECTIONS)
+@OperationsPerInvocation(NUM_COLLECTIONS / 2)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
@@ -36,40 +36,40 @@ open class PlusCollectionBenchmarks : FlatCollectionBenchmark() {
 
     @Benchmark
     fun plusCollection(bh: Blackhole) {
-        transformEachCollection(
+        transformEachPairOfCollections(
             bh,
             // lists
-            { list: List<String> -> list + list },
-            { list: List<Boolean> -> list + list },
-            { list: List<Byte> -> list + list },
-            { list: List<Char> -> list + list },
-            { list: List<Short> -> list + list },
-            { list: List<Int> -> list + list },
-            { list: List<Float> -> list + list },
-            { list: List<Long> -> list + list },
-            { list: List<Double> -> list + list },
+            { first: List<String>, second: List<String> -> first + second },
+            { first: List<Boolean>, second: List<Boolean> -> first + second },
+            { first: List<Byte>, second: List<Byte> -> first + second },
+            { first: List<Char>, second: List<Char> -> first + second },
+            { first: List<Short>, second: List<Short> -> first + second },
+            { first: List<Int>, second: List<Int> -> first + second },
+            { first: List<Float>, second: List<Float> -> first + second },
+            { first: List<Long>, second: List<Long> -> first + second },
+            { first: List<Double>, second: List<Double> -> first + second },
 
             // arrays
-            { array: Array<String> -> array + array },
-            { array: BooleanArray -> array + array },
-            { array: ByteArray -> array + array },
-            { array: CharArray -> array + array },
-            { array: ShortArray -> array + array },
-            { array: IntArray -> array + array },
-            { array: FloatArray -> array + array },
-            { array: LongArray -> array + array },
-            { array: DoubleArray -> array + array },
+            { first: Array<String>, second: Array<String> -> first + second },
+            { first: BooleanArray, second: BooleanArray -> first + second },
+            { first: ByteArray, second: ByteArray -> first + second },
+            { first: CharArray, second: CharArray -> first + second },
+            { first: ShortArray, second: ShortArray -> first + second },
+            { first: IntArray, second: IntArray -> first + second },
+            { first: FloatArray, second: FloatArray -> first + second },
+            { first: LongArray, second: LongArray -> first + second },
+            { first: DoubleArray, second: DoubleArray -> first + second },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array + array },
-            { array: ImmutableBooleanArray -> array + array },
-            { array: ImmutableByteArray -> array + array },
-            { array: ImmutableCharArray -> array + array },
-            { array: ImmutableShortArray -> array + array },
-            { array: ImmutableIntArray -> array + array },
-            { array: ImmutableFloatArray -> array + array },
-            { array: ImmutableLongArray -> array + array },
-            { array: ImmutableDoubleArray -> array + array },
+            { first: ImmutableArray<String>, second: ImmutableArray<String> -> first + second },
+            { first: ImmutableBooleanArray, second: ImmutableBooleanArray -> first + second },
+            { first: ImmutableByteArray, second: ImmutableByteArray -> first + second },
+            { first: ImmutableCharArray, second: ImmutableCharArray -> first + second },
+            { first: ImmutableShortArray, second: ImmutableShortArray -> first + second },
+            { first: ImmutableIntArray, second: ImmutableIntArray -> first + second },
+            { first: ImmutableFloatArray, second: ImmutableFloatArray -> first + second },
+            { first: ImmutableLongArray, second: ImmutableLongArray -> first + second },
+            { first: ImmutableDoubleArray, second: ImmutableDoubleArray -> first + second },
         )
     }
 }
