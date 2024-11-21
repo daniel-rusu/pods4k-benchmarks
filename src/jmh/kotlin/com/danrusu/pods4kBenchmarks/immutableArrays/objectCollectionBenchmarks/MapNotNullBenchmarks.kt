@@ -2,9 +2,9 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.mapNotNull
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValues
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValuesProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -33,7 +33,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         get() = CompoundElementOfNullableValuesProducer(nullRatio = 0.5)
 
     @Benchmark
-    fun benchmarkReferences(bh: Blackhole) {
+    fun mapNotNullReference(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableReference } },
@@ -43,7 +43,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkBooleans(bh: Blackhole) {
+    fun mapNotNullBoolean(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableBoolean } },
@@ -53,7 +53,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkBytes(bh: Blackhole) {
+    fun mapNotNullByte(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableByte } },
@@ -63,7 +63,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkChars(bh: Blackhole) {
+    fun mapNotNullChar(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableChar } },
@@ -73,7 +73,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkShorts(bh: Blackhole) {
+    fun mapNotNullShort(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableShort } },
@@ -83,7 +83,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkInts(bh: Blackhole) {
+    fun mapNotNullInt(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableInt } },
@@ -93,7 +93,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkFloats(bh: Blackhole) {
+    fun mapNotNullFloat(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableFloat } },
@@ -103,7 +103,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkLongs(bh: Blackhole) {
+    fun mapNotNullLong(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableLong } },
@@ -113,7 +113,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     }
 
     @Benchmark
-    fun benchmarkDoubles(bh: Blackhole) {
+    fun mapNotNullDouble(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableDouble } },

@@ -2,9 +2,9 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElement
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducer
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -33,7 +33,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         get() = CompoundElementProducer
 
     @Benchmark
-    fun benchmarkReferences(bh: Blackhole) {
+    fun mapReference(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.referenceValue } },
@@ -43,7 +43,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkBooleans(bh: Blackhole) {
+    fun mapBoolean(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.booleanValue } },
@@ -53,7 +53,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkBytes(bh: Blackhole) {
+    fun mapByte(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.byteValue } },
@@ -63,7 +63,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkChars(bh: Blackhole) {
+    fun mapChar(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.charValue } },
@@ -73,7 +73,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkShorts(bh: Blackhole) {
+    fun mapShort(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.shortValue } },
@@ -83,7 +83,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkInts(bh: Blackhole) {
+    fun mapInt(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.intValue } },
@@ -93,7 +93,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkFloats(bh: Blackhole) {
+    fun mapFloat(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.floatValue } },
@@ -103,7 +103,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkLongs(bh: Blackhole) {
+    fun mapLong(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.longValue } },
@@ -113,7 +113,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     }
 
     @Benchmark
-    fun benchmarkDoubles(bh: Blackhole) {
+    fun mapDouble(bh: Blackhole) {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.doubleValue } },
