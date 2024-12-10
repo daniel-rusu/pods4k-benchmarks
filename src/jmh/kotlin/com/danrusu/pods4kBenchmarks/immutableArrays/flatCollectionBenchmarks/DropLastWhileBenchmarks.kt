@@ -12,7 +12,6 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
-import com.danrusu.pods4kBenchmarks.utils.Distribution
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -23,10 +22,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit
 import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
-
-fun main() {
-    println(Distribution.LIST_SIZE_DISTRIBUTION.averageValue)
-}
 
 private const val NUM_COLLECTIONS = 1000
 
