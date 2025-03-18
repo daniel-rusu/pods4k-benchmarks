@@ -51,7 +51,7 @@ jmh {
     - Or comment out the "includes" filter if you want to run all benchmarks (takes many hours!)
     // includes = ...
      */
-    includes = listOf("scenarioBenchmarks.matrixOperations.MatrixBenchmarks")
+    includes = listOf("FilterBenchmarks")
 }
 
 // Consider the output of the JMH task always out of date to allow running benchmarks again even if no code changed
