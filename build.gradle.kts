@@ -40,10 +40,10 @@ jmh {
     ### Specify which benchmarks to run ###
     =======================================
     - Specify an individual benchmark class to run
-    includes = listOf("immutableArrays.nestedCollectionBenchmarks.FlatMapBenchmarks")
+    includes = listOf("immutableArrays.objectCollectionBenchmarks.MapBenchmarks")
 
     - Or specify a sub-category of benchmarks that includes common operations or which better resembles your use-case
-    includes = listOf("immutableArrays.scenarioBenchmarks")
+    includes = listOf("immutableArrays.flatCollectionBenchmarks")
 
     - Or specify a main category of benchmarks that you're interested in (can take several hours!):
     includes = listOf("immutableArrays")
