@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.9.25" # https://kotlinlang.org/docs/releases.html#release-details
-jUnit = "5.12.2" # https://github.com/junit-team/junit5
-jUnitPlatformLauncher = "1.12.2" # https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
+jUnit = "5.13.4" # https://github.com/junit-team/junit5
+jUnitPlatformLauncher = "1.13.4" # https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
 strikt = "0.35.1" # https://github.com/robfletcher/strikt/releases/latest
 jmhGradlePlugin = "0.7.2" # https://github.com/melix/jmh-gradle-plugin
 jmh = "1.37" # https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
