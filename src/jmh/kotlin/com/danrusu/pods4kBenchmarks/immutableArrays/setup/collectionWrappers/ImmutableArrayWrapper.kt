@@ -54,6 +54,9 @@ class ImmutableReferenceArrayWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = immutableReferenceArray.size
+
     override val immutableReferenceArray: ImmutableArray<String> =
         ImmutableArray(size) { dataProducer.nextReference(it, random) }
 }
@@ -66,6 +69,9 @@ class ImmutableBooleanArrayWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = immutableBooleanArray.size
 
     override val immutableBooleanArray: ImmutableBooleanArray =
         ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
@@ -80,6 +86,9 @@ class ImmutableByteArrayWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = immutableByteArray.size
+
     override val immutableByteArray: ImmutableByteArray =
         ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
 }
@@ -92,6 +101,9 @@ class ImmutableCharArrayWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = immutableCharArray.size
 
     override val immutableCharArray: ImmutableCharArray =
         ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
@@ -106,6 +118,9 @@ class ImmutableShortArrayWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = immutableShortArray.size
+
     override val immutableShortArray: ImmutableShortArray =
         ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
 }
@@ -119,6 +134,9 @@ class ImmutableIntArrayWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = immutableIntArray.size
+
     override val immutableIntArray: ImmutableIntArray = ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
 }
 
@@ -130,6 +148,9 @@ class ImmutableFloatArrayWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = immutableFloatArray.size
 
     override val immutableFloatArray: ImmutableFloatArray =
         ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
@@ -144,6 +165,9 @@ class ImmutableLongArrayWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = immutableLongArray.size
+
     override val immutableLongArray: ImmutableLongArray =
         ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
 }
@@ -156,6 +180,9 @@ class ImmutableDoubleArrayWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = immutableDoubleArray.size
 
     override val immutableDoubleArray: ImmutableDoubleArray =
         ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }

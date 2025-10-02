@@ -11,6 +11,8 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 
 abstract class CollectionWrapper {
+    abstract val size: Int
+
     open val referenceArray: Array<String>
         get() = throw UnsupportedOperationException()
 

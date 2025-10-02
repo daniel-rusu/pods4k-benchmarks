@@ -15,7 +15,7 @@ import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlin.random.Random
 
 /** Represents a wrapper class that stores a single array of the appropriate [DataType] */
-sealed class ArrayWrapper(val size: Int) : CollectionWrapper() {
+sealed class ArrayWrapper : CollectionWrapper() {
     companion object {
         fun create(
             random: Random,
@@ -108,10 +108,13 @@ class ReferenceArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = referenceArray.size
 
     override val referenceArray: Array<String> = Array(size) { dataProducer.nextReference(it, random) }
 }
@@ -120,10 +123,13 @@ class BooleanArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = booleanArray.size
 
     override val booleanArray: BooleanArray = BooleanArray(size) { dataProducer.nextBoolean(it, random) }
 }
@@ -132,10 +138,13 @@ class ByteArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = byteArray.size
 
     override val byteArray: ByteArray = ByteArray(size) { dataProducer.nextByte(it, random) }
 }
@@ -144,10 +153,13 @@ class CharArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = charArray.size
 
     override val charArray: CharArray = CharArray(size) { dataProducer.nextChar(it, random) }
 }
@@ -156,10 +168,13 @@ class ShortArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = shortArray.size
 
     override val shortArray: ShortArray = ShortArray(size) { dataProducer.nextShort(it, random) }
 }
@@ -168,10 +183,13 @@ class IntArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = intArray.size
 
     override val intArray: IntArray = IntArray(size) { dataProducer.nextInt(it, random) }
 }
@@ -180,10 +198,13 @@ class FloatArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = floatArray.size
 
     override val floatArray: FloatArray = FloatArray(size) { dataProducer.nextFloat(it, random) }
 }
@@ -192,10 +213,13 @@ class LongArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = longArray.size
 
     override val longArray: LongArray = LongArray(size) { dataProducer.nextLong(it, random) }
 }
@@ -204,10 +228,13 @@ class DoubleArrayWrapper(
     random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
-) : ArrayWrapper(size) {
+) : ArrayWrapper() {
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = doubleArray.size
 
     override val doubleArray: DoubleArray = DoubleArray(size) { dataProducer.nextDouble(it, random) }
 }

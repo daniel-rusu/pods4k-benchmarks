@@ -44,6 +44,9 @@ class ReferenceListWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = referenceList.size
+
     override val referenceList: List<String> = createList(size) { dataProducer.nextReference(it, random) }
 }
 
@@ -55,6 +58,9 @@ class BooleanListWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = booleanList.size
 
     override val booleanList: List<Boolean> = createList(size) { dataProducer.nextBoolean(it, random) }
 }
@@ -68,6 +74,9 @@ class ByteListWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = byteList.size
+
     override val byteList: List<Byte> = createList(size) { dataProducer.nextByte(it, random) }
 }
 
@@ -79,6 +88,9 @@ class CharListWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = charList.size
 
     override val charList: List<Char> = createList(size) { dataProducer.nextChar(it, random) }
 }
@@ -92,6 +104,9 @@ class ShortListWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = shortList.size
+
     override val shortList: List<Short> = createList(size) { dataProducer.nextShort(it, random) }
 }
 
@@ -103,6 +118,9 @@ class IntListWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = intList.size
 
     override val intList: List<Int> = createList(size) { dataProducer.nextInt(it, random) }
 }
@@ -116,6 +134,9 @@ class FloatListWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = floatList.size
+
     override val floatList: List<Float> = createList(size) { dataProducer.nextFloat(it, random) }
 }
 
@@ -128,6 +149,9 @@ class LongListWrapper(
         dataProducer.startNewCollection(size)
     }
 
+    override val size: Int
+        get() = longList.size
+
     override val longList: List<Long> = createList(size) { dataProducer.nextLong(it, random) }
 }
 
@@ -139,6 +163,9 @@ class DoubleListWrapper(
     init {
         dataProducer.startNewCollection(size)
     }
+
+    override val size: Int
+        get() = doubleList.size
 
     override val doubleList: List<Double> = createList(size) { dataProducer.nextDouble(it, random) }
 }
