@@ -42,39 +42,39 @@ sealed class ArrayWrapper : CollectionWrapper() {
             dataProducer: FlatDataProducer
         ): Array<out ArrayWrapper> = when (dataType) {
             REFERENCE -> Array(size) {
-                ReferenceArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                ReferenceArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             BOOLEAN -> Array(size) {
-                BooleanArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                BooleanArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             BYTE -> Array(size) {
-                ByteArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                ByteArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             CHAR -> Array(size) {
-                CharArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                CharArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             SHORT -> Array(size) {
-                ShortArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                ShortArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             INT -> Array(size) {
-                IntArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                IntArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             FLOAT -> Array(size) {
-                FloatArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                FloatArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             LONG -> Array(size) {
-                LongArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                LongArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
 
             DOUBLE -> Array(size) {
-                DoubleArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(random), dataProducer)
+                DoubleArrayWrapper(random, nestedCollectionSizeDistribution.nextValue(), dataProducer)
             }
         }
     }

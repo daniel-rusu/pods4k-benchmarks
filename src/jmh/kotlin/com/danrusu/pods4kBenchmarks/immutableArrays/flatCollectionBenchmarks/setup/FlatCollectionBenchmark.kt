@@ -29,6 +29,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Col
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.OperationsPerInvocation
 import org.openjdk.jmh.annotations.Param
@@ -74,8 +75,8 @@ abstract class FlatCollectionBenchmark {
     abstract val numCollections: Int
 
     /** Controls the sizes of the collections that will be generated */
-    open val sizeDistribution: Distribution
-        get() = Distribution.LIST_SIZE_DISTRIBUTION
+    open val sizeDistributionFactory: DistributionFactory
+        get() = DistributionFactory.ListSizeDistribution
 
     /** Responsible for generating the element data that the collections will contain */
     open val dataProducer: FlatDataProducer
@@ -87,13 +88,13 @@ abstract class FlatCollectionBenchmark {
     fun setupCollections() {
         // Use constant seed so the data is identical for all benchmarks since they're compared against each other
         val random = Random(0)
+        val sizeDistribution = sizeDistributionFactory.create(random)
 
         data = when (collectionType) {
-            LIST -> createLists(random)
-            ARRAY -> createArrays(random)
-            IMMUTABLE_ARRAY -> createImmutableArrays(random)
+            LIST -> createLists(random, sizeDistribution)
+            ARRAY -> createArrays(random, sizeDistribution)
+            IMMUTABLE_ARRAY -> createImmutableArrays(random, sizeDistribution)
         }
-
     }
 
     @TearDown
@@ -102,34 +103,37 @@ abstract class FlatCollectionBenchmark {
     }
 
     private fun createLists(
-        random: Random
+        random: Random,
+        sizeDistribution: Distribution
     ): Array<ListWrapper> = Array(numCollections) {
         ListWrapper.create(
             random = random,
             dataType = dataType,
-            size = sizeDistribution.nextValue(random),
+            size = sizeDistribution.nextValue(),
             dataProducer = dataProducer,
         )
     }
 
     private fun createArrays(
-        random: Random
+        random: Random,
+        sizeDistribution: Distribution
     ): Array<ArrayWrapper> = Array(numCollections) {
         ArrayWrapper.create(
             random = random,
             dataType = dataType,
-            size = sizeDistribution.nextValue(random),
+            size = sizeDistribution.nextValue(),
             dataProducer = dataProducer,
         )
     }
 
     private fun createImmutableArrays(
-        random: Random
+        random: Random,
+        sizeDistribution: Distribution
     ): Array<ImmutableArrayWrapper> = Array(numCollections) {
         ImmutableArrayWrapper.create(
             random = random,
             dataType = dataType,
-            size = sizeDistribution.nextValue(random),
+            size = sizeDistribution.nextValue(),
             dataProducer = dataProducer,
         )
     }

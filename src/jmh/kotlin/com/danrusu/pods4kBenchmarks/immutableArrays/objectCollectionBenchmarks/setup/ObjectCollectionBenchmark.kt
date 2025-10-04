@@ -6,7 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
@@ -49,8 +49,8 @@ abstract class ObjectCollectionBenchmark<T> {
     abstract val numCollections: Int
 
     /** Controls the sizes of the collections that will be generated */
-    open val sizeDistribution: Distribution
-        get() = Distribution.LIST_SIZE_DISTRIBUTION
+    open val sizeDistributionFactory: DistributionFactory
+        get() = DistributionFactory.ListSizeDistribution
 
     /** Responsible for generated the element data that the collections will contain */
     abstract val objectProducer: ObjectProducer<T>
@@ -67,9 +67,10 @@ abstract class ObjectCollectionBenchmark<T> {
     fun setupCollections() {
         // Use constant seed so the data is identical for all benchmarks since they're compared against each other
         val random = Random(0)
+        val sizeDistribution = sizeDistributionFactory.create(random)
 
         data = Array(numCollections) {
-            val numElements = sizeDistribution.nextValue(random)
+            val numElements = sizeDistribution.nextValue()
 
             WrapperForCollectionType(
                 random = random,
@@ -83,6 +84,7 @@ abstract class ObjectCollectionBenchmark<T> {
 
     @TearDown
     fun tearDown() {
+        data = emptyArray()
     }
 
     /**

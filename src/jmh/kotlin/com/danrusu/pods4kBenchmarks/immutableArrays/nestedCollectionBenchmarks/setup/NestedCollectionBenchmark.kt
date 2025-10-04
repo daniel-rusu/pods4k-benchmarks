@@ -12,6 +12,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteArrayWrapper
@@ -39,8 +40,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Ref
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
-import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
@@ -78,12 +78,12 @@ abstract class NestedCollectionBenchmark {
     abstract val numCollections: Int
 
     /** Controls the sizes of the parent collections that will be generated */
-    open val topLevelSizeDistribution: Distribution
-        get() = Distribution.LIST_SIZE_DISTRIBUTION
+    open val topLevelSizeDistributionFactory: DistributionFactory
+        get() = DistributionFactory.ListSizeDistribution
 
     /** Controls the sizes of the nested collections that will be generated */
-    open val nestedCollectionSizeDistribution: Distribution
-        get() = Distribution.NESTED_LIST_SIZE_DISTRIBUTION
+    open val nestedCollectionSizeDistributionFactory: DistributionFactory
+        get() = DistributionFactory.NESTED_LIST_SIZE_DISTRIBUTION
 
     /** Responsible for generating the element data that the nested collections will store */
     open val nestedDataProducer: FlatDataProducer
@@ -95,15 +95,17 @@ abstract class NestedCollectionBenchmark {
     fun setupCollections() {
         // Use constant seed so the data is identical for all benchmarks since they're compared against each other
         val random = Random(0)
+        val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(random)
+        val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(random)
 
         data = Array(numCollections) {
-            val numElements = topLevelSizeDistribution.nextValue(random)
+            val numElements = topLevelSizeDistribution.nextValue()
 
             NestedCollectionWrapper(
                 size = numElements,
                 random = random,
                 dataType = dataType,
-                nestedCollectionSizeDistribution = nestedCollectionSizeDistribution,
+                nestedCollectionSizeDistribution = nestedSizeDistribution,
                 dataProducer = nestedDataProducer,
             )
         }
@@ -111,6 +113,7 @@ abstract class NestedCollectionBenchmark {
 
     @TearDown
     fun tearDown() {
+        data = emptyArray()
     }
 
     @Suppress("UNCHECKED_CAST")
