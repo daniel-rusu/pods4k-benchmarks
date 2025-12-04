@@ -106,7 +106,7 @@ interface DistributionFactory {
      *
      * - List of cities with each city containing a nested list of attractions.
      */
-    object NESTED_LIST_SIZE_DISTRIBUTION : DistributionFactory {
+    object NestedListSizeDistribution : DistributionFactory {
         override fun create(random: Random): Distribution = Distribution(
             createNewRandomGenerator(from = random),
             30 to Distribution.Bounds(lowerBound = 0, upperBound = 1),

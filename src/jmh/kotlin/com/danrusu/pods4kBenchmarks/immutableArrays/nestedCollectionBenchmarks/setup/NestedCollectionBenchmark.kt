@@ -83,7 +83,7 @@ abstract class NestedCollectionBenchmark {
 
     /** Controls the sizes of the nested collections that will be generated */
     open val nestedCollectionSizeDistributionFactory: DistributionFactory
-        get() = DistributionFactory.NESTED_LIST_SIZE_DISTRIBUTION
+        get() = DistributionFactory.NestedListSizeDistribution
 
     /** Responsible for generating the element data that the nested collections will store */
     open val nestedDataProducer: FlatDataProducer
