@@ -41,6 +41,7 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
 
 jmh {
     jmhVersion = libs.versions.jmh
+    resultFormat = "CSV"
 
     /*
     ### Specify which benchmarks to run ###

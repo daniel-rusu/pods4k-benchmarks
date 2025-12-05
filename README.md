@@ -39,7 +39,7 @@ and produce more realistic results.
       benchmark iterations, and 2 JVM forks takes 3 * 8 * (10 + 5) * 2 * (1 second/iteration) = 720 seconds = 12
       minutes!
 6. Analyze results
-    * The results will be saved in [/build/results/jmh/results.txt](./build/results/jmh/results.txt)
+    * The results will be saved in [/build/results/jmh/results.csv](./build/results/jmh/results.csv)
     * Check the relative error of each benchmark. A good (or bad) result with a high relative error might be misleading
       as it may have been affected by other factors such as interference from other processes.
     * If necessary, run the benchmarks again ensuring that all other applications have been closed to reduce
