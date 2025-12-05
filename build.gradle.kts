@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     kotlin("jvm") version libs.versions.kotlin
     alias(libs.plugins.jmhGradlePlugin)
@@ -8,6 +10,10 @@ group = "com.danrusu"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    maven {
+        name = "Central Portal Snapshots"
+        url = URI("https://central.sonatype.com/repository/maven-snapshots")
+    }
     mavenCentral()
 }
 
