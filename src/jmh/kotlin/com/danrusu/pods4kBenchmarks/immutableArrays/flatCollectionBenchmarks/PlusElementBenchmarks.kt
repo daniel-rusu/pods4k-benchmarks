@@ -24,6 +24,16 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
 
+const val STRING_ELEMENT = ""
+const val BOOLEAN_ELEMENT = true
+const val BYTE_ELEMENT = Byte.MIN_VALUE
+const val CHAR_ELEMENT = 'A'
+const val SHORT_ELEMENT = Short.MIN_VALUE
+const val INT_ELEMENT = Int.MIN_VALUE
+const val FLOAT_ELEMENT = 0.0f
+const val LONG_ELEMENT = Long.MIN_VALUE
+const val DOUBLE_ELEMENT = 0.0
+
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @OperationsPerInvocation(NUM_COLLECTIONS)
@@ -39,37 +49,37 @@ open class PlusElementBenchmarks : FlatCollectionBenchmark() {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list + "" },
-            { list: List<Boolean> -> list + true },
-            { list: List<Byte> -> list + Byte.MIN_VALUE },
-            { list: List<Char> -> list + 'A' },
-            { list: List<Short> -> list + Short.MIN_VALUE },
-            { list: List<Int> -> list + Int.MIN_VALUE },
-            { list: List<Float> -> list + 0.0f },
-            { list: List<Long> -> list + Long.MIN_VALUE },
-            { list: List<Double> -> list + 0.0 },
+            { list: List<String> -> list + STRING_ELEMENT },
+            { list: List<Boolean> -> list + BOOLEAN_ELEMENT },
+            { list: List<Byte> -> list + BYTE_ELEMENT },
+            { list: List<Char> -> list + CHAR_ELEMENT },
+            { list: List<Short> -> list + SHORT_ELEMENT },
+            { list: List<Int> -> list + INT_ELEMENT },
+            { list: List<Float> -> list + FLOAT_ELEMENT },
+            { list: List<Long> -> list + LONG_ELEMENT },
+            { list: List<Double> -> list + DOUBLE_ELEMENT },
 
             // arrays
-            { array: Array<String> -> array + "" },
-            { array: BooleanArray -> array + true },
-            { array: ByteArray -> array + Byte.MIN_VALUE },
-            { array: CharArray -> array + 'A' },
-            { array: ShortArray -> array + Short.MIN_VALUE },
-            { array: IntArray -> array + Int.MIN_VALUE },
-            { array: FloatArray -> array + 0.0f },
-            { array: LongArray -> array + Long.MIN_VALUE },
-            { array: DoubleArray -> array + 0.0 },
+            { array: Array<String> -> array + STRING_ELEMENT },
+            { array: BooleanArray -> array + BOOLEAN_ELEMENT },
+            { array: ByteArray -> array + BYTE_ELEMENT },
+            { array: CharArray -> array + CHAR_ELEMENT },
+            { array: ShortArray -> array + SHORT_ELEMENT },
+            { array: IntArray -> array + INT_ELEMENT },
+            { array: FloatArray -> array + FLOAT_ELEMENT },
+            { array: LongArray -> array + LONG_ELEMENT },
+            { array: DoubleArray -> array + DOUBLE_ELEMENT },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array + "" },
-            { array: ImmutableBooleanArray -> array + true },
-            { array: ImmutableByteArray -> array + Byte.MIN_VALUE },
-            { array: ImmutableCharArray -> array + 'A' },
-            { array: ImmutableShortArray -> array + Short.MIN_VALUE },
-            { array: ImmutableIntArray -> array + Int.MIN_VALUE },
-            { array: ImmutableFloatArray -> array + 0.0f },
-            { array: ImmutableLongArray -> array + Long.MIN_VALUE },
-            { array: ImmutableDoubleArray -> array + 0.0 },
+            { array: ImmutableArray<String> -> array + STRING_ELEMENT },
+            { array: ImmutableBooleanArray -> array + BOOLEAN_ELEMENT },
+            { array: ImmutableByteArray -> array + BYTE_ELEMENT },
+            { array: ImmutableCharArray -> array + CHAR_ELEMENT },
+            { array: ImmutableShortArray -> array + SHORT_ELEMENT },
+            { array: ImmutableIntArray -> array + INT_ELEMENT },
+            { array: ImmutableFloatArray -> array + FLOAT_ELEMENT },
+            { array: ImmutableLongArray -> array + LONG_ELEMENT },
+            { array: ImmutableDoubleArray -> array + DOUBLE_ELEMENT },
         )
     }
 }

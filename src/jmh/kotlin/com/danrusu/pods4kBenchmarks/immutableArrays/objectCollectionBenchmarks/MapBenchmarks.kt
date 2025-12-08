@@ -24,7 +24,7 @@ private const val NUM_COLLECTIONS = 1000
 @OperationsPerInvocation(NUM_COLLECTIONS)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(2)
+@Fork(3)
 open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
