@@ -1,0 +1,51 @@
+# Architecture
+
+## Purpose
+
+This repo benchmarks the published `pods4k` dependency in an environment that does not have access to library internals. The current benchmark surface focuses on `immutableArrays` and compares `pods4k` immutable arrays against Kotlin/JVM `List` and JVM arrays.
+
+## Source Sets And Layout
+
+- `src/main/kotlin`: shared utilities used by benchmarks and tested by unit tests.
+- `src/test/kotlin`: JUnit 5 + Strikt tests for shared utilities.
+- `src/jmh/kotlin`: JMH benchmarks plus benchmark-only setup and wrapper code.
+- `src/*/java` and `src/*/resources`: present as source-set directories but currently empty in the inspected tree.
+- Gradle layout: single root project; Kotlin/JVM plugin, `jvm-test-suite`, and `me.champeau.jmh` plugin.
+
+## Core Abstractions
+
+- `CollectionType`: `LIST`, `ARRAY`, `IMMUTABLE_ARRAY`.
+- `DataType`: reference plus primitive/value families: `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`.
+- `Distribution` and `DistributionFactory`: deterministic collection-size distributions.
+- `FlatDataProducer`, `NullableDataProducer`, `FlatDataFilter`: data generation strategies for benchmark setup.
+- `CollectionWrapper` plus concrete wrappers: one shape for selecting correctly typed lists, arrays, and immutable arrays without changing benchmark methods for every data type.
+- Benchmark bases: `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`.
+
+## Generated-Code Model
+
+- No generated source is checked in under `src`.
+- JMH-generated code/classes and result files are build artifacts under `build/`.
+- Treat `build/`, `.gradle/`, `.kotlin/`, and benchmark result files as disposable output.
+
+## Public API Shape
+
+- Benchmarks import `com.danrusu.pods4k.immutableArrays.*` from the configured dependency in `gradle/libs.versions.toml`.
+- The benchmark intent is public API usage. Do not depend on internal `pods4k` implementation details.
+- Keep API-facing comparisons symmetrical: the same operation should be represented for `List`, array, and immutable-array variants when the benchmark category expects all three.
+
+## Important Invariants
+
+- Benchmark setup uses constant seeds so scenarios are comparable across collection and data types.
+- Size distribution RNGs are separated from element-data RNGs so data types that consume more random values, such as strings, still receive the same collection-size sequence as simpler data types.
+- Benchmark methods consume results through `Blackhole`.
+- `numCollections` overrides are expected to be fixed values.
+- `@OperationsPerInvocation` represents collections processed per invocation; for pairwise benchmarks it should usually be `NUM_COLLECTIONS / 2`.
+- `@Setup(Level.Trial)` prepares data; benchmark methods should measure the operation, not data construction unless that is the explicit scenario.
+- `@TearDown` clears large arrays to reduce cross-trial memory retention.
+
+## Boundaries
+
+- Manual utility code belongs in `src/main`; add or update tests in `src/test`.
+- Benchmark scenarios and benchmark-only fixtures belong in `src/jmh`.
+- Build configuration lives in Gradle files; do not bury benchmark selection rules in source comments when `jmh.includes` is the controlling mechanism.
+- Benchmark results are evidence to report, not source to edit.
