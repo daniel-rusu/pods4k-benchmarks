@@ -6,6 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -20,6 +21,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -63,6 +66,7 @@ open class FilterNotNull {
 
     /** Using a single list type for each value type as statically-typed lists will never make any difference*/
     private lateinit var listData: Array<List<Any?>>
+    private lateinit var persistentListData: Array<PersistentList<Any?>>
 
     private lateinit var referenceArrays: Array<Array<String?>>
     private lateinit var booleanArrays: Array<Array<Boolean?>>
@@ -93,6 +97,7 @@ open class FilterNotNull {
 
         when (collectionType) {
             LIST -> createLists(nullnessRandom, dataRandom, sizeDistribution)
+            PERSISTENT_LIST -> createPersistentLists(nullnessRandom, dataRandom, sizeDistribution)
             ARRAY -> createArrays(nullnessRandom, dataRandom, sizeDistribution)
             IMMUTABLE_ARRAY -> createImmutableArrays(nullnessRandom, dataRandom, sizeDistribution)
         }
@@ -101,6 +106,7 @@ open class FilterNotNull {
     @TearDown
     fun tearDown() {
         listData = emptyArray()
+        persistentListData = emptyArray()
 
         referenceArrays = emptyArray()
         booleanArrays = emptyArray()
@@ -127,16 +133,14 @@ open class FilterNotNull {
     @Suppress("UNCHECKED_CAST")
     fun filterNotNull(bh: Blackhole) {
         when (collectionType) {
-            LIST -> when (dataType) {
-                REFERENCE -> listData.forEach { bh.consume(it.filterNotNull()) }
-                BOOLEAN -> listData.forEach { bh.consume(it.filterNotNull()) }
-                BYTE -> listData.forEach { bh.consume(it.filterNotNull()) }
-                CHAR -> listData.forEach { bh.consume(it.filterNotNull()) }
-                SHORT -> listData.forEach { bh.consume(it.filterNotNull()) }
-                INT -> listData.forEach { bh.consume(it.filterNotNull()) }
-                FLOAT -> listData.forEach { bh.consume(it.filterNotNull()) }
-                LONG -> listData.forEach { bh.consume(it.filterNotNull()) }
-                DOUBLE -> listData.forEach { bh.consume(it.filterNotNull()) }
+            LIST -> {
+                // no need to check the dataType since we just use one list
+                listData.forEach { bh.consume(it.filterNotNull()) }
+            }
+
+            PERSISTENT_LIST -> {
+                // no need to check the dataType since we just use one list
+                persistentListData.forEach { bh.consume(it.filterNotNull()) }
             }
 
             ARRAY -> when (dataType) {
@@ -186,6 +190,32 @@ open class FilterNotNull {
         return ArrayList<T>(size).apply {
             repeat(size) { add(initializer(it)) }
         }
+    }
+
+    private fun createPersistentLists(nullnessRandom: Random, dataRandom: Random, sizeDistribution: Distribution) {
+        persistentListData = Array(NUM_COLLECTIONS) {
+            val size = sizeDistribution.nextValue()
+            when (dataType) {
+                REFERENCE -> createPersistentList(size) { dataProducer.nextReference(it, nullnessRandom, dataRandom) }
+                BOOLEAN -> createPersistentList(size) { dataProducer.nextBoolean(it, nullnessRandom, dataRandom) }
+                BYTE -> createPersistentList(size) { dataProducer.nextByte(it, nullnessRandom, dataRandom) }
+                CHAR -> createPersistentList(size) { dataProducer.nextChar(it, nullnessRandom, dataRandom) }
+                SHORT -> createPersistentList(size) { dataProducer.nextShort(it, nullnessRandom, dataRandom) }
+                INT -> createPersistentList(size) { dataProducer.nextInt(it, nullnessRandom, dataRandom) }
+                FLOAT -> createPersistentList(size) { dataProducer.nextFloat(it, nullnessRandom, dataRandom) }
+                LONG -> createPersistentList(size) { dataProducer.nextLong(it, nullnessRandom, dataRandom) }
+                DOUBLE -> createPersistentList(size) { dataProducer.nextDouble(it, nullnessRandom, dataRandom) }
+            }
+        }
+    }
+
+    private inline fun <T> createPersistentList(
+        size: Int,
+        crossinline initializer: (index: Int) -> T,
+    ): PersistentList<T> {
+        val builder = persistentListOf<T>().builder()
+        repeat(size) { builder.add(initializer(it)) }
+        return builder.build()
     }
 
     private fun createArrays(nullnessRandom: Random, dataRandom: Random, sizeDistribution: Distribution) {

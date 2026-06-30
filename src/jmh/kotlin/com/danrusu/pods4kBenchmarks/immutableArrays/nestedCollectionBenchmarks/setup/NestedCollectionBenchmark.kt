@@ -36,11 +36,21 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Int
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.IntListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentBooleanListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentByteListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentCharListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentDoubleListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentFloatListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentIntListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentLongListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentReferenceListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentShortListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
@@ -131,6 +141,17 @@ abstract class NestedCollectionBenchmark {
         transformNestedLongLists: (List<LongListWrapper>) -> Any?,
         transformNestedDoubleLists: (List<DoubleListWrapper>) -> Any?,
 
+        // persistent lists
+        transformNestedPersistentLists: (PersistentList<PersistentReferenceListWrapper>) -> Any?,
+        transformNestedPersistentBooleanLists: (PersistentList<PersistentBooleanListWrapper>) -> Any?,
+        transformNestedPersistentByteLists: (PersistentList<PersistentByteListWrapper>) -> Any?,
+        transformNestedPersistentCharLists: (PersistentList<PersistentCharListWrapper>) -> Any?,
+        transformNestedPersistentShortLists: (PersistentList<PersistentShortListWrapper>) -> Any?,
+        transformNestedPersistentIntLists: (PersistentList<PersistentIntListWrapper>) -> Any?,
+        transformNestedPersistentFloatLists: (PersistentList<PersistentFloatListWrapper>) -> Any?,
+        transformNestedPersistentLongLists: (PersistentList<PersistentLongListWrapper>) -> Any?,
+        transformNestedPersistentDoubleLists: (PersistentList<PersistentDoubleListWrapper>) -> Any?,
+
         // arrays
         transformNestedArrays: (Array<ReferenceArrayWrapper>) -> Any?,
         transformNestedBooleanArrays: (Array<BooleanArrayWrapper>) -> Any?,
@@ -163,6 +184,44 @@ abstract class NestedCollectionBenchmark {
             FLOAT -> data.forEach { bh.consume(transformNestedFloatLists(it.list as List<FloatListWrapper>)) }
             LONG -> data.forEach { bh.consume(transformNestedLongLists(it.list as List<LongListWrapper>)) }
             DOUBLE -> data.forEach { bh.consume(transformNestedDoubleLists(it.list as List<DoubleListWrapper>)) }
+        }
+
+        CollectionType.PERSISTENT_LIST -> when (dataType) {
+            REFERENCE -> data.forEach {
+                bh.consume(transformNestedPersistentLists(it.persistentList as PersistentList<PersistentReferenceListWrapper>))
+            }
+
+            BOOLEAN -> data.forEach {
+                bh.consume(transformNestedPersistentBooleanLists(it.persistentList as PersistentList<PersistentBooleanListWrapper>))
+            }
+
+            BYTE -> data.forEach {
+                bh.consume(transformNestedPersistentByteLists(it.persistentList as PersistentList<PersistentByteListWrapper>))
+            }
+
+            CHAR -> data.forEach {
+                bh.consume(transformNestedPersistentCharLists(it.persistentList as PersistentList<PersistentCharListWrapper>))
+            }
+
+            SHORT -> data.forEach {
+                bh.consume(transformNestedPersistentShortLists(it.persistentList as PersistentList<PersistentShortListWrapper>))
+            }
+
+            INT -> data.forEach {
+                bh.consume(transformNestedPersistentIntLists(it.persistentList as PersistentList<PersistentIntListWrapper>))
+            }
+
+            FLOAT -> data.forEach {
+                bh.consume(transformNestedPersistentFloatLists(it.persistentList as PersistentList<PersistentFloatListWrapper>))
+            }
+
+            LONG -> data.forEach {
+                bh.consume(transformNestedPersistentLongLists(it.persistentList as PersistentList<PersistentLongListWrapper>))
+            }
+
+            DOUBLE -> data.forEach {
+                bh.consume(transformNestedPersistentDoubleLists(it.persistentList as PersistentList<PersistentDoubleListWrapper>))
+            }
         }
 
         CollectionType.ARRAY -> when (dataType) {

@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -47,6 +48,17 @@ open class DropLastBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.dropLast(list.size / 2) },
             { list: List<Long> -> list.dropLast(list.size / 2) },
             { list: List<Double> -> list.dropLast(list.size / 2) },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Boolean> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Byte> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Char> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Short> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Int> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Float> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Long> -> list.dropLast(list.size / 2) },
+            { list: PersistentList<Double> -> list.dropLast(list.size / 2) },
 
             // arrays
             { array: Array<String> -> array.dropLast(array.size / 2) },

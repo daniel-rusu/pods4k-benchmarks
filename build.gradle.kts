@@ -23,6 +23,7 @@ dependencies {
     jmhImplementation(libs.jmhGenerator)
 
     jmhImplementation(libs.pods4k)
+    jmhImplementation(libs.kotlinxCollectionsImmutable)
 }
 
 plugins.withId("org.jetbrains.kotlin.jvm") {

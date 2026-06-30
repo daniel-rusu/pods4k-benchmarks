@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -47,6 +48,17 @@ open class DropBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.drop(list.size / 2) },
             { list: List<Long> -> list.drop(list.size / 2) },
             { list: List<Double> -> list.drop(list.size / 2) },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.drop(list.size / 2) },
+            { list: PersistentList<Boolean> -> list.drop(list.size / 2) },
+            { list: PersistentList<Byte> -> list.drop(list.size / 2) },
+            { list: PersistentList<Char> -> list.drop(list.size / 2) },
+            { list: PersistentList<Short> -> list.drop(list.size / 2) },
+            { list: PersistentList<Int> -> list.drop(list.size / 2) },
+            { list: PersistentList<Float> -> list.drop(list.size / 2) },
+            { list: PersistentList<Long> -> list.drop(list.size / 2) },
+            { list: PersistentList<Double> -> list.drop(list.size / 2) },
 
             // arrays
             { array: Array<String> -> array.drop(array.size / 2) },

@@ -3,17 +3,19 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.toImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.toPersistentList
 import kotlin.random.Random
 
 /**
- * Creates and stores each of the 3 types of collections (list, array, & immutable array) with each storing wrappers
- * for their respective type.  The wrappers will themselves store a collection with size controlled by the
- * nested-collection-size-distribution.
+ * Creates and stores each of the collection types with each storing wrappers for their respective type.
+ * The wrappers will themselves store a collection with size controlled by the nested-collection-size-distribution.
  *
  * Note that the wrapper layer is on purpose in order to more closely model the real world where we don't have a list
  * of lists directly but rather a list of objects which themselves contain lists (eg. list of Person objects and each
@@ -26,6 +28,9 @@ import kotlin.random.Random
  * - [list]
  *   - will be a list containing 10 [ListWrapper] elements
  *   - the wrappers will each store a List<Boolean> with contents copied from the array wrappers
+ * - [persistentList]
+ *   - will be a persistent list containing 10 [PersistentListWrapper] elements
+ *   - the wrappers will each store a PersistentList<Boolean> with contents copied from the array wrappers
  * - [immutableArray]
  *   - will be an immutable array containing 10 [ImmutableArrayWrapper] elements
  *   - the wrappers will each store a ImmutableBooleanArray with contents copied from the array wrappers
@@ -59,6 +64,16 @@ class NestedCollectionWrapper(
             dataProducer = arrayWrapper.copyData(),
         )
     }
+
+    // copy the data from the regular array so that they are tested against identical data
+    val persistentList: PersistentList<PersistentListWrapper> = array.map { arrayWrapper ->
+        PersistentListWrapper.create(
+            random = random,
+            dataType = dataType,
+            size = arrayWrapper.size,
+            dataProducer = arrayWrapper.copyData(),
+        )
+    }.toPersistentList()
 
     // copy the data from the regular array so that they are tested against identical data
     val immutableArray: ImmutableArray<ImmutableArrayWrapper> = array.map { arrayWrapper ->

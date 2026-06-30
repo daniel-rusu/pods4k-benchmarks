@@ -9,6 +9,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
+import kotlinx.collections.immutable.PersistentList
 
 abstract class CollectionWrapper {
     abstract val size: Int
@@ -92,5 +93,32 @@ abstract class CollectionWrapper {
         get() = throw UnsupportedOperationException()
 
     open val doubleList: List<Double>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentReferenceList: PersistentList<String>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentBooleanList: PersistentList<Boolean>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentByteList: PersistentList<Byte>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentCharList: PersistentList<Char>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentShortList: PersistentList<Short>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentIntList: PersistentList<Int>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentFloatList: PersistentList<Float>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentLongList: PersistentList<Long>
+        get() = throw UnsupportedOperationException()
+
+    open val persistentDoubleList: PersistentList<Double>
         get() = throw UnsupportedOperationException()
 }

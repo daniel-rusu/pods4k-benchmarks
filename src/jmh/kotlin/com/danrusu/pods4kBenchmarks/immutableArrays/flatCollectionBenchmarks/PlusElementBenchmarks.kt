@@ -11,6 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.plus
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -58,6 +59,17 @@ open class PlusElementBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list + FLOAT_ELEMENT },
             { list: List<Long> -> list + LONG_ELEMENT },
             { list: List<Double> -> list + DOUBLE_ELEMENT },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.adding(STRING_ELEMENT) },
+            { list: PersistentList<Boolean> -> list.adding(BOOLEAN_ELEMENT) },
+            { list: PersistentList<Byte> -> list.adding(BYTE_ELEMENT) },
+            { list: PersistentList<Char> -> list.adding(CHAR_ELEMENT) },
+            { list: PersistentList<Short> -> list.adding(SHORT_ELEMENT) },
+            { list: PersistentList<Int> -> list.adding(INT_ELEMENT) },
+            { list: PersistentList<Float> -> list.adding(FLOAT_ELEMENT) },
+            { list: PersistentList<Long> -> list.adding(LONG_ELEMENT) },
+            { list: PersistentList<Double> -> list.adding(DOUBLE_ELEMENT) },
 
             // arrays
             { array: Array<String> -> array + STRING_ELEMENT },

@@ -4,9 +4,12 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.random.Random
 
 private val EMPTY_LIST: List<Nothing> = emptyList()
+private val EMPTY_PERSISTENT_LIST: PersistentList<Nothing> = persistentListOf()
 private val EMPTY_ARRAY: Array<Any> = emptyArray()
 private val EMPTY_IMMUTABLE_ARRAY: ImmutableArray<Nothing> = emptyImmutableArray()
 
@@ -24,6 +27,9 @@ class WrapperForCollectionType<T>(
     var list: List<T> = EMPTY_LIST
         private set
 
+    var persistentList: PersistentList<T> = EMPTY_PERSISTENT_LIST
+        private set
+
     @Suppress("UNCHECKED_CAST")
     var array: Array<T> = EMPTY_ARRAY as Array<T>
         private set
@@ -36,6 +42,12 @@ class WrapperForCollectionType<T>(
         when (collectionType) {
             CollectionType.LIST -> {
                 list = (0..<size).map { objectProducer.nextObject(it, random) }
+            }
+
+            CollectionType.PERSISTENT_LIST -> {
+                val builder = persistentListOf<T>().builder()
+                repeat(size) { builder.add(objectProducer.nextObject(it, random)) }
+                persistentList = builder.build()
             }
 
             CollectionType.ARRAY -> {

@@ -6,6 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.s
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValuesProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducer
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -37,6 +38,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableReference } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableReference } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableReference } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableReference } },
         )
@@ -47,6 +49,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableBoolean } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableBoolean } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableBoolean } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableBoolean } },
         )
@@ -57,6 +60,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableByte } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableByte } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableByte } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableByte } },
         )
@@ -67,6 +71,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableChar } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableChar } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableChar } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableChar } },
         )
@@ -77,6 +82,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableShort } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableShort } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableShort } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableShort } },
         )
@@ -87,6 +93,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableInt } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableInt } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableInt } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableInt } },
         )
@@ -97,6 +104,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableFloat } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableFloat } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableFloat } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableFloat } },
         )
@@ -107,6 +115,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableLong } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableLong } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableLong } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableLong } },
         )
@@ -117,6 +126,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
         transformEachCollection(
             bh,
             { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableDouble } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableDouble } },
             { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableDouble } },
             { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableDouble } },
         )

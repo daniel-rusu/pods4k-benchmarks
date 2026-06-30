@@ -11,6 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.plus
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -48,6 +49,17 @@ open class PlusCollectionBenchmarks : FlatCollectionBenchmark() {
             { first: List<Float>, second: List<Float> -> first + second },
             { first: List<Long>, second: List<Long> -> first + second },
             { first: List<Double>, second: List<Double> -> first + second },
+
+            // persistent lists
+            { first: PersistentList<String>, second: PersistentList<String> -> first.addingAll(second) },
+            { first: PersistentList<Boolean>, second: PersistentList<Boolean> -> first.addingAll(second) },
+            { first: PersistentList<Byte>, second: PersistentList<Byte> -> first.addingAll(second) },
+            { first: PersistentList<Char>, second: PersistentList<Char> -> first.addingAll(second) },
+            { first: PersistentList<Short>, second: PersistentList<Short> -> first.addingAll(second) },
+            { first: PersistentList<Int>, second: PersistentList<Int> -> first.addingAll(second) },
+            { first: PersistentList<Float>, second: PersistentList<Float> -> first.addingAll(second) },
+            { first: PersistentList<Long>, second: PersistentList<Long> -> first.addingAll(second) },
+            { first: PersistentList<Double>, second: PersistentList<Double> -> first.addingAll(second) },
 
             // arrays
             { first: Array<String>, second: Array<String> -> first + second },

@@ -26,10 +26,20 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Int
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.IntListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentBooleanListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentByteListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentCharListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentDoubleListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentFloatListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentIntListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentLongListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentReferenceListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentShortListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -67,6 +77,17 @@ open class FlatMapBenchmarks : NestedCollectionBenchmark() {
             { list: List<FloatListWrapper> -> list.flatMap { it.floatList } },
             { list: List<LongListWrapper> -> list.flatMap { it.longList } },
             { list: List<DoubleListWrapper> -> list.flatMap { it.doubleList } },
+
+            // persistent lists
+            { list: PersistentList<PersistentReferenceListWrapper> -> list.flatMap { it.persistentReferenceList } },
+            { list: PersistentList<PersistentBooleanListWrapper> -> list.flatMap { it.persistentBooleanList } },
+            { list: PersistentList<PersistentByteListWrapper> -> list.flatMap { it.persistentByteList } },
+            { list: PersistentList<PersistentCharListWrapper> -> list.flatMap { it.persistentCharList } },
+            { list: PersistentList<PersistentShortListWrapper> -> list.flatMap { it.persistentShortList } },
+            { list: PersistentList<PersistentIntListWrapper> -> list.flatMap { it.persistentIntList } },
+            { list: PersistentList<PersistentFloatListWrapper> -> list.flatMap { it.persistentFloatList } },
+            { list: PersistentList<PersistentLongListWrapper> -> list.flatMap { it.persistentLongList } },
+            { list: PersistentList<PersistentDoubleListWrapper> -> list.flatMap { it.persistentDoubleList } },
 
             // arrays
             // Note that array.flatMap requires a nested iterable, so we need to call asList() on each nested array. The

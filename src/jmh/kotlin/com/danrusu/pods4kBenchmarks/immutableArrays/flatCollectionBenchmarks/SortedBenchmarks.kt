@@ -11,6 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.sorted
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -48,6 +49,17 @@ open class SortedBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.sorted() },
             { list: List<Long> -> list.sorted() },
             { list: List<Double> -> list.sorted() },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.sorted() },
+            { list: PersistentList<Boolean> -> list.sorted() },
+            { list: PersistentList<Byte> -> list.sorted() },
+            { list: PersistentList<Char> -> list.sorted() },
+            { list: PersistentList<Short> -> list.sorted() },
+            { list: PersistentList<Int> -> list.sorted() },
+            { list: PersistentList<Float> -> list.sorted() },
+            { list: PersistentList<Long> -> list.sorted() },
+            { list: PersistentList<Double> -> list.sorted() },
 
             // arrays
             { array: Array<String> -> array.sorted() },

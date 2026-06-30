@@ -13,6 +13,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -28,8 +29,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Arr
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CollectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.OperationsPerInvocation
 import org.openjdk.jmh.annotations.Param
@@ -92,6 +95,7 @@ abstract class FlatCollectionBenchmark {
 
         data = when (collectionType) {
             LIST -> createLists(random, sizeDistribution)
+            PERSISTENT_LIST -> createPersistentLists(random, sizeDistribution)
             ARRAY -> createArrays(random, sizeDistribution)
             IMMUTABLE_ARRAY -> createImmutableArrays(random, sizeDistribution)
         }
@@ -107,6 +111,18 @@ abstract class FlatCollectionBenchmark {
         sizeDistribution: Distribution
     ): Array<ListWrapper> = Array(numCollections) {
         ListWrapper.create(
+            random = random,
+            dataType = dataType,
+            size = sizeDistribution.nextValue(),
+            dataProducer = dataProducer,
+        )
+    }
+
+    private fun createPersistentLists(
+        random: Random,
+        sizeDistribution: Distribution
+    ): Array<PersistentListWrapper> = Array(numCollections) {
+        PersistentListWrapper.create(
             random = random,
             dataType = dataType,
             size = sizeDistribution.nextValue(),
@@ -156,6 +172,15 @@ abstract class FlatCollectionBenchmark {
         transformFloatList: (List<Float>) -> Any?,
         transformLongList: (List<Long>) -> Any?,
         transformDoubleList: (List<Double>) -> Any?,
+        transformPersistentList: (PersistentList<String>) -> Any?,
+        transformPersistentBooleanList: (PersistentList<Boolean>) -> Any?,
+        transformPersistentByteList: (PersistentList<Byte>) -> Any?,
+        transformPersistentCharList: (PersistentList<Char>) -> Any?,
+        transformPersistentShortList: (PersistentList<Short>) -> Any?,
+        transformPersistentIntList: (PersistentList<Int>) -> Any?,
+        transformPersistentFloatList: (PersistentList<Float>) -> Any?,
+        transformPersistentLongList: (PersistentList<Long>) -> Any?,
+        transformPersistentDoubleList: (PersistentList<Double>) -> Any?,
         transformArray: (Array<String>) -> Any?,
         transformBooleanArray: (BooleanArray) -> Any?,
         transformByteArray: (ByteArray) -> Any?,
@@ -186,6 +211,18 @@ abstract class FlatCollectionBenchmark {
                 FLOAT -> data.forEach { bh.consume(transformFloatList(it.floatList)) }
                 LONG -> data.forEach { bh.consume(transformLongList(it.longList)) }
                 DOUBLE -> data.forEach { bh.consume(transformDoubleList(it.doubleList)) }
+            }
+
+            PERSISTENT_LIST -> when (dataType) {
+                REFERENCE -> data.forEach { bh.consume(transformPersistentList(it.persistentReferenceList)) }
+                BOOLEAN -> data.forEach { bh.consume(transformPersistentBooleanList(it.persistentBooleanList)) }
+                BYTE -> data.forEach { bh.consume(transformPersistentByteList(it.persistentByteList)) }
+                CHAR -> data.forEach { bh.consume(transformPersistentCharList(it.persistentCharList)) }
+                SHORT -> data.forEach { bh.consume(transformPersistentShortList(it.persistentShortList)) }
+                INT -> data.forEach { bh.consume(transformPersistentIntList(it.persistentIntList)) }
+                FLOAT -> data.forEach { bh.consume(transformPersistentFloatList(it.persistentFloatList)) }
+                LONG -> data.forEach { bh.consume(transformPersistentLongList(it.persistentLongList)) }
+                DOUBLE -> data.forEach { bh.consume(transformPersistentDoubleList(it.persistentDoubleList)) }
             }
 
             ARRAY -> when (dataType) {
@@ -236,6 +273,15 @@ abstract class FlatCollectionBenchmark {
         transformFloatLists: (List<Float>, List<Float>) -> Any?,
         transformLongLists: (List<Long>, List<Long>) -> Any?,
         transformDoubleLists: (List<Double>, List<Double>) -> Any?,
+        transformPersistentLists: (PersistentList<String>, PersistentList<String>) -> Any?,
+        transformPersistentBooleanLists: (PersistentList<Boolean>, PersistentList<Boolean>) -> Any?,
+        transformPersistentByteLists: (PersistentList<Byte>, PersistentList<Byte>) -> Any?,
+        transformPersistentCharLists: (PersistentList<Char>, PersistentList<Char>) -> Any?,
+        transformPersistentShortLists: (PersistentList<Short>, PersistentList<Short>) -> Any?,
+        transformPersistentIntLists: (PersistentList<Int>, PersistentList<Int>) -> Any?,
+        transformPersistentFloatLists: (PersistentList<Float>, PersistentList<Float>) -> Any?,
+        transformPersistentLongLists: (PersistentList<Long>, PersistentList<Long>) -> Any?,
+        transformPersistentDoubleLists: (PersistentList<Double>, PersistentList<Double>) -> Any?,
         transformArrays: (Array<String>, Array<String>) -> Any?,
         transformBooleanArrays: (BooleanArray, BooleanArray) -> Any?,
         transformByteArrays: (ByteArray, ByteArray) -> Any?,
@@ -308,6 +354,107 @@ abstract class FlatCollectionBenchmark {
                 DOUBLE -> {
                     for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
                         bh.consume(transformDoubleLists(data[i].doubleList, data[i + 1].doubleList))
+                    }
+                }
+            }
+
+            PERSISTENT_LIST -> when (dataType) {
+                REFERENCE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentLists(
+                                data[i].persistentReferenceList,
+                                data[i + 1].persistentReferenceList,
+                            )
+                        )
+                    }
+                }
+
+                BOOLEAN -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentBooleanLists(
+                                data[i].persistentBooleanList,
+                                data[i + 1].persistentBooleanList,
+                            )
+                        )
+                    }
+                }
+
+                BYTE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentByteLists(
+                                data[i].persistentByteList,
+                                data[i + 1].persistentByteList,
+                            )
+                        )
+                    }
+                }
+
+                CHAR -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentCharLists(
+                                data[i].persistentCharList,
+                                data[i + 1].persistentCharList,
+                            )
+                        )
+                    }
+                }
+
+                SHORT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentShortLists(
+                                data[i].persistentShortList,
+                                data[i + 1].persistentShortList,
+                            )
+                        )
+                    }
+                }
+
+                INT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentIntLists(
+                                data[i].persistentIntList,
+                                data[i + 1].persistentIntList,
+                            )
+                        )
+                    }
+                }
+
+                FLOAT -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentFloatLists(
+                                data[i].persistentFloatList,
+                                data[i + 1].persistentFloatList,
+                            )
+                        )
+                    }
+                }
+
+                LONG -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentLongLists(
+                                data[i].persistentLongList,
+                                data[i + 1].persistentLongList,
+                            )
+                        )
+                    }
+                }
+
+                DOUBLE -> {
+                    for (i in 0..<data.lastIndex step 2) { // exclude last index since we add 1
+                        bh.consume(
+                            transformPersistentDoubleLists(
+                                data[i].persistentDoubleList,
+                                data[i + 1].persistentDoubleList,
+                            )
+                        )
                     }
                 }
             }

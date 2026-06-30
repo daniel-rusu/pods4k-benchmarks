@@ -11,6 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.sortedDescending
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -48,6 +49,17 @@ open class SortedDescendingBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.sortedDescending() },
             { list: List<Long> -> list.sortedDescending() },
             { list: List<Double> -> list.sortedDescending() },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.sortedDescending() },
+            { list: PersistentList<Boolean> -> list.sortedDescending() },
+            { list: PersistentList<Byte> -> list.sortedDescending() },
+            { list: PersistentList<Char> -> list.sortedDescending() },
+            { list: PersistentList<Short> -> list.sortedDescending() },
+            { list: PersistentList<Int> -> list.sortedDescending() },
+            { list: PersistentList<Float> -> list.sortedDescending() },
+            { list: PersistentList<Long> -> list.sortedDescending() },
+            { list: PersistentList<Double> -> list.sortedDescending() },
 
             // arrays
             { array: Array<String> -> array.sortedDescending() },

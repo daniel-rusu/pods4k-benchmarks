@@ -5,8 +5,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
@@ -21,7 +23,7 @@ import kotlin.random.Random
  * types).  Note that the term collection is used loosely to represent a [List], [Array], or [ImmutableArray] rather
  * than the actual [Collection] interface.
  *
- * Benchmarks are parameterized by each of the 3 [CollectionType] values.
+ * Benchmarks are parameterized by each of the [CollectionType] values.
  *
  * Subclasses should create 9 benchmark methods for measuring the performance of an operation for each of the 8 base
  * types (like Boolean, Int, etc.) plus the most common reference type, String.  The benchmark methods should call
@@ -96,11 +98,13 @@ abstract class ObjectCollectionBenchmark<T> {
     protected inline fun transformEachCollection(
         bh: Blackhole,
         transformList: (List<T>) -> Any?,
+        transformPersistentList: (PersistentList<T>) -> Any?,
         transformArray: (Array<T>) -> Any?,
         transformImmutableArray: (ImmutableArray<T>) -> Any?,
     ) {
         when (collectionType) {
             LIST -> data.forEach { bh.consume(transformList(it.list)) }
+            PERSISTENT_LIST -> data.forEach { bh.consume(transformPersistentList(it.persistentList)) }
             ARRAY -> data.forEach { bh.consume(transformArray(it.array)) }
             IMMUTABLE_ARRAY -> data.forEach { bh.consume(transformImmutableArray(it.immutableArray)) }
         }

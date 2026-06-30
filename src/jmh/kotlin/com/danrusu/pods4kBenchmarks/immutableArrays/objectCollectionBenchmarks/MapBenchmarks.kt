@@ -6,6 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.s
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducer
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -37,6 +38,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.referenceValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.referenceValue } },
             { array: Array<CompoundElement> -> array.map { it.referenceValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.referenceValue } },
         )
@@ -47,6 +49,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.booleanValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.booleanValue } },
             { array: Array<CompoundElement> -> array.map { it.booleanValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.booleanValue } },
         )
@@ -57,6 +60,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.byteValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.byteValue } },
             { array: Array<CompoundElement> -> array.map { it.byteValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.byteValue } },
         )
@@ -67,6 +71,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.charValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.charValue } },
             { array: Array<CompoundElement> -> array.map { it.charValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.charValue } },
         )
@@ -77,6 +82,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.shortValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.shortValue } },
             { array: Array<CompoundElement> -> array.map { it.shortValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.shortValue } },
         )
@@ -87,6 +93,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.intValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.intValue } },
             { array: Array<CompoundElement> -> array.map { it.intValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.intValue } },
         )
@@ -97,6 +104,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.floatValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.floatValue } },
             { array: Array<CompoundElement> -> array.map { it.floatValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.floatValue } },
         )
@@ -107,6 +115,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.longValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.longValue } },
             { array: Array<CompoundElement> -> array.map { it.longValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.longValue } },
         )
@@ -117,6 +126,7 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
         transformEachCollection(
             bh,
             { list: List<CompoundElement> -> list.map { it.doubleValue } },
+            { list: PersistentList<CompoundElement> -> list.map { it.doubleValue } },
             { array: Array<CompoundElement> -> array.map { it.doubleValue } },
             { array: ImmutableArray<CompoundElement> -> array.map { it.doubleValue } },
         )

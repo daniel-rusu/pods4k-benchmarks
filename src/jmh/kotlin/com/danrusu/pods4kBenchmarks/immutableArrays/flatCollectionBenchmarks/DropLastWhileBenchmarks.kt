@@ -12,6 +12,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -55,6 +56,17 @@ open class DropLastWhileBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
             { list: List<Long> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
             { list: List<Double> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Boolean> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Byte> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Char> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Short> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Int> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Float> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Long> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Double> -> list.dropLastWhile { FlatDataFilter.shouldAccept(it) } },
 
             // arrays
             { array: Array<String> -> array.dropLastWhile { FlatDataFilter.shouldAccept(it) } },

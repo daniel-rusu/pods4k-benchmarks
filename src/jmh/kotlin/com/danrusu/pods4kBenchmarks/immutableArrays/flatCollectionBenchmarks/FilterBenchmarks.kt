@@ -12,6 +12,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -55,6 +56,17 @@ open class FilterBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.filter { FlatDataFilter.shouldAccept(it) } },
             { list: List<Long> -> list.filter { FlatDataFilter.shouldAccept(it) } },
             { list: List<Double> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Boolean> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Byte> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Char> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Short> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Int> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Float> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Long> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<Double> -> list.filter { FlatDataFilter.shouldAccept(it) } },
 
             // arrays
             { array: Array<String> -> array.filter { FlatDataFilter.shouldAccept(it) } },

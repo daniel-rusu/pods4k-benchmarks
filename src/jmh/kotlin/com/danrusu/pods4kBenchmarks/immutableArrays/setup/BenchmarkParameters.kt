@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 enum class CollectionType {
     LIST,
+    PERSISTENT_LIST,
     ARRAY,
     IMMUTABLE_ARRAY,
 }

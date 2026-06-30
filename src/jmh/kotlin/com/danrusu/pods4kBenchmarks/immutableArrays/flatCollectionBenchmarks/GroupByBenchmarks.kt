@@ -11,6 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.groupBy
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -48,6 +49,17 @@ open class GroupByBenchmarks : FlatCollectionBenchmark() {
             { list: List<Float> -> list.groupBy { it.toGroup() } },
             { list: List<Long> -> list.groupBy { it.toGroup() } },
             { list: List<Double> -> list.groupBy { it.toGroup() } },
+
+            // persistent lists
+            { list: PersistentList<String> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Boolean> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Byte> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Char> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Short> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Int> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Float> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Long> -> list.groupBy { it.toGroup() } },
+            { list: PersistentList<Double> -> list.groupBy { it.toGroup() } },
 
             // arrays
             { array: Array<String> -> array.groupBy { it.toGroup() } },
