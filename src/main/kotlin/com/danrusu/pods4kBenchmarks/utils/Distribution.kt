@@ -79,12 +79,20 @@ class Distribution(private val random: Random, vararg percentages: Pair<Int, Bou
 
 interface DistributionFactory {
 
-    fun create(random: Random): Distribution
+    /**
+     * Creates a distribution with its own random generator initialized from [seed].
+     *
+     * Recommendation:
+     * Each source of data generation (element data, size distribution, nullability, etc.) should use a separate seed
+     * for their RNG streams.  Create a random instance for the element data and call random.nextLong() to generate
+     * seeds for each of the other RNG streams.
+     **/
+    fun create(seed: Long): Distribution
 
     /** Represents the size distribution of flat lists */
     object ListSizeDistribution : DistributionFactory {
-        override fun create(random: Random): Distribution = Distribution(
-            createNewRandomGenerator(from = random),
+        override fun create(seed: Long): Distribution = Distribution(
+            Random(seed),
             35 to Distribution.Bounds(lowerBound = 0, upperBound = 10),
             30 to Distribution.Bounds(lowerBound = 11, upperBound = 50),
             20 to Distribution.Bounds(lowerBound = 51, upperBound = 200),
@@ -107,8 +115,8 @@ interface DistributionFactory {
      * - List of cities with each city containing a nested list of attractions.
      */
     object NestedListSizeDistribution : DistributionFactory {
-        override fun create(random: Random): Distribution = Distribution(
-            createNewRandomGenerator(from = random),
+        override fun create(seed: Long): Distribution = Distribution(
+            Random(seed),
             30 to Distribution.Bounds(lowerBound = 0, upperBound = 1),
             35 to Distribution.Bounds(lowerBound = 2, upperBound = 3),
             25 to Distribution.Bounds(lowerBound = 4, upperBound = 7),
@@ -117,14 +125,3 @@ interface DistributionFactory {
         )
     }
 }
-
-/**
- * IMPORTANT: Use a separate random generator for the collection size distribution so that different element types
- * always end up with the same sequence of collection sizes.  That's because different element types can use the random
- * generator more often which can affect the sequence of collection sizes.  For example, while a random boolean value
- * only uses the generator once, generating a random string requires appending a random character multiple times.
- *
- * Also, the original is used for generating the seed in order to have repeatable results which also don't follow the
- * same sequence as the original random generator.
- */
-private fun createNewRandomGenerator(from: Random): Random = Random(seed = from.nextLong())

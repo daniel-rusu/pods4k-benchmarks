@@ -35,7 +35,7 @@ Use this map to jump to the right files for common Codex tasks.
 
 - Files: `src/jmh/kotlin/.../immutableArrays/objectCollectionBenchmarks/`.
 - Base: `objectCollectionBenchmarks/setup/ObjectCollectionBenchmark.kt`.
-- Setup files: `ObjectProducer`, `WrapperForCollectionType`, `CompoundElement`, `CompoundElementOfNullableValues`.
+- Setup files: `ObjectProducer`, `ObjectProducerFactory`, `CompoundElementProducerFactory`, `CompoundNullableValuesProducerFactory`, `WrapperForCollectionType`, `CompoundElement`, `CompoundElementOfNullableValues`.
 - Pitfalls: avoid boxing/erasing immutable array variants in ways that make results no longer match normal public API usage.
 
 ## Nested Collection Benchmarks

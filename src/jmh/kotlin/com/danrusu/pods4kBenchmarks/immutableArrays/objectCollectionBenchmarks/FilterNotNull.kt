@@ -17,8 +17,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducerFactory
+import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import kotlinx.collections.immutable.PersistentList
@@ -62,7 +64,10 @@ open class FilterNotNull {
     private val sizeDistributionFactory = DistributionFactory.ListSizeDistribution
 
     /** Responsible for generating the element data that the collections will contain */
-    private val dataProducer = NullableDataProducer(nullRatio = 0.5, FlatDataProducer.RandomDataProducer)
+    private val dataProducerFactory = NullableDataProducerFactory(
+        nullRatio = 0.5,
+        flatDataProducerFactory = FlatDataProducerFactory.RandomDataProducerFactory,
+    )
 
     /** Using a single list type for each value type as statically-typed lists will never make any difference*/
     private lateinit var listData: Array<List<Any?>>
@@ -90,16 +95,15 @@ open class FilterNotNull {
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        // Use constant seed so the data is identical for all benchmarks since they're compared against each other
-        val dataRandom = Random(0)
-        val nullnessRandom = Random(dataRandom.nextLong())
-        val sizeDistribution = sizeDistributionFactory.create(dataRandom)
+        val seedGenerator = Random(0)
+        val sizeDistribution = sizeDistributionFactory.create(seedGenerator.nextLong())
+        val dataProducer = dataProducerFactory.create(seedGenerator.nextLong())
 
         when (collectionType) {
-            LIST -> createLists(nullnessRandom, dataRandom, sizeDistribution)
-            PERSISTENT_LIST -> createPersistentLists(nullnessRandom, dataRandom, sizeDistribution)
-            ARRAY -> createArrays(nullnessRandom, dataRandom, sizeDistribution)
-            IMMUTABLE_ARRAY -> createImmutableArrays(nullnessRandom, dataRandom, sizeDistribution)
+            LIST -> createLists(sizeDistribution, dataProducer)
+            PERSISTENT_LIST -> createPersistentLists(sizeDistribution, dataProducer)
+            ARRAY -> createArrays(sizeDistribution, dataProducer)
+            IMMUTABLE_ARRAY -> createImmutableArrays(sizeDistribution, dataProducer)
         }
     }
 
@@ -134,12 +138,12 @@ open class FilterNotNull {
     fun filterNotNull(bh: Blackhole) {
         when (collectionType) {
             LIST -> {
-                // no need to check the dataType since we just use one list
+                // no need to check the dataType since we always use the same listData
                 listData.forEach { bh.consume(it.filterNotNull()) }
             }
 
             PERSISTENT_LIST -> {
-                // no need to check the dataType since we just use one list
+                // no need to check the dataType since we always use persistentListData
                 persistentListData.forEach { bh.consume(it.filterNotNull()) }
             }
 
@@ -169,149 +173,137 @@ open class FilterNotNull {
         }
     }
 
-    private fun createLists(nullnessRandom: Random, dataRandom: Random, sizeDistribution: Distribution) {
-        listData = Array(NUM_COLLECTIONS) {
-            val size = sizeDistribution.nextValue()
+    private fun createLists(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
+        listData = Array(NUM_COLLECTIONS) { index ->
             when (dataType) {
-                REFERENCE -> createList(size) { dataProducer.nextReference(it, nullnessRandom, dataRandom) }
-                BOOLEAN -> createList(size) { dataProducer.nextBoolean(it, nullnessRandom, dataRandom) }
-                BYTE -> createList(size) { dataProducer.nextByte(it, nullnessRandom, dataRandom) }
-                CHAR -> createList(size) { dataProducer.nextChar(it, nullnessRandom, dataRandom) }
-                SHORT -> createList(size) { dataProducer.nextShort(it, nullnessRandom, dataRandom) }
-                INT -> createList(size) { dataProducer.nextInt(it, nullnessRandom, dataRandom) }
-                FLOAT -> createList(size) { dataProducer.nextFloat(it, nullnessRandom, dataRandom) }
-                LONG -> createList(size) { dataProducer.nextLong(it, nullnessRandom, dataRandom) }
-                DOUBLE -> createList(size) { dataProducer.nextDouble(it, nullnessRandom, dataRandom) }
+                REFERENCE -> createList(sizeDistribution.nextValue()) { dataProducer.nextReference() }
+                BOOLEAN -> createList(sizeDistribution.nextValue()) { dataProducer.nextBoolean() }
+                BYTE -> createList(sizeDistribution.nextValue()) { dataProducer.nextByte() }
+                CHAR -> createList(sizeDistribution.nextValue()) { dataProducer.nextChar() }
+                SHORT -> createList(sizeDistribution.nextValue()) { dataProducer.nextShort() }
+                INT -> createList(sizeDistribution.nextValue()) { dataProducer.nextInt() }
+                FLOAT -> createList(sizeDistribution.nextValue()) { dataProducer.nextFloat() }
+                LONG -> createList(sizeDistribution.nextValue()) { dataProducer.nextLong() }
+                DOUBLE -> createList(sizeDistribution.nextValue()) { dataProducer.nextDouble() }
             }
         }
     }
 
-    private inline fun <T> createList(size: Int, initializer: (index: Int) -> T): List<T> {
-        return ArrayList<T>(size).apply {
-            repeat(size) { add(initializer(it)) }
-        }
+    private inline fun <T> createList(
+        listSize: Int,
+        initializer: () -> T,
+    ): List<T> {
+        val result = ArrayList<T>(listSize)
+        repeat(listSize) { result.add(initializer()) }
+        return result
     }
 
-    private fun createPersistentLists(nullnessRandom: Random, dataRandom: Random, sizeDistribution: Distribution) {
-        persistentListData = Array(NUM_COLLECTIONS) {
-            val size = sizeDistribution.nextValue()
+    private fun createPersistentLists(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
+        persistentListData = Array(NUM_COLLECTIONS) { index ->
             when (dataType) {
-                REFERENCE -> createPersistentList(size) { dataProducer.nextReference(it, nullnessRandom, dataRandom) }
-                BOOLEAN -> createPersistentList(size) { dataProducer.nextBoolean(it, nullnessRandom, dataRandom) }
-                BYTE -> createPersistentList(size) { dataProducer.nextByte(it, nullnessRandom, dataRandom) }
-                CHAR -> createPersistentList(size) { dataProducer.nextChar(it, nullnessRandom, dataRandom) }
-                SHORT -> createPersistentList(size) { dataProducer.nextShort(it, nullnessRandom, dataRandom) }
-                INT -> createPersistentList(size) { dataProducer.nextInt(it, nullnessRandom, dataRandom) }
-                FLOAT -> createPersistentList(size) { dataProducer.nextFloat(it, nullnessRandom, dataRandom) }
-                LONG -> createPersistentList(size) { dataProducer.nextLong(it, nullnessRandom, dataRandom) }
-                DOUBLE -> createPersistentList(size) { dataProducer.nextDouble(it, nullnessRandom, dataRandom) }
+                REFERENCE -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextReference() }
+                BOOLEAN -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextBoolean() }
+                BYTE -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextByte() }
+                CHAR -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextChar() }
+                SHORT -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextShort() }
+                INT -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextInt() }
+                FLOAT -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextFloat() }
+                LONG -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextLong() }
+                DOUBLE -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextDouble() }
             }
         }
     }
 
-    private inline fun <T> createPersistentList(
-        size: Int,
-        crossinline initializer: (index: Int) -> T,
-    ): PersistentList<T> {
+    private inline fun <T> createPersistentList(listSize: Int, crossinline initializer: () -> T): PersistentList<T> {
         val builder = persistentListOf<T>().builder()
-        repeat(size) { builder.add(initializer(it)) }
+        repeat(listSize) { builder.add(initializer()) }
         return builder.build()
     }
 
-    private fun createArrays(nullnessRandom: Random, dataRandom: Random, sizeDistribution: Distribution) {
+    private fun createArrays(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
         if (dataType == REFERENCE) {
-            referenceArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextReference(it, nullnessRandom, dataRandom) }
+            referenceArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), String::class.java) { dataProducer.nextReference() }
             }
         } else if (dataType == BOOLEAN) {
-            booleanArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextBoolean(it, nullnessRandom, dataRandom) }
+            booleanArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Boolean::class.java) { dataProducer.nextBoolean() }
             }
         } else if (dataType == BYTE) {
-            byteArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextByte(it, nullnessRandom, dataRandom) }
+            byteArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Byte::class.java) { dataProducer.nextByte() }
             }
         } else if (dataType == CHAR) {
-            charArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextChar(it, nullnessRandom, dataRandom) }
+            charArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Char::class.java) { dataProducer.nextChar() }
             }
         } else if (dataType == SHORT) {
-            shortArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextShort(it, nullnessRandom, dataRandom) }
+            shortArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Short::class.java) { dataProducer.nextShort() }
             }
         } else if (dataType == INT) {
-            intArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextInt(it, nullnessRandom, dataRandom) }
+            intArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Int::class.java) { dataProducer.nextInt() }
             }
         } else if (dataType == FLOAT) {
-            floatArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextFloat(it, nullnessRandom, dataRandom) }
+            floatArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Float::class.java) { dataProducer.nextFloat() }
             }
         } else if (dataType == LONG) {
-            longArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextLong(it, nullnessRandom, dataRandom) }
+            longArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Long::class.java) { dataProducer.nextLong() }
             }
         } else if (dataType == DOUBLE) {
-            doubleArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                Array(size) { dataProducer.nextDouble(it, nullnessRandom, dataRandom) }
+            doubleArrays = Array(NUM_COLLECTIONS) { index ->
+                createArray(sizeDistribution.nextValue(), Double::class.java) { dataProducer.nextDouble() }
             }
         }
     }
 
-    private fun createImmutableArrays(nullnessRandom: Random, dataRandom: Random, sizeDistribution: Distribution) {
+    private inline fun <T> createArray(
+        size: Int,
+        componentClass: Class<T & Any>,
+        crossinline initializer: () -> T?,
+    ): Array<T?> {
+        return ArrayCreator.createArray(componentClass, size) { initializer() }
+    }
+
+    private fun createImmutableArrays(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
         if (dataType == REFERENCE) {
-            immutableReferenceArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextReference(it, nullnessRandom, dataRandom) }
+            immutableReferenceArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextReference() }
             }
         } else if (dataType == BOOLEAN) {
-            immutableBooleanArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextBoolean(it, nullnessRandom, dataRandom) }
+            immutableBooleanArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextBoolean() }
             }
         } else if (dataType == BYTE) {
-            immutableByteArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextByte(it, nullnessRandom, dataRandom) }
+            immutableByteArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextByte() }
             }
         } else if (dataType == CHAR) {
-            immutableCharArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextChar(it, nullnessRandom, dataRandom) }
+            immutableCharArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextChar() }
             }
         } else if (dataType == SHORT) {
-            immutableShortArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextShort(it, nullnessRandom, dataRandom) }
+            immutableShortArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextShort() }
             }
         } else if (dataType == INT) {
-            immutableIntArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextInt(it, nullnessRandom, dataRandom) }
+            immutableIntArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextInt() }
             }
         } else if (dataType == FLOAT) {
-            immutableFloatArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextFloat(it, nullnessRandom, dataRandom) }
+            immutableFloatArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextFloat() }
             }
         } else if (dataType == LONG) {
-            immutableLongArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextLong(it, nullnessRandom, dataRandom) }
+            immutableLongArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextLong() }
             }
         } else if (dataType == DOUBLE) {
-            immutableDoubleArrays = Array(NUM_COLLECTIONS) {
-                val size = sizeDistribution.nextValue()
-                ImmutableArray(size) { dataProducer.nextDouble(it, nullnessRandom, dataRandom) }
+            immutableDoubleArrays = Array(NUM_COLLECTIONS) { index ->
+                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextDouble() }
             }
         }
     }

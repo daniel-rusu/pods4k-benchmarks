@@ -14,11 +14,11 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 
 ## Core Abstractions
 
-- `CollectionType`: `LIST`, `ARRAY`, `IMMUTABLE_ARRAY`.
+- `CollectionType`: `LIST`, `PERSISTENT_LIST`, `ARRAY`, `IMMUTABLE_ARRAY`.
 - `DataType`: reference plus primitive/value families: `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`.
 - `Distribution` and `DistributionFactory`: deterministic collection-size distributions.
 - `FlatDataProducer`, `NullableDataProducer`, `FlatDataFilter`: data generation strategies for benchmark setup.
-- `CollectionWrapper` plus concrete wrappers: one shape for selecting correctly typed lists, arrays, and immutable arrays without changing benchmark methods for every data type.
+- `CollectionWrapper` plus concrete wrappers: one for selecting correctly typed lists, arrays, and immutable arrays without changing benchmark methods for every data type.
 - Benchmark bases: `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`.
 
 ## Generated-Code Model
@@ -36,7 +36,7 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 ## Important Invariants
 
 - Benchmark setup uses constant seeds so scenarios are comparable across collection and data types.
-- Size distribution RNGs are separated from element-data RNGs so data types that consume more random values, such as strings, still receive the same collection-size sequence as simpler data types.
+- Size distribution, filter acceptance, null placement, and generated values use separate RNG streams where needed so changing value generation for one data type does not also change predicate or null distributions.
 - Benchmark methods consume results through `Blackhole`.
 - `numCollections` overrides are expected to be fixed values.
 - `@OperationsPerInvocation` represents collections processed per invocation; for pairwise benchmarks it should usually be `NUM_COLLECTIONS / 2`.

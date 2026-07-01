@@ -3,9 +3,10 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.mapNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValues
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValuesProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundNullableValuesProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducerFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -30,8 +31,11 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val objectProducer: ObjectProducer<CompoundElementOfNullableValues>
-        get() = CompoundElementOfNullableValuesProducer(nullRatio = 0.5)
+    override val objectProducerFactory: ObjectProducerFactory<CompoundElementOfNullableValues>
+        get() = CompoundNullableValuesProducerFactory(
+            nullRatio = 0.5,
+            flatDataProducerFactory = FlatDataProducerFactory.RandomDataProducerFactory,
+        )
 
     @Benchmark
     fun mapNotNullReference(bh: Blackhole) {

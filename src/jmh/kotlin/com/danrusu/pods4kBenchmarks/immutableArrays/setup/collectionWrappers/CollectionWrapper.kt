@@ -12,8 +12,6 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import kotlinx.collections.immutable.PersistentList
 
 abstract class CollectionWrapper {
-    abstract val size: Int
-
     open val referenceArray: Array<String>
         get() = throw UnsupportedOperationException()
 

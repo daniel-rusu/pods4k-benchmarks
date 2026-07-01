@@ -1,23 +1,30 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import kotlin.random.Random
 
 interface ObjectProducer<T> {
-    val objectClass: Class<T>
+    val objectClass: Class<T & Any>
 
-    /** Indicates that a new collection is about to be created that will store [size] number of elements */
-    fun startNewCollection(size: Int)
-
-    fun nextObject(index: Int, random: Random): T
+    fun nextObject(): T
 }
 
-object CompoundElementProducer : ObjectProducer<CompoundElement> {
+interface ObjectProducerFactory<T> {
+    fun create(seed: Long): ObjectProducer<T>
+}
+
+object CompoundElementProducerFactory : ObjectProducerFactory<CompoundElement> {
+    override fun create(seed: Long): ObjectProducer<CompoundElement> = RandomCompoundElementProducer(Random(seed))
+}
+
+private class RandomCompoundElementProducer(
+    private val random: Random,
+) : ObjectProducer<CompoundElement> {
     override val objectClass: Class<CompoundElement> = CompoundElement::class.java
 
-    override fun startNewCollection(size: Int) {}
-
-    override fun nextObject(index: Int, random: Random): CompoundElement = CompoundElement(
+    override fun nextObject(): CompoundElement = CompoundElement(
         referenceValue = DataGenerator.randomString(random = random),
         booleanValue = random.nextBoolean(),
         byteValue = DataGenerator.randomByte(random),
@@ -41,31 +48,42 @@ object CompoundElementProducer : ObjectProducer<CompoundElement> {
  * E.g. If [nullRatio] is 0.4, each field will be randomly null 40% of the time and have some random value the other 60%
  * of the time.
  */
-class CompoundElementOfNullableValuesProducer(
+class CompoundNullableValuesProducerFactory(
     val nullRatio: Double,
-) : ObjectProducer<CompoundElementOfNullableValues> {
+    private val flatDataProducerFactory: FlatDataProducerFactory,
+) : ObjectProducerFactory<CompoundElementOfNullableValues> {
     init {
         require(nullRatio in 0.0..1.0)
     }
 
+    override fun create(seed: Long): ObjectProducer<CompoundElementOfNullableValues> {
+        val seedRandom = Random(seed)
+        return CompoundNullableValuesProducer(
+            nullRatio = nullRatio,
+            nullabilityRandom = Random(seedRandom.nextLong()),
+            flatDataProducer = flatDataProducerFactory.create(seedRandom.nextLong()),
+        )
+    }
+}
+
+private class CompoundNullableValuesProducer(
+    private val nullRatio: Double,
+    private val nullabilityRandom: Random,
+    private val flatDataProducer: FlatDataProducer,
+) : ObjectProducer<CompoundElementOfNullableValues> {
     override val objectClass: Class<CompoundElementOfNullableValues> = CompoundElementOfNullableValues::class.java
 
-    override fun startNewCollection(size: Int) {}
-
-    override fun nextObject(
-        index: Int,
-        random: Random
-    ): CompoundElementOfNullableValues = CompoundElementOfNullableValues(
-        nullableReference = if (shouldBeNull(random)) null else DataGenerator.randomString(random = random),
-        nullableBoolean = if (shouldBeNull(random)) null else random.nextBoolean(),
-        nullableByte = if (shouldBeNull(random)) null else DataGenerator.randomByte(random),
-        nullableChar = if (shouldBeNull(random)) null else DataGenerator.randomChar(random),
-        nullableShort = if (shouldBeNull(random)) null else DataGenerator.randomShort(random),
-        nullableInt = if (shouldBeNull(random)) null else random.nextInt(),
-        nullableFloat = if (shouldBeNull(random)) null else random.nextFloat(),
-        nullableLong = if (shouldBeNull(random)) null else random.nextLong(),
-        nullableDouble = if (shouldBeNull(random)) null else random.nextDouble(),
+    override fun nextObject(): CompoundElementOfNullableValues = CompoundElementOfNullableValues(
+        nullableReference = if (shouldBeNull()) null else flatDataProducer.nextReference(),
+        nullableBoolean = if (shouldBeNull()) null else flatDataProducer.nextBoolean(),
+        nullableByte = if (shouldBeNull()) null else flatDataProducer.nextByte(),
+        nullableChar = if (shouldBeNull()) null else flatDataProducer.nextChar(),
+        nullableShort = if (shouldBeNull()) null else flatDataProducer.nextShort(),
+        nullableInt = if (shouldBeNull()) null else flatDataProducer.nextInt(),
+        nullableFloat = if (shouldBeNull()) null else flatDataProducer.nextFloat(),
+        nullableLong = if (shouldBeNull()) null else flatDataProducer.nextLong(),
+        nullableDouble = if (shouldBeNull()) null else flatDataProducer.nextDouble(),
     )
 
-    private fun shouldBeNull(random: Random): Boolean = random.nextDouble() < nullRatio
+    private fun shouldBeNull(): Boolean = nullabilityRandom.nextDouble() < nullRatio
 }

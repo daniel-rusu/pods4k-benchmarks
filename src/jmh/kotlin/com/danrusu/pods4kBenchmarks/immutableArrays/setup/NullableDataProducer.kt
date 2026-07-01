@@ -2,64 +2,63 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import kotlin.random.Random
 
-class NullableDataProducer(val nullRatio: Double, val flatDataProducer: FlatDataProducer) {
-    /** Indicates that a new collection is about to be created that will store [size] number of elements */
-    fun startNewCollection(size: Int) {
-        flatDataProducer.startNewCollection(size)
+class NullableDataProducer(
+    val nullRatio: Double,
+    private val nullnessRandom: Random,
+    private val flatDataProducer: FlatDataProducer,
+) {
+    /** Returns the next reference element */
+    fun nextReference(): String? = when {
+        shouldBeNull(nullnessRandom) -> null
+        else -> flatDataProducer.nextReference()
     }
 
-    /** Returns the next reference element that will be the [index]th element into the collection being created */
-    fun nextReference(index: Int, nullnessRandom: Random, dataRandom: Random): String? = when {
+    /** Returns the next Boolean? element */
+    fun nextBoolean(): Boolean? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextReference(index, dataRandom)
+        else -> flatDataProducer.nextBoolean()
     }
 
-    /** Returns the next [Boolean] element that will be the [index]th element into the collection being created */
-    fun nextBoolean(index: Int, nullnessRandom: Random, dataRandom: Random): Boolean? = when {
+    /** Returns the next Byte? element */
+    fun nextByte(): Byte? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextBoolean(index, dataRandom)
+        else -> flatDataProducer.nextByte()
     }
 
-    /** Returns the next [Byte] element that will be the [index]th element into the collection being created */
-    fun nextByte(index: Int, nullnessRandom: Random, dataRandom: Random): Byte? = when {
+    /** Returns the next Char? element */
+    fun nextChar(): Char? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextByte(index, dataRandom)
+        else -> flatDataProducer.nextChar()
     }
 
-    /** Returns the next [Char] element that will be the [index]th element into the collection being created */
-    fun nextChar(index: Int, nullnessRandom: Random, dataRandom: Random): Char? = when {
+    /** Returns the next Short? element */
+    fun nextShort(): Short? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextChar(index, dataRandom)
+        else -> flatDataProducer.nextShort()
     }
 
-    /** Returns the next [Short] element that will be the [index]th element into the collection being created */
-    fun nextShort(index: Int, nullnessRandom: Random, dataRandom: Random): Short? = when {
+    /** Returns the next Int? element */
+    fun nextInt(): Int? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextShort(index, dataRandom)
+        else -> flatDataProducer.nextInt()
     }
 
-    /** Returns the next [Int] element that will be the [index]th element into the collection being created */
-    fun nextInt(index: Int, nullnessRandom: Random, dataRandom: Random): Int? = when {
+    /** Returns the next Float? element */
+    fun nextFloat(): Float? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextInt(index, dataRandom)
+        else -> flatDataProducer.nextFloat()
     }
 
-    /** Returns the next [Float] element that will be the [index]th element into the collection being created */
-    fun nextFloat(index: Int, nullnessRandom: Random, dataRandom: Random): Float? = when {
+    /** Returns the next Long? element */
+    fun nextLong(): Long? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextFloat(index, dataRandom)
+        else -> flatDataProducer.nextLong()
     }
 
-    /** Returns the next [Long] element that will be the [index]th element into the collection being created */
-    fun nextLong(index: Int, nullnessRandom: Random, dataRandom: Random): Long? = when {
+    /** Returns the next Double? element */
+    fun nextDouble(): Double? = when {
         shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextLong(index, dataRandom)
-    }
-
-    /** Returns the next [Double] element that will be the [index]th element into the collection being created */
-    fun nextDouble(index: Int, nullnessRandom: Random, dataRandom: Random): Double? = when {
-        shouldBeNull(nullnessRandom) -> null
-        else -> flatDataProducer.nextDouble(index, dataRandom)
+        else -> flatDataProducer.nextDouble()
     }
 
     /**
@@ -70,4 +69,22 @@ class NullableDataProducer(val nullRatio: Double, val flatDataProducer: FlatData
      * the distribution of null values is identical across different data types so that they are directly comparable.
      */
     private fun shouldBeNull(random: Random): Boolean = random.nextDouble() < nullRatio
+}
+
+class NullableDataProducerFactory(
+    private val nullRatio: Double,
+    private val flatDataProducerFactory: FlatDataProducerFactory,
+) {
+    init {
+        require(nullRatio in 0.0..1.0)
+    }
+
+    fun create(seed: Long): NullableDataProducer {
+        val seedRandom = Random(seed)
+        return NullableDataProducer(
+            nullRatio = nullRatio,
+            nullnessRandom = Random(seedRandom.nextLong()),
+            flatDataProducer = flatDataProducerFactory.create(seedRandom.nextLong()),
+        )
+    }
 }

@@ -24,13 +24,12 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CollectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
-import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
@@ -82,76 +81,51 @@ abstract class FlatCollectionBenchmark {
         get() = DistributionFactory.ListSizeDistribution
 
     /** Responsible for generating the element data that the collections will contain */
-    open val dataProducer: FlatDataProducer
-        get() = FlatDataProducer.RandomDataProducer
+    open val dataProducerFactory: FlatDataProducerFactory
+        get() = FlatDataProducerFactory.RandomDataProducerFactory
 
     protected lateinit var data: Array<out CollectionWrapper>
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        // Use constant seed so the data is identical for all benchmarks since they're compared against each other
-        val random = Random(0)
-        val sizeDistribution = sizeDistributionFactory.create(random)
+        val seedGenerator = Random(0)
+        val sizeDistribution = sizeDistributionFactory.create(seedGenerator.nextLong())
+        val dataProducer = dataProducerFactory.create(seedGenerator.nextLong())
 
         data = when (collectionType) {
-            LIST -> createLists(random, sizeDistribution)
-            PERSISTENT_LIST -> createPersistentLists(random, sizeDistribution)
-            ARRAY -> createArrays(random, sizeDistribution)
-            IMMUTABLE_ARRAY -> createImmutableArrays(random, sizeDistribution)
+            LIST -> ListWrapper.createWrappers(
+                count = numCollections,
+                sizeDistribution = sizeDistribution,
+                dataType = dataType,
+                dataProducer = dataProducer
+            )
+
+            PERSISTENT_LIST -> PersistentListWrapper.createWrappers(
+                count = numCollections,
+                sizeDistribution = sizeDistribution,
+                dataType = dataType,
+                dataProducer = dataProducer
+            )
+
+            ARRAY -> ArrayWrapper.createWrappers(
+                count = numCollections,
+                sizeDistribution = sizeDistribution,
+                dataType = dataType,
+                dataProducer = dataProducer
+            )
+
+            IMMUTABLE_ARRAY -> ImmutableArrayWrapper.createWrappers(
+                count = numCollections,
+                sizeDistribution = sizeDistribution,
+                dataType = dataType,
+                dataProducer = dataProducer
+            )
         }
     }
 
     @TearDown
     fun tearDown() {
         data = emptyArray()
-    }
-
-    private fun createLists(
-        random: Random,
-        sizeDistribution: Distribution
-    ): Array<ListWrapper> = Array(numCollections) {
-        ListWrapper.create(
-            random = random,
-            dataType = dataType,
-            size = sizeDistribution.nextValue(),
-            dataProducer = dataProducer,
-        )
-    }
-
-    private fun createPersistentLists(
-        random: Random,
-        sizeDistribution: Distribution
-    ): Array<PersistentListWrapper> = Array(numCollections) {
-        PersistentListWrapper.create(
-            random = random,
-            dataType = dataType,
-            size = sizeDistribution.nextValue(),
-            dataProducer = dataProducer,
-        )
-    }
-
-    private fun createArrays(
-        random: Random,
-        sizeDistribution: Distribution
-    ): Array<ArrayWrapper> = Array(numCollections) {
-        ArrayWrapper.create(
-            random = random,
-            dataType = dataType,
-            size = sizeDistribution.nextValue(),
-            dataProducer = dataProducer,
-        )
-    }
-
-    private fun createImmutableArrays(
-        random: Random,
-        sizeDistribution: Distribution
-    ): Array<ImmutableArrayWrapper> = Array(numCollections) {
-        ImmutableArrayWrapper.create(
-            random = random,
-            dataType = dataType,
-            size = sizeDistribution.nextValue(),
-            dataProducer = dataProducer,
-        )
     }
 
     /**

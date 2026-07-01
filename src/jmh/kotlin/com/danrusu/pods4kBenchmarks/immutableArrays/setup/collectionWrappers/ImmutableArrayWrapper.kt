@@ -20,170 +20,107 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
-import kotlin.random.Random
+import com.danrusu.pods4kBenchmarks.utils.Distribution
 
 /** Represents a wrapper class that stores a single immutable array of the appropriate [DataType] */
 sealed class ImmutableArrayWrapper : CollectionWrapper() {
     companion object {
-        fun create(
-            random: Random,
+        fun createWrappers(
+            count: Int,
+            sizeDistribution: Distribution,
             dataType: DataType,
-            size: Int,
-            dataProducer: FlatDataProducer
-        ): ImmutableArrayWrapper = when (dataType) {
-            REFERENCE -> ImmutableReferenceArrayWrapper(random, size, dataProducer)
-            BOOLEAN -> ImmutableBooleanArrayWrapper(random, size, dataProducer)
-            BYTE -> ImmutableByteArrayWrapper(random, size, dataProducer)
-            CHAR -> ImmutableCharArrayWrapper(random, size, dataProducer)
-            SHORT -> ImmutableShortArrayWrapper(random, size, dataProducer)
-            INT -> ImmutableIntArrayWrapper(random, size, dataProducer)
-            FLOAT -> ImmutableFloatArrayWrapper(random, size, dataProducer)
-            LONG -> ImmutableLongArrayWrapper(random, size, dataProducer)
-            DOUBLE -> ImmutableDoubleArrayWrapper(random, size, dataProducer)
-
+            dataProducer: FlatDataProducer,
+        ): Array<ImmutableArrayWrapper> = when (dataType) {
+            REFERENCE -> Array(count) { ImmutableReferenceArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            BOOLEAN -> Array(count) { ImmutableBooleanArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            BYTE -> Array(count) { ImmutableByteArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            CHAR -> Array(count) { ImmutableCharArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            SHORT -> Array(count) { ImmutableShortArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            INT -> Array(count) { ImmutableIntArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            FLOAT -> Array(count) { ImmutableFloatArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            LONG -> Array(count) { ImmutableLongArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            DOUBLE -> Array(count) { ImmutableDoubleArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
         }
     }
 }
 
 class ImmutableReferenceArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableReferenceArray: ImmutableArray<String> = ImmutableArray(size) {
+        dataProducer.nextReference()
     }
-
-    override val size: Int
-        get() = immutableReferenceArray.size
-
-    override val immutableReferenceArray: ImmutableArray<String> =
-        ImmutableArray(size) { dataProducer.nextReference(it, random) }
 }
 
 class ImmutableBooleanArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableBooleanArray: ImmutableBooleanArray = ImmutableBooleanArray(size) {
+        dataProducer.nextBoolean()
     }
-
-    override val size: Int
-        get() = immutableBooleanArray.size
-
-    override val immutableBooleanArray: ImmutableBooleanArray =
-        ImmutableBooleanArray(size) { dataProducer.nextBoolean(it, random) }
 }
 
 class ImmutableByteArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableByteArray: ImmutableByteArray = ImmutableByteArray(size) {
+        dataProducer.nextByte()
     }
-
-    override val size: Int
-        get() = immutableByteArray.size
-
-    override val immutableByteArray: ImmutableByteArray =
-        ImmutableByteArray(size) { dataProducer.nextByte(it, random) }
 }
 
 class ImmutableCharArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableCharArray: ImmutableCharArray = ImmutableCharArray(size) {
+        dataProducer.nextChar()
     }
-
-    override val size: Int
-        get() = immutableCharArray.size
-
-    override val immutableCharArray: ImmutableCharArray =
-        ImmutableCharArray(size) { dataProducer.nextChar(it, random) }
 }
 
 class ImmutableShortArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableShortArray: ImmutableShortArray = ImmutableShortArray(size) {
+        dataProducer.nextShort()
     }
-
-    override val size: Int
-        get() = immutableShortArray.size
-
-    override val immutableShortArray: ImmutableShortArray =
-        ImmutableShortArray(size) { dataProducer.nextShort(it, random) }
 }
 
 class ImmutableIntArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableIntArray: ImmutableIntArray = ImmutableIntArray(size) {
+        dataProducer.nextInt()
     }
-
-    override val size: Int
-        get() = immutableIntArray.size
-
-    override val immutableIntArray: ImmutableIntArray = ImmutableIntArray(size) { dataProducer.nextInt(it, random) }
 }
 
 class ImmutableFloatArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableFloatArray: ImmutableFloatArray = ImmutableFloatArray(size) {
+        dataProducer.nextFloat()
     }
-
-    override val size: Int
-        get() = immutableFloatArray.size
-
-    override val immutableFloatArray: ImmutableFloatArray =
-        ImmutableFloatArray(size) { dataProducer.nextFloat(it, random) }
 }
 
 class ImmutableLongArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableLongArray: ImmutableLongArray = ImmutableLongArray(size) {
+        dataProducer.nextLong()
     }
-
-    override val size: Int
-        get() = immutableLongArray.size
-
-    override val immutableLongArray: ImmutableLongArray =
-        ImmutableLongArray(size) { dataProducer.nextLong(it, random) }
 }
 
 class ImmutableDoubleArrayWrapper(
-    random: Random,
     size: Int,
     dataProducer: FlatDataProducer,
 ) : ImmutableArrayWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val immutableDoubleArray: ImmutableDoubleArray = ImmutableDoubleArray(size) {
+        dataProducer.nextDouble()
     }
-
-    override val size: Int
-        get() = immutableDoubleArray.size
-
-    override val immutableDoubleArray: ImmutableDoubleArray =
-        ImmutableDoubleArray(size) { dataProducer.nextDouble(it, random) }
 }

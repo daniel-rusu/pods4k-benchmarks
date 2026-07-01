@@ -12,7 +12,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteArrayWrapper
@@ -96,27 +96,26 @@ abstract class NestedCollectionBenchmark {
         get() = DistributionFactory.NestedListSizeDistribution
 
     /** Responsible for generating the element data that the nested collections will store */
-    open val nestedDataProducer: FlatDataProducer
-        get() = FlatDataProducer.RandomDataProducer
+    open val nestedDataProducerFactory: FlatDataProducerFactory
+        get() = FlatDataProducerFactory.RandomDataProducerFactory
 
     protected lateinit var data: Array<NestedCollectionWrapper>
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        // Use constant seed so the data is identical for all benchmarks since they're compared against each other
-        val random = Random(0)
-        val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(random)
-        val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(random)
+        val seedGenerator = Random(0)
 
-        data = Array(numCollections) {
-            val numElements = topLevelSizeDistribution.nextValue()
+        val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(seedGenerator.nextLong())
+        val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(seedGenerator.nextLong())
+        val dataProducer = nestedDataProducerFactory.create(seedGenerator.nextLong())
 
+        data = Array(numCollections) { index ->
             NestedCollectionWrapper(
-                size = numElements,
-                random = random,
+                numNestedCollections = topLevelSizeDistribution.nextValue(),
+                nestedSizeDistribution = nestedSizeDistribution,
+                collectionType = collectionType,
                 dataType = dataType,
-                nestedCollectionSizeDistribution = nestedSizeDistribution,
-                dataProducer = nestedDataProducer,
+                dataProducer = dataProducer,
             )
         }
     }

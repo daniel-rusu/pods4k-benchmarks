@@ -3,9 +3,9 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElement
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducerFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -30,8 +30,8 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val objectProducer: ObjectProducer<CompoundElement>
-        get() = CompoundElementProducer
+    override val objectProducerFactory: ObjectProducerFactory<CompoundElement>
+        get() = CompoundElementProducerFactory
 
     @Benchmark
     fun mapReference(bh: Blackhole) {

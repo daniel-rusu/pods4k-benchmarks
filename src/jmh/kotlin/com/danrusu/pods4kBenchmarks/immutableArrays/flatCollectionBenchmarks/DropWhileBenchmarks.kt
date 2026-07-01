@@ -11,7 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -36,8 +36,8 @@ open class DropWhileBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val dataProducer: FlatDataProducer
-        get() = FlatDataFilter.generateData(
+    override val dataProducerFactory: FlatDataProducerFactory
+        get() = FlatDataFilter.createDataProducerFactory(
             // statistically, `dropWhile` will drop about 34 values on average since (0.98)^34 = 50%
             acceptRatio = 0.98,
         )

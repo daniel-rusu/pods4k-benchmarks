@@ -3,26 +3,24 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlin.random.Random
 
 private val EMPTY_LIST: List<Nothing> = emptyList()
 private val EMPTY_PERSISTENT_LIST: PersistentList<Nothing> = persistentListOf()
 private val EMPTY_ARRAY: Array<Any> = emptyArray()
 private val EMPTY_IMMUTABLE_ARRAY: ImmutableArray<Nothing> = emptyImmutableArray()
 
-/**
- * Creates and stores a collection of the specified collection type by using the appropriate provided factory.
- */
-
+/** Creates and stores a collection of the specified collection type */
 class WrapperForCollectionType<T>(
-    random: Random,
-    size: Int,
+    collectionSize: Int,
     collectionType: CollectionType,
     objectProducer: ObjectProducer<T>,
-    objectClass: Class<T>,
 ) {
     var list: List<T> = EMPTY_LIST
         private set
@@ -38,24 +36,25 @@ class WrapperForCollectionType<T>(
         private set
 
     init {
-        objectProducer.startNewCollection(size)
+        val objectClass = objectProducer.objectClass
+
         when (collectionType) {
-            CollectionType.LIST -> {
-                list = (0..<size).map { objectProducer.nextObject(it, random) }
+            LIST -> {
+                list = (1..collectionSize).map { objectProducer.nextObject() }
             }
 
-            CollectionType.PERSISTENT_LIST -> {
+            PERSISTENT_LIST -> {
                 val builder = persistentListOf<T>().builder()
-                repeat(size) { builder.add(objectProducer.nextObject(it, random)) }
+                repeat(collectionSize) { builder.add(objectProducer.nextObject()) }
                 persistentList = builder.build()
             }
 
-            CollectionType.ARRAY -> {
-                array = ArrayCreator.createArray(objectClass, size) { objectProducer.nextObject(it, random) }
+            ARRAY -> {
+                array = ArrayCreator.createArray(objectClass, collectionSize) { objectProducer.nextObject() }
             }
 
-            CollectionType.IMMUTABLE_ARRAY -> {
-                immutableArray = ImmutableArray(size) { objectProducer.nextObject(it, random) }
+            IMMUTABLE_ARRAY -> {
+                immutableArray = ImmutableArray(collectionSize) { objectProducer.nextObject() }
             }
         }
     }

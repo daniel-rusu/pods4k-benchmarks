@@ -11,181 +11,131 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
+import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlin.random.Random
 
 /** Represents a wrapper class that stores a single persistent list of the appropriate [DataType] */
 sealed class PersistentListWrapper : CollectionWrapper() {
     companion object {
         fun create(
-            random: Random,
-            dataType: DataType,
             size: Int,
+            dataType: DataType,
             dataProducer: FlatDataProducer,
         ): PersistentListWrapper = when (dataType) {
-            REFERENCE -> PersistentReferenceListWrapper(random, size, dataProducer)
-            BOOLEAN -> PersistentBooleanListWrapper(random, size, dataProducer)
-            BYTE -> PersistentByteListWrapper(random, size, dataProducer)
-            CHAR -> PersistentCharListWrapper(random, size, dataProducer)
-            SHORT -> PersistentShortListWrapper(random, size, dataProducer)
-            INT -> PersistentIntListWrapper(random, size, dataProducer)
-            FLOAT -> PersistentFloatListWrapper(random, size, dataProducer)
-            LONG -> PersistentLongListWrapper(random, size, dataProducer)
-            DOUBLE -> PersistentDoubleListWrapper(random, size, dataProducer)
+            REFERENCE -> PersistentReferenceListWrapper(size, dataProducer)
+            BOOLEAN -> PersistentBooleanListWrapper(size, dataProducer)
+            BYTE -> PersistentByteListWrapper(size, dataProducer)
+            CHAR -> PersistentCharListWrapper(size, dataProducer)
+            SHORT -> PersistentShortListWrapper(size, dataProducer)
+            INT -> PersistentIntListWrapper(size, dataProducer)
+            FLOAT -> PersistentFloatListWrapper(size, dataProducer)
+            LONG -> PersistentLongListWrapper(size, dataProducer)
+            DOUBLE -> PersistentDoubleListWrapper(size, dataProducer)
+        }
+
+        fun createWrappers(
+            count: Int,
+            sizeDistribution: Distribution,
+            dataType: DataType,
+            dataProducer: FlatDataProducer,
+        ): Array<PersistentListWrapper> = when (dataType) {
+            REFERENCE -> Array(count) { PersistentReferenceListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            BOOLEAN -> Array(count) { PersistentBooleanListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            BYTE -> Array(count) { PersistentByteListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            CHAR -> Array(count) { PersistentCharListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            SHORT -> Array(count) { PersistentShortListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            INT -> Array(count) { PersistentIntListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            FLOAT -> Array(count) { PersistentFloatListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            LONG -> Array(count) { PersistentLongListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            DOUBLE -> Array(count) { PersistentDoubleListWrapper(sizeDistribution.nextValue(), dataProducer) }
         }
     }
 }
 
 class PersistentReferenceListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentReferenceList: PersistentList<String> = createPersistentList(listSize) {
+        dataProducer.nextReference()
     }
-
-    override val size: Int
-        get() = persistentReferenceList.size
-
-    override val persistentReferenceList: PersistentList<String> =
-        createPersistentList(size) { dataProducer.nextReference(it, random) }
 }
 
 class PersistentBooleanListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentBooleanList: PersistentList<Boolean> = createPersistentList(listSize) {
+        dataProducer.nextBoolean()
     }
-
-    override val size: Int
-        get() = persistentBooleanList.size
-
-    override val persistentBooleanList: PersistentList<Boolean> =
-        createPersistentList(size) { dataProducer.nextBoolean(it, random) }
 }
 
 class PersistentByteListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentByteList: PersistentList<Byte> = createPersistentList(listSize) {
+        dataProducer.nextByte()
     }
-
-    override val size: Int
-        get() = persistentByteList.size
-
-    override val persistentByteList: PersistentList<Byte> =
-        createPersistentList(size) { dataProducer.nextByte(it, random) }
 }
 
 class PersistentCharListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentCharList: PersistentList<Char> = createPersistentList(listSize) {
+        dataProducer.nextChar()
     }
-
-    override val size: Int
-        get() = persistentCharList.size
-
-    override val persistentCharList: PersistentList<Char> =
-        createPersistentList(size) { dataProducer.nextChar(it, random) }
 }
 
 class PersistentShortListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentShortList: PersistentList<Short> = createPersistentList(listSize) {
+        dataProducer.nextShort()
     }
-
-    override val size: Int
-        get() = persistentShortList.size
-
-    override val persistentShortList: PersistentList<Short> =
-        createPersistentList(size) { dataProducer.nextShort(it, random) }
 }
 
 class PersistentIntListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentIntList: PersistentList<Int> = createPersistentList(listSize) {
+        dataProducer.nextInt()
     }
-
-    override val size: Int
-        get() = persistentIntList.size
-
-    override val persistentIntList: PersistentList<Int> =
-        createPersistentList(size) { dataProducer.nextInt(it, random) }
 }
 
 class PersistentFloatListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentFloatList: PersistentList<Float> = createPersistentList(listSize) {
+        dataProducer.nextFloat()
     }
-
-    override val size: Int
-        get() = persistentFloatList.size
-
-    override val persistentFloatList: PersistentList<Float> =
-        createPersistentList(size) { dataProducer.nextFloat(it, random) }
 }
 
 class PersistentLongListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentLongList: PersistentList<Long> = createPersistentList(listSize) {
+        dataProducer.nextLong()
     }
-
-    override val size: Int
-        get() = persistentLongList.size
-
-    override val persistentLongList: PersistentList<Long> =
-        createPersistentList(size) { dataProducer.nextLong(it, random) }
 }
 
 class PersistentDoubleListWrapper(
-    random: Random,
-    size: Int,
+    listSize: Int,
     dataProducer: FlatDataProducer,
 ) : PersistentListWrapper() {
-    init {
-        dataProducer.startNewCollection(size)
+    override val persistentDoubleList: PersistentList<Double> = createPersistentList(listSize) {
+        dataProducer.nextDouble()
     }
-
-    override val size: Int
-        get() = persistentDoubleList.size
-
-    override val persistentDoubleList: PersistentList<Double> =
-        createPersistentList(size) { dataProducer.nextDouble(it, random) }
 }
 
-private inline fun <T> createPersistentList(
-    size: Int,
-    crossinline initializer: (index: Int) -> T,
-): PersistentList<T> {
+private inline fun <T> createPersistentList(listSize: Int, initializer: () -> T): PersistentList<T> {
     val builder = persistentListOf<T>().builder()
-    repeat(size) { builder.add(initializer(it)) }
+    repeat(listSize) { builder.add(initializer()) }
     return builder.build()
 }

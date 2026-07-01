@@ -29,9 +29,9 @@ import kotlin.random.Random
  * types (like Boolean, Int, etc.) plus the most common reference type, String.  The benchmark methods should call
  * [transformEachCollection] providing the operations to be performed for each collection type.
  *
- * For example, if [numCollections] returns 500, and the data type being measured is [DataType.BOOLEAN], then 500
- * List<Boolean>, 500 BooleanArray, and 500 ImmutableBooleanArray collections will be created.  The provided list
- * transform, defined in [transformEachCollection], will be called for each of the 500 lists.
+ * For example, if [numCollections] is 500, type is [CollectionType.LIST], and data type is [DataType.BOOLEAN], then 500
+ * List<Boolean> collections will be created.  When the subclass calls [transformEachCollection], the provided boolean
+ * collection transform will be called for each of the 500 collections.
  */
 @State(Scope.Benchmark)
 abstract class ObjectCollectionBenchmark<T> {
@@ -55,7 +55,7 @@ abstract class ObjectCollectionBenchmark<T> {
         get() = DistributionFactory.ListSizeDistribution
 
     /** Responsible for generated the element data that the collections will contain */
-    abstract val objectProducer: ObjectProducer<T>
+    abstract val objectProducerFactory: ObjectProducerFactory<T>
 
     /**
      * Note: We're storing an array of [WrapperForCollectionType] instances with each wrapper storing the appropriate
@@ -67,19 +67,15 @@ abstract class ObjectCollectionBenchmark<T> {
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        // Use constant seed so the data is identical for all benchmarks since they're compared against each other
-        val random = Random(0)
-        val sizeDistribution = sizeDistributionFactory.create(random)
+        val seedGenerator = Random(0)
+        val sizeDistribution = sizeDistributionFactory.create(seedGenerator.nextLong())
+        val objectProducer = objectProducerFactory.create(seedGenerator.nextLong())
 
-        data = Array(numCollections) {
-            val numElements = sizeDistribution.nextValue()
-
+        data = Array(numCollections) { index ->
             WrapperForCollectionType(
-                random = random,
-                size = numElements,
+                sizeDistribution.nextValue(),
                 collectionType = collectionType,
                 objectProducer = objectProducer,
-                objectClass = objectProducer.objectClass,
             )
         }
     }

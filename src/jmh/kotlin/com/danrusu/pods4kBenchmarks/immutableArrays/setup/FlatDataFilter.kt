@@ -44,55 +44,96 @@ object FlatDataFilter {
     inline fun shouldAccept(value: Double): Boolean = value < MEDIAN_DOUBLE
 
     /**
-     * Creates a [FlatDataProducer] that produces values which will be accepted with a ratio of [acceptRatio].
+     * Creates a [FlatDataProducerFactory] that produces values which will be accepted with a ratio of [acceptRatio].
      *
      * acceptRatio = (# of accepted values) / (# of total values)
      */
-    fun generateData(acceptRatio: Double): FlatDataProducer = object : FlatDataProducer {
+    fun createDataProducerFactory(acceptRatio: Double): FlatDataProducerFactory = object : FlatDataProducerFactory {
         init {
             require(acceptRatio in 0.0..1.0)
         }
 
-        override fun startNewCollection(size: Int) {}
+        override fun create(seed: Long): FlatDataProducer {
+            val seedRandom = Random(seed)
+            return FilteredFlatDataProducer(
+                acceptRatio = acceptRatio,
+                acceptanceRandom = Random(seedRandom.nextLong()),
+                dataRandom = Random(seedRandom.nextLong()),
+            )
+        }
+    }
 
-        override fun nextReference(index: Int, random: Random): String {
-            return generateAppropriateValue(random, ::shouldAccept) {
-                val length = random.nextInt(from = MIN_STRING_LENGTH, until = MAX_STRING_LENGTH + 1)
-                val randomChars = CharArray(length) { alphanumericCharacters.random(random) }
-                String(randomChars)
-            }
+    /** Produces data that the [FlatDataFilter] will accept [acceptRatio] amount of the time */
+    private class FilteredFlatDataProducer(
+        private val acceptRatio: Double,
+        private val acceptanceRandom: Random,
+        private val dataRandom: Random,
+    ) : FlatDataProducer {
+        override fun nextReference(): String {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = {
+                    val length = dataRandom.nextInt(from = MIN_STRING_LENGTH, until = MAX_STRING_LENGTH + 1)
+                    val randomChars = CharArray(length) { alphanumericCharacters.random(dataRandom) }
+                    String(randomChars)
+                },
+            )
         }
 
-        override fun nextBoolean(index: Int, random: Random): Boolean {
-            return generateAppropriateValue(random, ::shouldAccept) { random.nextBoolean() }
+        override fun nextBoolean(): Boolean {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { dataRandom.nextBoolean() },
+            )
         }
 
-        override fun nextByte(index: Int, random: Random): Byte {
-            return generateAppropriateValue(random, ::shouldAccept) { DataGenerator.randomByte(random) }
+        override fun nextByte(): Byte {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { DataGenerator.randomByte(dataRandom) },
+            )
         }
 
-        override fun nextChar(index: Int, random: Random): Char {
-            return generateAppropriateValue(random, ::shouldAccept) { alphanumericCharacters.random(random) }
+        override fun nextChar(): Char {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { alphanumericCharacters.random(dataRandom) },
+            )
         }
 
-        override fun nextShort(index: Int, random: Random): Short {
-            return generateAppropriateValue(random, ::shouldAccept) { DataGenerator.randomShort(random) }
+        override fun nextShort(): Short {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { DataGenerator.randomShort(dataRandom) },
+            )
         }
 
-        override fun nextInt(index: Int, random: Random): Int {
-            return generateAppropriateValue(random, ::shouldAccept) { random.nextInt() }
+        override fun nextInt(): Int {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { dataRandom.nextInt() },
+            )
         }
 
-        override fun nextFloat(index: Int, random: Random): Float {
-            return generateAppropriateValue(random, ::shouldAccept) { random.nextFloat() }
+        override fun nextFloat(): Float {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { dataRandom.nextFloat() },
+            )
         }
 
-        override fun nextLong(index: Int, random: Random): Long {
-            return generateAppropriateValue(random, ::shouldAccept) { random.nextLong() }
+        override fun nextLong(): Long {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { dataRandom.nextLong() },
+            )
         }
 
-        override fun nextDouble(index: Int, random: Random): Double {
-            return generateAppropriateValue(random, ::shouldAccept) { random.nextDouble() }
+        override fun nextDouble(): Double {
+            return generateAppropriateValue(
+                accept = { shouldAccept(it) },
+                generate = { dataRandom.nextDouble() },
+            )
         }
 
         /**
@@ -110,13 +151,12 @@ object FlatDataFilter {
          * ratio just means that most of the generated values will be above the median so they'll be rejected.  So the
          * acceptance ratio doesn't represent the rarity of the generated values but rather how often values will be
          * below the median.
+         *
+         * An [acceptRatio] of 0.0 is safe because every supported data type can produce values that fail its
+         * acceptance predicate.
          */
-        private inline fun <T> generateAppropriateValue(
-            random: Random,
-            accept: (T) -> Boolean,
-            generate: () -> T
-        ): T {
-            val shouldBeAccepted = random.nextDouble() < acceptRatio
+        private inline fun <T> generateAppropriateValue(accept: (T) -> Boolean, generate: () -> T): T {
+            val shouldBeAccepted = acceptanceRandom.nextDouble() < acceptRatio
 
             var value = generate()
             while (accept(value) != shouldBeAccepted) {

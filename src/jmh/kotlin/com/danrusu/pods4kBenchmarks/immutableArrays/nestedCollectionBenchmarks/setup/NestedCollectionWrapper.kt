@@ -1,7 +1,13 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
 import com.danrusu.pods4k.immutableArrays.toImmutableArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ArrayWrapper
@@ -10,78 +16,59 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Lis
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import kotlin.random.Random
 
 /**
- * Creates and stores each of the collection types with each storing wrappers for their respective type.
+ * Creates and stores the active collection type with wrappers for its respective type.
  * The wrappers will themselves store a collection with size controlled by the nested-collection-size-distribution.
  *
  * Note that the wrapper layer is on purpose in order to more closely model the real world where we don't have a list
  * of lists directly but rather a list of objects which themselves contain lists (eg. list of Person objects and each
  * person has a list of friends).
- *
- * For example, for a size of 10 with a data type of [DataType.BOOLEAN] then:
- * - [array]
- *   - will be an array containing 10 [ArrayWrapper] elements
- *   - the wrappers will each store a primitive BooleanArray with size controlled by the specified distribution
- * - [list]
- *   - will be a list containing 10 [ListWrapper] elements
- *   - the wrappers will each store a List<Boolean> with contents copied from the array wrappers
- * - [persistentList]
- *   - will be a persistent list containing 10 [PersistentListWrapper] elements
- *   - the wrappers will each store a PersistentList<Boolean> with contents copied from the array wrappers
- * - [immutableArray]
- *   - will be an immutable array containing 10 [ImmutableArrayWrapper] elements
- *   - the wrappers will each store a ImmutableBooleanArray with contents copied from the array wrappers
  */
 class NestedCollectionWrapper(
-    size: Int,
-    random: Random,
+    numNestedCollections: Int,
+    nestedSizeDistribution: Distribution,
+    collectionType: CollectionType,
     dataType: DataType,
-    nestedCollectionSizeDistribution: Distribution,
     dataProducer: FlatDataProducer,
 ) {
-    val array: Array<out ArrayWrapper> = ArrayWrapper.createWrappers(
-        random = random,
-        dataType = dataType,
-        size = size,
-        nestedCollectionSizeDistribution = nestedCollectionSizeDistribution,
-        dataProducer = dataProducer,
-    )
-
-    /*
-    Note that instead of copying the data, I tried accepting the collection type as a  parameter and using empty
-    collections when it's not of this type but strangely that made the benchmarks significantly slower so be sure to
-    run the benchmarks before & after to ensure such a change doesn't prevent some JVM optimization.
-     */
-    val list: List<ListWrapper> = array.map { arrayWrapper ->
-        ListWrapper.create(
-            random = random,
-            dataType = dataType,
-            size = arrayWrapper.size,
-            // copy the data from the regular array so that they are tested against identical data
-            dataProducer = arrayWrapper.copyData(),
-        )
+    val array: Array<out ArrayWrapper> = when (collectionType) {
+        ARRAY -> ArrayWrapper.createWrappers(numNestedCollections, nestedSizeDistribution, dataType, dataProducer)
+        else -> emptyArray()
     }
 
-    // copy the data from the regular array so that they are tested against identical data
-    val persistentList: PersistentList<PersistentListWrapper> = array.map { arrayWrapper ->
-        PersistentListWrapper.create(
-            random = random,
+    val list: List<ListWrapper> = when (collectionType) {
+        LIST -> ListWrapper.createWrappers(
+            count = numNestedCollections,
+            sizeDistribution = nestedSizeDistribution,
             dataType = dataType,
-            size = arrayWrapper.size,
-            dataProducer = arrayWrapper.copyData(),
-        )
-    }.toPersistentList()
+            dataProducer = dataProducer,
+        ).toList()
 
-    // copy the data from the regular array so that they are tested against identical data
-    val immutableArray: ImmutableArray<ImmutableArrayWrapper> = array.map { arrayWrapper ->
-        ImmutableArrayWrapper.create(
-            random = random,
+        else -> emptyList()
+    }
+
+    val persistentList: PersistentList<PersistentListWrapper> = when (collectionType) {
+        PERSISTENT_LIST -> PersistentListWrapper.createWrappers(
+            count = numNestedCollections,
+            sizeDistribution = nestedSizeDistribution,
             dataType = dataType,
-            size = arrayWrapper.size,
-            dataProducer = arrayWrapper.copyData(),
-        )
-    }.toImmutableArray()
+            dataProducer = dataProducer
+        ).toPersistentList()
+
+        else -> persistentListOf()
+    }
+
+    val immutableArray: ImmutableArray<ImmutableArrayWrapper> = when (collectionType) {
+        IMMUTABLE_ARRAY -> ImmutableArrayWrapper.createWrappers(
+            count = numNestedCollections,
+            sizeDistribution = nestedSizeDistribution,
+            dataType = dataType,
+            dataProducer = dataProducer
+        ).toImmutableArray()
+
+        else -> emptyImmutableArray()
+    }
 }
