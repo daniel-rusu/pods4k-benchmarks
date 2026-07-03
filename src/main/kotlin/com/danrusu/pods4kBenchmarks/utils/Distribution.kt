@@ -1,7 +1,5 @@
 package com.danrusu.pods4kBenchmarks.utils
 
-import kotlin.random.Random
-
 /**
  * Represents a probability distribution defined by 1 or more pairs.  Each pair defines the probability of that pair
  * being chosen along with the bounds for that pair, controlling the range of values that this pair can generate.
@@ -11,11 +9,13 @@ import kotlin.random.Random
  * - For 20% of the time, a value will be generated in the closed range [100, 120]
  *
  * Distribution(
+ *     rngFactory,
  *     80 to Bounds(0, 10)
  *     20 to Bounds(100, 120)
  * )
  */
-class Distribution(private val random: Random, vararg percentages: Pair<Int, Bounds>) {
+class Distribution(rngFactory: RngFactory, vararg percentages: Pair<Int, Bounds>) {
+    private val random = rngFactory.createRng()
     private val accumulatedPercentages: IntArray
     private val boundaries = Array(percentages.size) { percentages[it].second }
 
@@ -80,19 +80,18 @@ class Distribution(private val random: Random, vararg percentages: Pair<Int, Bou
 interface DistributionFactory {
 
     /**
-     * Creates a distribution with its own random generator initialized from [seed].
+     * Creates a distribution with its own random generator created from [rngFactory].
      *
      * Recommendation:
-     * Each source of data generation (element data, size distribution, nullability, etc.) should use a separate seed
-     * for their RNG streams.  Create a random instance for the element data and call random.nextLong() to generate
-     * seeds for each of the other RNG streams.
+     * Each source of data generation (element data, size distribution, nullability, etc.) should use its own RNG
+     * stream by receiving this factory and calling [RngFactory.createRng] when it needs a stream.
      **/
-    fun create(seed: Long): Distribution
+    fun create(rngFactory: RngFactory): Distribution
 
     /** Represents the size distribution of flat lists */
     object ListSizeDistribution : DistributionFactory {
-        override fun create(seed: Long): Distribution = Distribution(
-            Random(seed),
+        override fun create(rngFactory: RngFactory): Distribution = Distribution(
+            rngFactory,
             35 to Distribution.Bounds(lowerBound = 0, upperBound = 10),
             30 to Distribution.Bounds(lowerBound = 11, upperBound = 50),
             20 to Distribution.Bounds(lowerBound = 51, upperBound = 200),
@@ -115,8 +114,8 @@ interface DistributionFactory {
      * - List of cities with each city containing a nested list of attractions.
      */
     object NestedListSizeDistribution : DistributionFactory {
-        override fun create(seed: Long): Distribution = Distribution(
-            Random(seed),
+        override fun create(rngFactory: RngFactory): Distribution = Distribution(
+            rngFactory,
             30 to Distribution.Bounds(lowerBound = 0, upperBound = 1),
             35 to Distribution.Bounds(lowerBound = 2, upperBound = 3),
             25 to Distribution.Bounds(lowerBound = 4, upperBound = 7),

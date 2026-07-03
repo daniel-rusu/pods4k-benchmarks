@@ -3,6 +3,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlin.random.Random
 
 interface ObjectProducer<T> {
@@ -12,11 +13,13 @@ interface ObjectProducer<T> {
 }
 
 interface ObjectProducerFactory<T> {
-    fun create(seed: Long): ObjectProducer<T>
+    fun create(rngFactory: RngFactory): ObjectProducer<T>
 }
 
 object CompoundElementProducerFactory : ObjectProducerFactory<CompoundElement> {
-    override fun create(seed: Long): ObjectProducer<CompoundElement> = RandomCompoundElementProducer(Random(seed))
+    override fun create(rngFactory: RngFactory): ObjectProducer<CompoundElement> {
+        return RandomCompoundElementProducer(rngFactory.createRng())
+    }
 }
 
 private class RandomCompoundElementProducer(
@@ -56,14 +59,12 @@ class CompoundNullableValuesProducerFactory(
         require(nullRatio in 0.0..1.0)
     }
 
-    override fun create(seed: Long): ObjectProducer<CompoundElementOfNullableValues> {
-        val seedRandom = Random(seed)
-        return CompoundNullableValuesProducer(
+    override fun create(rngFactory: RngFactory): ObjectProducer<CompoundElementOfNullableValues> =
+        CompoundNullableValuesProducer(
             nullRatio = nullRatio,
-            nullabilityRandom = Random(seedRandom.nextLong()),
-            flatDataProducer = flatDataProducerFactory.create(seedRandom.nextLong()),
+            nullabilityRandom = rngFactory.createRng(),
+            flatDataProducer = flatDataProducerFactory.create(rngFactory),
         )
-    }
 }
 
 private class CompoundNullableValuesProducer(

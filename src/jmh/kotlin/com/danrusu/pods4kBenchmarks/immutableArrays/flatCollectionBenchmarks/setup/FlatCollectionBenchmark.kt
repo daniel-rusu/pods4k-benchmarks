@@ -31,6 +31,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Imm
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.OperationsPerInvocation
@@ -40,7 +41,6 @@ import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.infra.Blackhole
-import kotlin.random.Random
 
 /**
  * Represents a benchmark that measures the performance of operating on flat collections.  Note that the term collection
@@ -88,9 +88,9 @@ abstract class FlatCollectionBenchmark {
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        val seedGenerator = Random(0)
-        val sizeDistribution = sizeDistributionFactory.create(seedGenerator.nextLong())
-        val dataProducer = dataProducerFactory.create(seedGenerator.nextLong())
+        val rngFactory = RngFactory()
+        val sizeDistribution = sizeDistributionFactory.create(rngFactory)
+        val dataProducer = dataProducerFactory.create(rngFactory)
 
         data = when (collectionType) {
             LIST -> ListWrapper.createWrappers(

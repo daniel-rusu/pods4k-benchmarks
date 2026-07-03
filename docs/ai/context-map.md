@@ -15,6 +15,7 @@ Use this map to jump to the right files for common Codex tasks.
 - Tests: `src/test/kotlin/com/danrusu/pods4kBenchmarks/utils/`.
 - Boundaries: utility source is manual, checked-in Kotlin. It is used by benchmark setup and should stay small/testable.
 - Pitfalls: random data helpers affect benchmark comparability; preserve validation messages when tests assert exact text.
+- RNG setup: use `RngFactory` with a constant master seed and give each independent data source its own created stream.
 
 ## Benchmark Setup Model
 

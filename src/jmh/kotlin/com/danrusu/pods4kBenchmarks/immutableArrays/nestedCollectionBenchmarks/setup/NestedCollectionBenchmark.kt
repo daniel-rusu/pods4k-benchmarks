@@ -50,6 +50,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Ref
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
@@ -58,7 +59,6 @@ import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.infra.Blackhole
-import kotlin.random.Random
 
 /**
  * Represents a benchmark that measures the performance of operating on nested collections, such as a list of orders
@@ -103,11 +103,11 @@ abstract class NestedCollectionBenchmark {
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        val seedGenerator = Random(0)
+        val rngFactory = RngFactory()
 
-        val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(seedGenerator.nextLong())
-        val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(seedGenerator.nextLong())
-        val dataProducer = nestedDataProducerFactory.create(seedGenerator.nextLong())
+        val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
+        val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
+        val dataProducer = nestedDataProducerFactory.create(rngFactory)
 
         data = Array(numCollections) { index ->
             NestedCollectionWrapper(

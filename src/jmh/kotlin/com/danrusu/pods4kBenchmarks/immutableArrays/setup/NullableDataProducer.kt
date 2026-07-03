@@ -1,12 +1,16 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlin.random.Random
 
 class NullableDataProducer(
     val nullRatio: Double,
-    private val nullnessRandom: Random,
-    private val flatDataProducer: FlatDataProducer,
+    rngFactory: RngFactory,
+    flatDataProducerFactory: FlatDataProducerFactory,
 ) {
+    private val nullnessRandom: Random = rngFactory.createRng()
+    private val flatDataProducer: FlatDataProducer = flatDataProducerFactory.create(rngFactory)
+
     /** Returns the next reference element */
     fun nextReference(): String? = when {
         shouldBeNull(nullnessRandom) -> null
@@ -79,12 +83,9 @@ class NullableDataProducerFactory(
         require(nullRatio in 0.0..1.0)
     }
 
-    fun create(seed: Long): NullableDataProducer {
-        val seedRandom = Random(seed)
-        return NullableDataProducer(
-            nullRatio = nullRatio,
-            nullnessRandom = Random(seedRandom.nextLong()),
-            flatDataProducer = flatDataProducerFactory.create(seedRandom.nextLong()),
-        )
-    }
+    fun create(rngFactory: RngFactory): NullableDataProducer = NullableDataProducer(
+        nullRatio = nullRatio,
+        rngFactory = rngFactory,
+        flatDataProducerFactory = flatDataProducerFactory,
+    )
 }

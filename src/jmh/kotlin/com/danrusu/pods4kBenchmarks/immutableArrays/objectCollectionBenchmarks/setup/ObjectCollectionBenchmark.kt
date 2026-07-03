@@ -8,6 +8,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
@@ -16,7 +17,6 @@ import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.infra.Blackhole
-import kotlin.random.Random
 
 /**
  * Represents a benchmark that measures the performance of operating on collections that store objects (not the 8 base
@@ -67,9 +67,9 @@ abstract class ObjectCollectionBenchmark<T> {
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        val seedGenerator = Random(0)
-        val sizeDistribution = sizeDistributionFactory.create(seedGenerator.nextLong())
-        val objectProducer = objectProducerFactory.create(seedGenerator.nextLong())
+        val rngFactory = RngFactory()
+        val sizeDistribution = sizeDistributionFactory.create(rngFactory)
+        val objectProducer = objectProducerFactory.create(rngFactory)
 
         data = Array(numCollections) { index ->
             WrapperForCollectionType(

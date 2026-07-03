@@ -23,6 +23,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducerFa
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Benchmark
@@ -41,7 +42,6 @@ import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 private const val NUM_COLLECTIONS = 1000
 
@@ -95,9 +95,9 @@ open class FilterNotNull {
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        val seedGenerator = Random(0)
-        val sizeDistribution = sizeDistributionFactory.create(seedGenerator.nextLong())
-        val dataProducer = dataProducerFactory.create(seedGenerator.nextLong())
+        val rngFactory = RngFactory()
+        val sizeDistribution = sizeDistributionFactory.create(rngFactory)
+        val dataProducer = dataProducerFactory.create(rngFactory)
 
         when (collectionType) {
             LIST -> createLists(sizeDistribution, dataProducer)

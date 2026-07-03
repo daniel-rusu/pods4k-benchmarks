@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlin.random.Random
 
 interface FlatDataProducer {
@@ -33,10 +34,10 @@ interface FlatDataProducer {
 }
 
 interface FlatDataProducerFactory {
-    fun create(seed: Long): FlatDataProducer
+    fun create(rngFactory: RngFactory): FlatDataProducer
 
     object RandomDataProducerFactory : FlatDataProducerFactory {
-        override fun create(seed: Long): FlatDataProducer = RandomFlatDataProducer(Random(seed))
+        override fun create(rngFactory: RngFactory): FlatDataProducer = RandomFlatDataProducer(rngFactory.createRng())
     }
 }
 

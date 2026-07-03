@@ -26,7 +26,7 @@ Use this checklist when reviewing Codex-generated changes in this repo.
 - Benchmark methods use JMH annotations consistent with neighboring benchmarks.
 - `Blackhole` consumes measured results.
 - Data setup happens in `@Setup(Level.Trial)` unless construction cost is the benchmark target.
-- Constant seeds and separate RNG streams are preserved so collection sizes, null placement, and data values do not pollute each other.
+- Constant master seeds and separate `RngFactory` streams are preserved so collection sizes, null placement, and data values do not pollute each other.
 - Filter acceptance decisions and nullable null-placement decisions use RNG streams separate from value generation.
 - `@OperationsPerInvocation` matches collections processed per invocation, including pairwise loops.
 - `jmh.includes` changes are intentional and called out.

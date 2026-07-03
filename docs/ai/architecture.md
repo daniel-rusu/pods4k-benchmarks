@@ -16,6 +16,7 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 
 - `CollectionType`: `LIST`, `PERSISTENT_LIST`, `ARRAY`, `IMMUTABLE_ARRAY`.
 - `DataType`: reference plus primitive/value families: `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`.
+- `RngFactory`: deterministic source of independent RNG streams created from a constant master seed.
 - `Distribution` and `DistributionFactory`: deterministic collection-size distributions.
 - `FlatDataProducer`, `NullableDataProducer`, `FlatDataFilter`: data generation strategies for benchmark setup.
 - `CollectionWrapper` plus concrete wrappers: one for selecting correctly typed lists, arrays, and immutable arrays without changing benchmark methods for every data type.
@@ -35,7 +36,7 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 
 ## Important Invariants
 
-- Benchmark setup uses constant seeds so scenarios are comparable across collection and data types.
+- Benchmark setup uses constant master seeds so scenarios are comparable across collection and data types.
 - Size distribution, filter acceptance, null placement, and generated values use separate RNG streams where needed so changing value generation for one data type does not also change predicate or null distributions.
 - Benchmark methods consume results through `Blackhole`.
 - `numCollections` overrides are expected to be fixed values.

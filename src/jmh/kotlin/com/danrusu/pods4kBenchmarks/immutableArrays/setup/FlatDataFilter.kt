@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import kotlin.random.Random
 
 /**
@@ -53,14 +54,11 @@ object FlatDataFilter {
             require(acceptRatio in 0.0..1.0)
         }
 
-        override fun create(seed: Long): FlatDataProducer {
-            val seedRandom = Random(seed)
-            return FilteredFlatDataProducer(
-                acceptRatio = acceptRatio,
-                acceptanceRandom = Random(seedRandom.nextLong()),
-                dataRandom = Random(seedRandom.nextLong()),
-            )
-        }
+        override fun create(rngFactory: RngFactory): FlatDataProducer = FilteredFlatDataProducer(
+            acceptRatio = acceptRatio,
+            acceptanceRandom = rngFactory.createRng(),
+            dataRandom = rngFactory.createRng(),
+        )
     }
 
     /** Produces data that the [FlatDataFilter] will accept [acceptRatio] amount of the time */

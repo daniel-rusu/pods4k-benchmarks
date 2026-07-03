@@ -5,7 +5,6 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
-import kotlin.random.Random
 
 class DistributionTest {
     @Test
@@ -32,7 +31,7 @@ class DistributionTest {
     @Test
     fun `percentages must be positive`() {
         expectThrows<IllegalArgumentException> {
-            Distribution(Random, 0 to Distribution.Bounds(lowerBound = 1, upperBound = 10))
+            Distribution(RngFactory(), 0 to Distribution.Bounds(lowerBound = 1, upperBound = 10))
         }.message.isEqualTo("The percentage (0) must be positive")
     }
 
@@ -40,7 +39,7 @@ class DistributionTest {
     fun `percentages must add up to 100`() {
         expectThrows<IllegalArgumentException> {
             Distribution(
-                Random,
+                RngFactory(),
                 50 to Distribution.Bounds(lowerBound = 1, upperBound = 10),
                 49 to Distribution.Bounds(lowerBound = 11, upperBound = 100),
             )
@@ -48,7 +47,7 @@ class DistributionTest {
 
         expectThrows<IllegalArgumentException> {
             Distribution(
-                Random,
+                RngFactory(),
                 50 to Distribution.Bounds(lowerBound = 1, upperBound = 10),
                 30 to Distribution.Bounds(lowerBound = 11, upperBound = 100),
                 21 to Distribution.Bounds(lowerBound = 101, upperBound = 1000),
@@ -60,7 +59,7 @@ class DistributionTest {
     fun `average validation`() {
         with(
             Distribution(
-                Random,
+                RngFactory(),
                 80 to Distribution.Bounds(lowerBound = 10, upperBound = 10),
                 20 to Distribution.Bounds(lowerBound = 100, upperBound = 100),
             )
@@ -71,7 +70,7 @@ class DistributionTest {
 
         with(
             Distribution(
-                Random,
+                RngFactory(),
                 80 to Distribution.Bounds(lowerBound = 0, upperBound = 10), // 5 average
                 20 to Distribution.Bounds(lowerBound = 100, upperBound = 120), // 110 average
             )
@@ -79,5 +78,17 @@ class DistributionTest {
             expectThat(averageValue)
                 .isEqualTo(26.0) // 5 * 0.8 + 110 * 0.2
         }
+    }
+
+    @Test
+    fun `distribution produces deterministic output for a fixed master seed`() {
+        val firstDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory())
+        val secondDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory())
+
+        val firstValues = List(100) { firstDistribution.nextValue() }
+        val secondValues = List(100) { secondDistribution.nextValue() }
+
+        expectThat(firstValues)
+            .isEqualTo(secondValues)
     }
 }
