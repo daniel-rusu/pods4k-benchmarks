@@ -1,23 +1,21 @@
 package com.danrusu.pods4kBenchmarks.utils
 
 /**
- * Represents a probability distribution defined by 1 or more pairs.  Each pair defines the probability of that pair
- * being chosen along with the bounds for that pair, controlling the range of values that this pair can generate.
+ * Represents a probability distribution defined by 1 or more buckets. Each bucket defines the probability of that
+ * bucket being chosen along with the range of values that this bucket can generate.
  *
- * For example, the following distribution results in
- * - For 80% of the time, a value will be generated in the closed range [0, 10]
- * - For 20% of the time, a value will be generated in the closed range [100, 120]
+ * For example:
  *
  * Distribution(
  *     rngFactory,
- *     80 to Bounds(0, 10)
- *     20 to Bounds(100, 120)
+ *     80.percent inRange 0..10,
+ *     20.percent inRange 100..120,
  * )
  */
-class Distribution(rngFactory: RngFactory, vararg percentages: Pair<Int, Bounds>) {
+class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
     private val random = rngFactory.createRng()
     private val accumulatedPercentages: IntArray
-    private val boundaries = Array(percentages.size) { percentages[it].second }
+    private val boundaries = Array(buckets.size) { buckets[it].values }
 
     /**
      * Represents the mathematical average value that this distribution will produce.
@@ -35,14 +33,14 @@ class Distribution(rngFactory: RngFactory, vararg percentages: Pair<Int, Bounds>
 
     init {
         var accumulatedPercentage = 0
-        var accumulatedValue = 0.0
-        accumulatedPercentages = IntArray(percentages.size)
+        var weightedAverage = 0.0
+        accumulatedPercentages = IntArray(buckets.size)
 
-        for (index in percentages.indices) {
-            val (percentage, bounds) = percentages[index]
+        for (index in buckets.indices) {
+            val (percentage, values) = buckets[index]
             require(percentage > 0) { "The percentage ($percentage) must be positive" }
 
-            accumulatedValue += percentage * bounds.computeAverageValue() / 100
+            weightedAverage += percentage * values.computeAverageValue() / 100
             accumulatedPercentage += percentage
             accumulatedPercentages[index] = accumulatedPercentage
         }
@@ -50,32 +48,36 @@ class Distribution(rngFactory: RngFactory, vararg percentages: Pair<Int, Bounds>
             "The percentages must add up to 100 (found $accumulatedPercentage)"
         }
 
-        averageValue = accumulatedValue
+        averageValue = weightedAverage
     }
 
     fun nextValue(): Int {
         val selector = random.nextInt(100)
         // note that a binary search would perform worse here as most distributions have a small number of boundaries.
         val index = accumulatedPercentages.indexOfFirst { selector < it }
-        val bounds = boundaries[index]
-        return random.nextInt(from = bounds.lowerBound, until = bounds.upperBound + 1)
+        val values = boundaries[index]
+        return random.nextInt(from = values.first, until = values.last + 1)
     }
 
-    /**
-     * Defines the boundaries (both inclusive) of allowed values.
-     */
-    class Bounds(val lowerBound: Int, val upperBound: Int) {
+    data class Bucket(val percentage: Int, val values: IntRange) {
         init {
-            require(lowerBound <= upperBound) {
-                "lowerBound ($lowerBound) cannot be greater than the upperBound ($upperBound)"
+            require(!values.isEmpty()) {
+                "values range (${values.first}..${values.last}) cannot be empty"
             }
         }
+    }
 
-        fun computeAverageValue(): Double {
-            return (lowerBound.toDouble() + upperBound.toDouble()) / 2.0
-        }
+    class Percentage internal constructor(private val value: Int) {
+        infix fun inRange(values: IntRange): Bucket = Bucket(percentage = value, values = values)
+    }
+
+    private fun IntRange.computeAverageValue(): Double {
+        return (first.toDouble() + last.toDouble()) / 2.0
     }
 }
+
+val Int.percent: Distribution.Percentage
+    get() = Distribution.Percentage(this)
 
 interface DistributionFactory {
 
@@ -92,11 +94,11 @@ interface DistributionFactory {
     object ListSizeDistribution : DistributionFactory {
         override fun create(rngFactory: RngFactory): Distribution = Distribution(
             rngFactory,
-            35 to Distribution.Bounds(lowerBound = 0, upperBound = 10),
-            30 to Distribution.Bounds(lowerBound = 11, upperBound = 50),
-            20 to Distribution.Bounds(lowerBound = 51, upperBound = 200),
-            10 to Distribution.Bounds(lowerBound = 201, upperBound = 1_000),
-            5 to Distribution.Bounds(lowerBound = 1_001, upperBound = 10_000),
+            35.percent inRange 0..10,
+            30.percent inRange 11..50,
+            20.percent inRange 51..200,
+            10.percent inRange 201..1_000,
+            5.percent inRange 1_001..10_000,
         )
     }
 
@@ -116,11 +118,11 @@ interface DistributionFactory {
     object NestedListSizeDistribution : DistributionFactory {
         override fun create(rngFactory: RngFactory): Distribution = Distribution(
             rngFactory,
-            30 to Distribution.Bounds(lowerBound = 0, upperBound = 1),
-            35 to Distribution.Bounds(lowerBound = 2, upperBound = 3),
-            25 to Distribution.Bounds(lowerBound = 4, upperBound = 7),
-            7 to Distribution.Bounds(lowerBound = 8, upperBound = 15),
-            3 to Distribution.Bounds(lowerBound = 16, upperBound = 25),
+            30.percent inRange 0..1,
+            35.percent inRange 2..3,
+            25.percent inRange 4..7,
+            7.percent inRange 8..15,
+            3.percent inRange 16..25,
         )
     }
 }

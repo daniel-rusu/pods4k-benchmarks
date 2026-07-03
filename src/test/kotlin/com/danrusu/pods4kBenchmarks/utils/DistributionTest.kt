@@ -8,22 +8,21 @@ import strikt.assertions.message
 
 class DistributionTest {
     @Test
-    fun `bounds validation`() {
+    fun `range validation`() {
         expectThrows<IllegalArgumentException> {
-            Distribution.Bounds(lowerBound = 10, upperBound = 9)
-        }.message.isEqualTo("lowerBound (10) cannot be greater than the upperBound (9)")
+            10.percent inRange 10..9
+        }.message.isEqualTo("values range (10..9) cannot be empty")
     }
 
     @Test
-    fun `bounds computeAverage validation`() {
-        with(Distribution.Bounds(lowerBound = 0, upperBound = 10)) {
-            expectThat(computeAverageValue())
-                .isEqualTo(5.0)
-        }
-
-        // overflow is avoided
-        with(Distribution.Bounds(lowerBound = Int.MAX_VALUE - 8, upperBound = Int.MAX_VALUE)) {
-            expectThat(computeAverageValue())
+    fun `range average validation`() {
+        with(
+            Distribution(
+                RngFactory(),
+                100.percent inRange Int.MAX_VALUE - 8..Int.MAX_VALUE,
+            )
+        ) {
+            expectThat(averageValue)
                 .isEqualTo((Int.MAX_VALUE - 4).toDouble())
         }
     }
@@ -31,7 +30,7 @@ class DistributionTest {
     @Test
     fun `percentages must be positive`() {
         expectThrows<IllegalArgumentException> {
-            Distribution(RngFactory(), 0 to Distribution.Bounds(lowerBound = 1, upperBound = 10))
+            Distribution(RngFactory(), 0.percent inRange 1..10)
         }.message.isEqualTo("The percentage (0) must be positive")
     }
 
@@ -40,17 +39,17 @@ class DistributionTest {
         expectThrows<IllegalArgumentException> {
             Distribution(
                 RngFactory(),
-                50 to Distribution.Bounds(lowerBound = 1, upperBound = 10),
-                49 to Distribution.Bounds(lowerBound = 11, upperBound = 100),
+                50.percent inRange 1..10,
+                49.percent inRange 11..100,
             )
         }.message.isEqualTo("The percentages must add up to 100 (found 99)")
 
         expectThrows<IllegalArgumentException> {
             Distribution(
                 RngFactory(),
-                50 to Distribution.Bounds(lowerBound = 1, upperBound = 10),
-                30 to Distribution.Bounds(lowerBound = 11, upperBound = 100),
-                21 to Distribution.Bounds(lowerBound = 101, upperBound = 1000),
+                50.percent inRange 1..10,
+                30.percent inRange 11..100,
+                21.percent inRange 101..1000,
             )
         }.message.isEqualTo("The percentages must add up to 100 (found 101)")
     }
@@ -60,23 +59,23 @@ class DistributionTest {
         with(
             Distribution(
                 RngFactory(),
-                80 to Distribution.Bounds(lowerBound = 10, upperBound = 10),
-                20 to Distribution.Bounds(lowerBound = 100, upperBound = 100),
+                80.percent inRange 10..10,
+                20.percent inRange 100..100,
             )
         ) {
             expectThat(averageValue)
-                .isEqualTo(28.0) // 10 * 0.8 + 100 * 0.2
+                .isEqualTo(28.0)
         }
 
         with(
             Distribution(
                 RngFactory(),
-                80 to Distribution.Bounds(lowerBound = 0, upperBound = 10), // 5 average
-                20 to Distribution.Bounds(lowerBound = 100, upperBound = 120), // 110 average
+                80.percent inRange 0..10,
+                20.percent inRange 100..120,
             )
         ) {
             expectThat(averageValue)
-                .isEqualTo(26.0) // 5 * 0.8 + 110 * 0.2
+                .isEqualTo(26.0)
         }
     }
 
