@@ -2,6 +2,11 @@
 
 `pods4k-benchmarks` is a Kotlin/JVM benchmark project for the external `pods4k` library. It keeps benchmarks outside the library repo so they exercise `pods4k` only through its published dependency and public API.
 
+## Collaboration Rules
+
+- Unless the user explicitly asks you to make changes, do not edit files. For exploratory, design, review, or "is it possible" requests, respond with findings and/or a proposed plan first.
+- When the user does explicitly ask for changes, proceed with the requested edits as long as the scope is clear. If the scope is ambiguous, clarify the plan before editing.
+
 ## Important Directories
 
 - `src/main/kotlin/com/danrusu/pods4kBenchmarks/utils`: shared benchmark data utilities with unit tests.
