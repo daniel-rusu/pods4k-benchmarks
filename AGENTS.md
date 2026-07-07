@@ -36,7 +36,8 @@
 - Use package `com.danrusu.pods4kBenchmarks...`.
 - Keep benchmark helpers in `src/main` only when they are reusable and unit-testable; keep benchmark fixtures in `src/jmh`.
 - Tests use JUnit 5 `@Test` and Strikt assertions.
-- Benchmark code should compare `List`, JVM arrays, and `ImmutableArray` variants through public `pods4k` APIs.
+- Keep tests focused by behavior or class under test. Put reusable test fakes/fixtures in clearly named fixture packages and files instead of bundling unrelated helpers into one catch-all test-support file.
+- Benchmark code should compare `List`, `PersistentList`, JVM arrays, and `ImmutableArray` variants through public `pods4k` APIs.
 - Do not reach into `pods4k` internals or copy library implementation details into this repo.
 
 ## Performance Constraints
