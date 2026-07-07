@@ -1,6 +1,12 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
+import com.danrusu.pods4kBenchmarks.utils.generators.NullableObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomNullabilityPolicy
 import kotlin.random.Random
 
 class NullableDataProducer(
@@ -88,4 +94,42 @@ class NullableDataProducerFactory(
         rngFactory = rngFactory,
         flatDataProducerFactory = flatDataProducerFactory,
     )
+
+    fun createNullableFieldGenerator(generatorRngs: GeneratorRngs): FieldGenerator = NullableFieldGenerator(
+        delegate = flatDataProducerFactory.createFieldGenerator(generatorRngs),
+        nullabilityPolicy = RandomNullabilityPolicy(
+            nullRatio = nullRatio,
+            random = generatorRngs.nullabilityDecisionsRng,
+        ),
+    )
+
+    fun createNullableStringGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<String?> =
+        NullableObjectGenerator(
+            delegate = flatDataProducerFactory.createStringGenerator(generatorRngs),
+            nullabilityPolicy = RandomNullabilityPolicy(
+                nullRatio = nullRatio,
+                random = generatorRngs.nullabilityDecisionsRng,
+            ),
+        )
+}
+
+private class NullableFieldGenerator(
+    private val delegate: FieldGenerator,
+    nullabilityPolicy: NullabilityPolicy,
+) : FieldGenerator(nullabilityPolicy) {
+    override fun nextBoolean(): Boolean = delegate.nextBoolean()
+
+    override fun nextByte(): Byte = delegate.nextByte()
+
+    override fun nextChar(): Char = delegate.nextChar()
+
+    override fun nextShort(): Short = delegate.nextShort()
+
+    override fun nextInt(): Int = delegate.nextInt()
+
+    override fun nextFloat(): Float = delegate.nextFloat()
+
+    override fun nextLong(): Long = delegate.nextLong()
+
+    override fun nextDouble(): Double = delegate.nextDouble()
 }

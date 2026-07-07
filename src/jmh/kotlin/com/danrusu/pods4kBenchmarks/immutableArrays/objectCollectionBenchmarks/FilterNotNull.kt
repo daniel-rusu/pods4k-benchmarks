@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.filterNotNull
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -18,12 +19,13 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducerFactory
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Benchmark
@@ -96,14 +98,16 @@ open class FilterNotNull {
     @Setup(Level.Trial)
     fun setupCollections() {
         val rngFactory = RngFactory()
+        val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
         val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val dataProducer = dataProducerFactory.create(rngFactory)
+        val fields = dataProducerFactory.createNullableFieldGenerator(generatorRngs)
+        val references = dataProducerFactory.createNullableStringGenerator(generatorRngs)
 
         when (collectionType) {
-            LIST -> createLists(sizeDistribution, dataProducer)
-            PERSISTENT_LIST -> createPersistentLists(sizeDistribution, dataProducer)
-            ARRAY -> createArrays(sizeDistribution, dataProducer)
-            IMMUTABLE_ARRAY -> createImmutableArrays(sizeDistribution, dataProducer)
+            LIST -> createLists(sizeDistribution, fields, references)
+            PERSISTENT_LIST -> createPersistentLists(sizeDistribution, fields, references)
+            ARRAY -> createArrays(sizeDistribution, fields, references)
+            IMMUTABLE_ARRAY -> createImmutableArrays(sizeDistribution, fields, references)
         }
     }
 
@@ -173,18 +177,22 @@ open class FilterNotNull {
         }
     }
 
-    private fun createLists(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
+    private fun createLists(
+        sizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String?>,
+    ) {
         listData = Array(NUM_COLLECTIONS) { index ->
             when (dataType) {
-                REFERENCE -> createList(sizeDistribution.nextValue()) { dataProducer.nextReference() }
-                BOOLEAN -> createList(sizeDistribution.nextValue()) { dataProducer.nextBoolean() }
-                BYTE -> createList(sizeDistribution.nextValue()) { dataProducer.nextByte() }
-                CHAR -> createList(sizeDistribution.nextValue()) { dataProducer.nextChar() }
-                SHORT -> createList(sizeDistribution.nextValue()) { dataProducer.nextShort() }
-                INT -> createList(sizeDistribution.nextValue()) { dataProducer.nextInt() }
-                FLOAT -> createList(sizeDistribution.nextValue()) { dataProducer.nextFloat() }
-                LONG -> createList(sizeDistribution.nextValue()) { dataProducer.nextLong() }
-                DOUBLE -> createList(sizeDistribution.nextValue()) { dataProducer.nextDouble() }
+                REFERENCE -> createList(sizeDistribution.nextValue()) { references.next() }
+                BOOLEAN -> createList(sizeDistribution.nextValue()) { fields.nextNullableBoolean() }
+                BYTE -> createList(sizeDistribution.nextValue()) { fields.nextNullableByte() }
+                CHAR -> createList(sizeDistribution.nextValue()) { fields.nextNullableChar() }
+                SHORT -> createList(sizeDistribution.nextValue()) { fields.nextNullableShort() }
+                INT -> createList(sizeDistribution.nextValue()) { fields.nextNullableInt() }
+                FLOAT -> createList(sizeDistribution.nextValue()) { fields.nextNullableFloat() }
+                LONG -> createList(sizeDistribution.nextValue()) { fields.nextNullableLong() }
+                DOUBLE -> createList(sizeDistribution.nextValue()) { fields.nextNullableDouble() }
             }
         }
     }
@@ -198,18 +206,22 @@ open class FilterNotNull {
         return result
     }
 
-    private fun createPersistentLists(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
+    private fun createPersistentLists(
+        sizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String?>,
+    ) {
         persistentListData = Array(NUM_COLLECTIONS) { index ->
             when (dataType) {
-                REFERENCE -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextReference() }
-                BOOLEAN -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextBoolean() }
-                BYTE -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextByte() }
-                CHAR -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextChar() }
-                SHORT -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextShort() }
-                INT -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextInt() }
-                FLOAT -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextFloat() }
-                LONG -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextLong() }
-                DOUBLE -> createPersistentList(sizeDistribution.nextValue()) { dataProducer.nextDouble() }
+                REFERENCE -> createPersistentList(sizeDistribution.nextValue()) { references.next() }
+                BOOLEAN -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableBoolean() }
+                BYTE -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableByte() }
+                CHAR -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableChar() }
+                SHORT -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableShort() }
+                INT -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableInt() }
+                FLOAT -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableFloat() }
+                LONG -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableLong() }
+                DOUBLE -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableDouble() }
             }
         }
     }
@@ -220,42 +232,48 @@ open class FilterNotNull {
         return builder.build()
     }
 
-    private fun createArrays(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
+    private fun createArrays(
+        sizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String?>,
+    ) {
         if (dataType == REFERENCE) {
             referenceArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), String::class.java) { dataProducer.nextReference() }
+                createArray(sizeDistribution.nextValue(), references.objectClass) { references.next() }
             }
         } else if (dataType == BOOLEAN) {
             booleanArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Boolean::class.java) { dataProducer.nextBoolean() }
+                createArray(sizeDistribution.nextValue(), Boolean::class.javaObjectType) {
+                    fields.nextNullableBoolean()
+                }
             }
         } else if (dataType == BYTE) {
             byteArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Byte::class.java) { dataProducer.nextByte() }
+                createArray(sizeDistribution.nextValue(), Byte::class.javaObjectType) { fields.nextNullableByte() }
             }
         } else if (dataType == CHAR) {
             charArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Char::class.java) { dataProducer.nextChar() }
+                createArray(sizeDistribution.nextValue(), Char::class.javaObjectType) { fields.nextNullableChar() }
             }
         } else if (dataType == SHORT) {
             shortArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Short::class.java) { dataProducer.nextShort() }
+                createArray(sizeDistribution.nextValue(), Short::class.javaObjectType) { fields.nextNullableShort() }
             }
         } else if (dataType == INT) {
             intArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Int::class.java) { dataProducer.nextInt() }
+                createArray(sizeDistribution.nextValue(), Int::class.javaObjectType) { fields.nextNullableInt() }
             }
         } else if (dataType == FLOAT) {
             floatArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Float::class.java) { dataProducer.nextFloat() }
+                createArray(sizeDistribution.nextValue(), Float::class.javaObjectType) { fields.nextNullableFloat() }
             }
         } else if (dataType == LONG) {
             longArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Long::class.java) { dataProducer.nextLong() }
+                createArray(sizeDistribution.nextValue(), Long::class.javaObjectType) { fields.nextNullableLong() }
             }
         } else if (dataType == DOUBLE) {
             doubleArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Double::class.java) { dataProducer.nextDouble() }
+                createArray(sizeDistribution.nextValue(), Double::class.javaObjectType) { fields.nextNullableDouble() }
             }
         }
     }
@@ -268,42 +286,46 @@ open class FilterNotNull {
         return ArrayCreator.createArray(componentClass, size) { initializer() }
     }
 
-    private fun createImmutableArrays(sizeDistribution: Distribution, dataProducer: NullableDataProducer) {
+    private fun createImmutableArrays(
+        sizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String?>,
+    ) {
         if (dataType == REFERENCE) {
             immutableReferenceArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextReference() }
+                ImmutableArray(sizeDistribution.nextValue()) { references.next() }
             }
         } else if (dataType == BOOLEAN) {
             immutableBooleanArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextBoolean() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableBoolean() }
             }
         } else if (dataType == BYTE) {
             immutableByteArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextByte() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableByte() }
             }
         } else if (dataType == CHAR) {
             immutableCharArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextChar() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableChar() }
             }
         } else if (dataType == SHORT) {
             immutableShortArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextShort() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableShort() }
             }
         } else if (dataType == INT) {
             immutableIntArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextInt() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableInt() }
             }
         } else if (dataType == FLOAT) {
             immutableFloatArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextFloat() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableFloat() }
             }
         } else if (dataType == LONG) {
             immutableLongArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextLong() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableLong() }
             }
         } else if (dataType == DOUBLE) {
             immutableDoubleArrays = Array(NUM_COLLECTIONS) { index ->
-                ImmutableArray(sizeDistribution.nextValue()) { dataProducer.nextDouble() }
+                ImmutableArray(sizeDistribution.nextValue()) { fields.nextNullableDouble() }
             }
         }
     }

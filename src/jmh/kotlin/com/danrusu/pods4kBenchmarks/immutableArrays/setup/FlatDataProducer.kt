@@ -2,6 +2,11 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomFieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.StringGenerator
 import kotlin.random.Random
 
 interface FlatDataProducer {
@@ -36,8 +41,18 @@ interface FlatDataProducer {
 interface FlatDataProducerFactory {
     fun create(rngFactory: RngFactory): FlatDataProducer
 
+    fun createFieldGenerator(generatorRngs: GeneratorRngs): FieldGenerator
+
+    fun createStringGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<String>
+
     object RandomDataProducerFactory : FlatDataProducerFactory {
         override fun create(rngFactory: RngFactory): FlatDataProducer = RandomFlatDataProducer(rngFactory.createRng())
+
+        override fun createFieldGenerator(generatorRngs: GeneratorRngs): FieldGenerator =
+            RandomFieldGenerator(generatorRngs.dataGenerationRng)
+
+        override fun createStringGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<String> =
+            StringGenerator(generatorRngs.dataGenerationRng)
     }
 }
 

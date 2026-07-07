@@ -14,6 +14,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -89,36 +90,42 @@ abstract class FlatCollectionBenchmark {
     @Setup(Level.Trial)
     fun setupCollections() {
         val rngFactory = RngFactory()
+        val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
         val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val dataProducer = dataProducerFactory.create(rngFactory)
+        val fields = dataProducerFactory.createFieldGenerator(generatorRngs)
+        val references = dataProducerFactory.createStringGenerator(generatorRngs)
 
         data = when (collectionType) {
             LIST -> ListWrapper.createWrappers(
                 count = numCollections,
                 sizeDistribution = sizeDistribution,
                 dataType = dataType,
-                dataProducer = dataProducer
+                fields = fields,
+                references = references,
             )
 
             PERSISTENT_LIST -> PersistentListWrapper.createWrappers(
                 count = numCollections,
                 sizeDistribution = sizeDistribution,
                 dataType = dataType,
-                dataProducer = dataProducer
+                fields = fields,
+                references = references,
             )
 
             ARRAY -> ArrayWrapper.createWrappers(
                 count = numCollections,
                 sizeDistribution = sizeDistribution,
                 dataType = dataType,
-                dataProducer = dataProducer
+                fields = fields,
+                references = references,
             )
 
             IMMUTABLE_ARRAY -> ImmutableArrayWrapper.createWrappers(
                 count = numCollections,
                 sizeDistribution = sizeDistribution,
                 dataType = dataType,
-                dataProducer = dataProducer
+                fields = fields,
+                references = references,
             )
         }
     }

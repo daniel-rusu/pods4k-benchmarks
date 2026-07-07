@@ -10,8 +10,9 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 
 /** Represents a wrapper class that stores a single array of the appropriate [DataType] */
 sealed class ListWrapper : CollectionWrapper() {
@@ -19,99 +20,101 @@ sealed class ListWrapper : CollectionWrapper() {
         fun create(
             size: Int,
             dataType: DataType,
-            dataProducer: FlatDataProducer,
+            fields: FieldGenerator,
+            references: ObjectGenerator<String>,
         ): ListWrapper = when (dataType) {
-            REFERENCE -> ReferenceListWrapper(size, dataProducer)
-            BOOLEAN -> BooleanListWrapper(size, dataProducer)
-            BYTE -> ByteListWrapper(size, dataProducer)
-            CHAR -> CharListWrapper(size, dataProducer)
-            SHORT -> ShortListWrapper(size, dataProducer)
-            INT -> IntListWrapper(size, dataProducer)
-            FLOAT -> FloatListWrapper(size, dataProducer)
-            LONG -> LongListWrapper(size, dataProducer)
-            DOUBLE -> DoubleListWrapper(size, dataProducer)
+            REFERENCE -> ReferenceListWrapper(size, references)
+            BOOLEAN -> BooleanListWrapper(size, fields)
+            BYTE -> ByteListWrapper(size, fields)
+            CHAR -> CharListWrapper(size, fields)
+            SHORT -> ShortListWrapper(size, fields)
+            INT -> IntListWrapper(size, fields)
+            FLOAT -> FloatListWrapper(size, fields)
+            LONG -> LongListWrapper(size, fields)
+            DOUBLE -> DoubleListWrapper(size, fields)
         }
 
         fun createWrappers(
             count: Int,
             sizeDistribution: Distribution,
             dataType: DataType,
-            dataProducer: FlatDataProducer,
+            fields: FieldGenerator,
+            references: ObjectGenerator<String>,
         ): Array<ListWrapper> = when (dataType) {
-            REFERENCE -> Array(count) { ReferenceListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            BOOLEAN -> Array(count) { BooleanListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            BYTE -> Array(count) { ByteListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            CHAR -> Array(count) { CharListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            SHORT -> Array(count) { ShortListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            INT -> Array(count) { IntListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            FLOAT -> Array(count) { FloatListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            LONG -> Array(count) { LongListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            DOUBLE -> Array(count) { DoubleListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            REFERENCE -> Array(count) { ReferenceListWrapper(sizeDistribution.nextValue(), references) }
+            BOOLEAN -> Array(count) { BooleanListWrapper(sizeDistribution.nextValue(), fields) }
+            BYTE -> Array(count) { ByteListWrapper(sizeDistribution.nextValue(), fields) }
+            CHAR -> Array(count) { CharListWrapper(sizeDistribution.nextValue(), fields) }
+            SHORT -> Array(count) { ShortListWrapper(sizeDistribution.nextValue(), fields) }
+            INT -> Array(count) { IntListWrapper(sizeDistribution.nextValue(), fields) }
+            FLOAT -> Array(count) { FloatListWrapper(sizeDistribution.nextValue(), fields) }
+            LONG -> Array(count) { LongListWrapper(sizeDistribution.nextValue(), fields) }
+            DOUBLE -> Array(count) { DoubleListWrapper(sizeDistribution.nextValue(), fields) }
         }
     }
 }
 
 class ReferenceListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    references: ObjectGenerator<String>,
 ) : ListWrapper() {
-    override val referenceList: List<String> = createList(listSize) { dataProducer.nextReference() }
+    override val referenceList: List<String> = createList(listSize) { references.next() }
 }
 
 class BooleanListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val booleanList: List<Boolean> = createList(listSize) { dataProducer.nextBoolean() }
+    override val booleanList: List<Boolean> = createList(listSize) { fields.nextBoolean() }
 }
 
 class ByteListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val byteList: List<Byte> = createList(listSize) { dataProducer.nextByte() }
+    override val byteList: List<Byte> = createList(listSize) { fields.nextByte() }
 }
 
 class CharListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val charList: List<Char> = createList(listSize) { dataProducer.nextChar() }
+    override val charList: List<Char> = createList(listSize) { fields.nextChar() }
 }
 
 class ShortListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val shortList: List<Short> = createList(listSize) { dataProducer.nextShort() }
+    override val shortList: List<Short> = createList(listSize) { fields.nextShort() }
 }
 
 class IntListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val intList: List<Int> = createList(listSize) { dataProducer.nextInt() }
+    override val intList: List<Int> = createList(listSize) { fields.nextInt() }
 }
 
 class FloatListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val floatList: List<Float> = createList(listSize) { dataProducer.nextFloat() }
+    override val floatList: List<Float> = createList(listSize) { fields.nextFloat() }
 }
 
 class LongListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val longList: List<Long> = createList(listSize) { dataProducer.nextLong() }
+    override val longList: List<Long> = createList(listSize) { fields.nextLong() }
 }
 
 class DoubleListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ListWrapper() {
-    override val doubleList: List<Double> = createList(listSize) { dataProducer.nextDouble() }
+    override val doubleList: List<Double> = createList(listSize) { fields.nextDouble() }
 }
 
 private inline fun <T> createList(listSize: Int, initializer: () -> T): List<T> {

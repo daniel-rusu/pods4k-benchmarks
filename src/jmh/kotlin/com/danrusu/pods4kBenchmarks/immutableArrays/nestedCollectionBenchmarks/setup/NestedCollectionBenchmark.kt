@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -104,10 +105,12 @@ abstract class NestedCollectionBenchmark {
     @Setup(Level.Trial)
     fun setupCollections() {
         val rngFactory = RngFactory()
+        val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
 
         val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
         val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
-        val dataProducer = nestedDataProducerFactory.create(rngFactory)
+        val fields = nestedDataProducerFactory.createFieldGenerator(generatorRngs)
+        val references = nestedDataProducerFactory.createStringGenerator(generatorRngs)
 
         data = Array(numCollections) { index ->
             NestedCollectionWrapper(
@@ -115,7 +118,8 @@ abstract class NestedCollectionBenchmark {
                 nestedSizeDistribution = nestedSizeDistribution,
                 collectionType = collectionType,
                 dataType = dataType,
-                dataProducer = dataProducer,
+                fields = fields,
+                references = references,
             )
         }
     }

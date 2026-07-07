@@ -4,6 +4,11 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomNullabilityPolicy
 import kotlin.random.Random
 
 interface ObjectProducer<T> {
@@ -14,11 +19,17 @@ interface ObjectProducer<T> {
 
 interface ObjectProducerFactory<T> {
     fun create(rngFactory: RngFactory): ObjectProducer<T>
+
+    fun createObjectGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<T>
 }
 
 object CompoundElementProducerFactory : ObjectProducerFactory<CompoundElement> {
     override fun create(rngFactory: RngFactory): ObjectProducer<CompoundElement> {
         return RandomCompoundElementProducer(rngFactory.createRng())
+    }
+
+    override fun createObjectGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<CompoundElement> {
+        return RandomCompoundElementGenerator(generatorRngs.dataGenerationRng)
     }
 }
 
@@ -28,6 +39,24 @@ private class RandomCompoundElementProducer(
     override val objectClass: Class<CompoundElement> = CompoundElement::class.java
 
     override fun nextObject(): CompoundElement = CompoundElement(
+        referenceValue = DataGenerator.randomString(random = random),
+        booleanValue = random.nextBoolean(),
+        byteValue = DataGenerator.randomByte(random),
+        charValue = DataGenerator.randomChar(random),
+        shortValue = DataGenerator.randomShort(random),
+        intValue = random.nextInt(),
+        floatValue = random.nextFloat(),
+        longValue = random.nextLong(),
+        doubleValue = random.nextDouble(),
+    )
+}
+
+private class RandomCompoundElementGenerator(
+    private val random: Random,
+) : ObjectGenerator<CompoundElement> {
+    override val objectClass: Class<CompoundElement> = CompoundElement::class.java
+
+    override fun next(): CompoundElement = CompoundElement(
         referenceValue = DataGenerator.randomString(random = random),
         booleanValue = random.nextBoolean(),
         byteValue = DataGenerator.randomByte(random),
@@ -65,6 +94,16 @@ class CompoundNullableValuesProducerFactory(
             nullabilityRandom = rngFactory.createRng(),
             flatDataProducer = flatDataProducerFactory.create(rngFactory),
         )
+
+    override fun createObjectGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<CompoundElementOfNullableValues> =
+        CompoundNullableValuesGenerator(
+            nullabilityPolicy = RandomNullabilityPolicy(
+                nullRatio = nullRatio,
+                random = generatorRngs.nullabilityDecisionsRng,
+            ),
+            fieldGenerator = flatDataProducerFactory.createFieldGenerator(generatorRngs),
+            referenceGenerator = flatDataProducerFactory.createStringGenerator(generatorRngs),
+        )
 }
 
 private class CompoundNullableValuesProducer(
@@ -87,4 +126,24 @@ private class CompoundNullableValuesProducer(
     )
 
     private fun shouldBeNull(): Boolean = nullabilityRandom.nextDouble() < nullRatio
+}
+
+private class CompoundNullableValuesGenerator(
+    private val nullabilityPolicy: NullabilityPolicy,
+    private val fieldGenerator: FieldGenerator,
+    private val referenceGenerator: ObjectGenerator<String>,
+) : ObjectGenerator<CompoundElementOfNullableValues> {
+    override val objectClass: Class<CompoundElementOfNullableValues> = CompoundElementOfNullableValues::class.java
+
+    override fun next(): CompoundElementOfNullableValues = CompoundElementOfNullableValues(
+        nullableReference = nullabilityPolicy.nullable { referenceGenerator.next() },
+        nullableBoolean = nullabilityPolicy.nullable { fieldGenerator.nextBoolean() },
+        nullableByte = nullabilityPolicy.nullable { fieldGenerator.nextByte() },
+        nullableChar = nullabilityPolicy.nullable { fieldGenerator.nextChar() },
+        nullableShort = nullabilityPolicy.nullable { fieldGenerator.nextShort() },
+        nullableInt = nullabilityPolicy.nullable { fieldGenerator.nextInt() },
+        nullableFloat = nullabilityPolicy.nullable { fieldGenerator.nextFloat() },
+        nullableLong = nullabilityPolicy.nullable { fieldGenerator.nextLong() },
+        nullableDouble = nullabilityPolicy.nullable { fieldGenerator.nextDouble() },
+    )
 }

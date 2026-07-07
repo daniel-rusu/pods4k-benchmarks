@@ -9,12 +9,13 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTAB
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -32,10 +33,11 @@ class NestedCollectionWrapper(
     nestedSizeDistribution: Distribution,
     collectionType: CollectionType,
     dataType: DataType,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
+    references: ObjectGenerator<String>,
 ) {
     val array: Array<out ArrayWrapper> = when (collectionType) {
-        ARRAY -> ArrayWrapper.createWrappers(numNestedCollections, nestedSizeDistribution, dataType, dataProducer)
+        ARRAY -> ArrayWrapper.createWrappers(numNestedCollections, nestedSizeDistribution, dataType, fields, references)
         else -> emptyArray()
     }
 
@@ -44,7 +46,8 @@ class NestedCollectionWrapper(
             count = numNestedCollections,
             sizeDistribution = nestedSizeDistribution,
             dataType = dataType,
-            dataProducer = dataProducer,
+            fields = fields,
+            references = references,
         ).toList()
 
         else -> emptyList()
@@ -55,7 +58,8 @@ class NestedCollectionWrapper(
             count = numNestedCollections,
             sizeDistribution = nestedSizeDistribution,
             dataType = dataType,
-            dataProducer = dataProducer
+            fields = fields,
+            references = references,
         ).toPersistentList()
 
         else -> persistentListOf()
@@ -66,7 +70,8 @@ class NestedCollectionWrapper(
             count = numNestedCollections,
             sizeDistribution = nestedSizeDistribution,
             dataType = dataType,
-            dataProducer = dataProducer
+            fields = fields,
+            references = references,
         ).toImmutableArray()
 
         else -> emptyImmutableArray()

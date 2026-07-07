@@ -10,8 +10,9 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -21,116 +22,118 @@ sealed class PersistentListWrapper : CollectionWrapper() {
         fun create(
             size: Int,
             dataType: DataType,
-            dataProducer: FlatDataProducer,
+            fields: FieldGenerator,
+            references: ObjectGenerator<String>,
         ): PersistentListWrapper = when (dataType) {
-            REFERENCE -> PersistentReferenceListWrapper(size, dataProducer)
-            BOOLEAN -> PersistentBooleanListWrapper(size, dataProducer)
-            BYTE -> PersistentByteListWrapper(size, dataProducer)
-            CHAR -> PersistentCharListWrapper(size, dataProducer)
-            SHORT -> PersistentShortListWrapper(size, dataProducer)
-            INT -> PersistentIntListWrapper(size, dataProducer)
-            FLOAT -> PersistentFloatListWrapper(size, dataProducer)
-            LONG -> PersistentLongListWrapper(size, dataProducer)
-            DOUBLE -> PersistentDoubleListWrapper(size, dataProducer)
+            REFERENCE -> PersistentReferenceListWrapper(size, references)
+            BOOLEAN -> PersistentBooleanListWrapper(size, fields)
+            BYTE -> PersistentByteListWrapper(size, fields)
+            CHAR -> PersistentCharListWrapper(size, fields)
+            SHORT -> PersistentShortListWrapper(size, fields)
+            INT -> PersistentIntListWrapper(size, fields)
+            FLOAT -> PersistentFloatListWrapper(size, fields)
+            LONG -> PersistentLongListWrapper(size, fields)
+            DOUBLE -> PersistentDoubleListWrapper(size, fields)
         }
 
         fun createWrappers(
             count: Int,
             sizeDistribution: Distribution,
             dataType: DataType,
-            dataProducer: FlatDataProducer,
+            fields: FieldGenerator,
+            references: ObjectGenerator<String>,
         ): Array<PersistentListWrapper> = when (dataType) {
-            REFERENCE -> Array(count) { PersistentReferenceListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            BOOLEAN -> Array(count) { PersistentBooleanListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            BYTE -> Array(count) { PersistentByteListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            CHAR -> Array(count) { PersistentCharListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            SHORT -> Array(count) { PersistentShortListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            INT -> Array(count) { PersistentIntListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            FLOAT -> Array(count) { PersistentFloatListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            LONG -> Array(count) { PersistentLongListWrapper(sizeDistribution.nextValue(), dataProducer) }
-            DOUBLE -> Array(count) { PersistentDoubleListWrapper(sizeDistribution.nextValue(), dataProducer) }
+            REFERENCE -> Array(count) { PersistentReferenceListWrapper(sizeDistribution.nextValue(), references) }
+            BOOLEAN -> Array(count) { PersistentBooleanListWrapper(sizeDistribution.nextValue(), fields) }
+            BYTE -> Array(count) { PersistentByteListWrapper(sizeDistribution.nextValue(), fields) }
+            CHAR -> Array(count) { PersistentCharListWrapper(sizeDistribution.nextValue(), fields) }
+            SHORT -> Array(count) { PersistentShortListWrapper(sizeDistribution.nextValue(), fields) }
+            INT -> Array(count) { PersistentIntListWrapper(sizeDistribution.nextValue(), fields) }
+            FLOAT -> Array(count) { PersistentFloatListWrapper(sizeDistribution.nextValue(), fields) }
+            LONG -> Array(count) { PersistentLongListWrapper(sizeDistribution.nextValue(), fields) }
+            DOUBLE -> Array(count) { PersistentDoubleListWrapper(sizeDistribution.nextValue(), fields) }
         }
     }
 }
 
 class PersistentReferenceListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    references: ObjectGenerator<String>,
 ) : PersistentListWrapper() {
     override val persistentReferenceList: PersistentList<String> = createPersistentList(listSize) {
-        dataProducer.nextReference()
+        references.next()
     }
 }
 
 class PersistentBooleanListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentBooleanList: PersistentList<Boolean> = createPersistentList(listSize) {
-        dataProducer.nextBoolean()
+        fields.nextBoolean()
     }
 }
 
 class PersistentByteListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentByteList: PersistentList<Byte> = createPersistentList(listSize) {
-        dataProducer.nextByte()
+        fields.nextByte()
     }
 }
 
 class PersistentCharListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentCharList: PersistentList<Char> = createPersistentList(listSize) {
-        dataProducer.nextChar()
+        fields.nextChar()
     }
 }
 
 class PersistentShortListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentShortList: PersistentList<Short> = createPersistentList(listSize) {
-        dataProducer.nextShort()
+        fields.nextShort()
     }
 }
 
 class PersistentIntListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentIntList: PersistentList<Int> = createPersistentList(listSize) {
-        dataProducer.nextInt()
+        fields.nextInt()
     }
 }
 
 class PersistentFloatListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentFloatList: PersistentList<Float> = createPersistentList(listSize) {
-        dataProducer.nextFloat()
+        fields.nextFloat()
     }
 }
 
 class PersistentLongListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentLongList: PersistentList<Long> = createPersistentList(listSize) {
-        dataProducer.nextLong()
+        fields.nextLong()
     }
 }
 
 class PersistentDoubleListWrapper(
     listSize: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : PersistentListWrapper() {
     override val persistentDoubleList: PersistentList<Double> = createPersistentList(listSize) {
-        dataProducer.nextDouble()
+        fields.nextDouble()
     }
 }
 

@@ -8,6 +8,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTAB
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -20,7 +21,7 @@ private val EMPTY_IMMUTABLE_ARRAY: ImmutableArray<Nothing> = emptyImmutableArray
 class WrapperForCollectionType<T>(
     collectionSize: Int,
     collectionType: CollectionType,
-    objectProducer: ObjectProducer<T>,
+    objectGenerator: ObjectGenerator<T>,
 ) {
     var list: List<T> = EMPTY_LIST
         private set
@@ -36,25 +37,25 @@ class WrapperForCollectionType<T>(
         private set
 
     init {
-        val objectClass = objectProducer.objectClass
+        val objectClass = objectGenerator.objectClass
 
         when (collectionType) {
             LIST -> {
-                list = (1..collectionSize).map { objectProducer.nextObject() }
+                list = (1..collectionSize).map { objectGenerator.next() }
             }
 
             PERSISTENT_LIST -> {
                 val builder = persistentListOf<T>().builder()
-                repeat(collectionSize) { builder.add(objectProducer.nextObject()) }
+                repeat(collectionSize) { builder.add(objectGenerator.next()) }
                 persistentList = builder.build()
             }
 
             ARRAY -> {
-                array = ArrayCreator.createArray(objectClass, collectionSize) { objectProducer.nextObject() }
+                array = ArrayCreator.createArray(objectClass, collectionSize) { objectGenerator.next() }
             }
 
             IMMUTABLE_ARRAY -> {
-                immutableArray = ImmutableArray(collectionSize) { objectProducer.nextObject() }
+                immutableArray = ImmutableArray(collectionSize) { objectGenerator.next() }
             }
         }
     }

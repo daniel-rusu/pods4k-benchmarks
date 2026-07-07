@@ -10,8 +10,9 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducer
 import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 
 /** Represents a wrapper class that stores a single array of the appropriate [DataType] */
 sealed class ArrayWrapper : CollectionWrapper() {
@@ -20,80 +21,81 @@ sealed class ArrayWrapper : CollectionWrapper() {
             count: Int,
             sizeDistribution: Distribution,
             dataType: DataType,
-            dataProducer: FlatDataProducer,
+            fields: FieldGenerator,
+            references: ObjectGenerator<String>,
         ): Array<out ArrayWrapper> = when (dataType) {
-            REFERENCE -> Array(count) { ReferenceArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            BOOLEAN -> Array(count) { BooleanArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            BYTE -> Array(count) { ByteArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            CHAR -> Array(count) { CharArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            SHORT -> Array(count) { ShortArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            INT -> Array(count) { IntArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            FLOAT -> Array(count) { FloatArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            LONG -> Array(count) { LongArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
-            DOUBLE -> Array(count) { DoubleArrayWrapper(sizeDistribution.nextValue(), dataProducer) }
+            REFERENCE -> Array(count) { ReferenceArrayWrapper(sizeDistribution.nextValue(), references) }
+            BOOLEAN -> Array(count) { BooleanArrayWrapper(sizeDistribution.nextValue(), fields) }
+            BYTE -> Array(count) { ByteArrayWrapper(sizeDistribution.nextValue(), fields) }
+            CHAR -> Array(count) { CharArrayWrapper(sizeDistribution.nextValue(), fields) }
+            SHORT -> Array(count) { ShortArrayWrapper(sizeDistribution.nextValue(), fields) }
+            INT -> Array(count) { IntArrayWrapper(sizeDistribution.nextValue(), fields) }
+            FLOAT -> Array(count) { FloatArrayWrapper(sizeDistribution.nextValue(), fields) }
+            LONG -> Array(count) { LongArrayWrapper(sizeDistribution.nextValue(), fields) }
+            DOUBLE -> Array(count) { DoubleArrayWrapper(sizeDistribution.nextValue(), fields) }
         }
     }
 }
 
 class ReferenceArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    references: ObjectGenerator<String>,
 ) : ArrayWrapper() {
-    override val referenceArray: Array<String> = Array(size) { dataProducer.nextReference() }
+    override val referenceArray: Array<String> = Array(size) { references.next() }
 }
 
 class BooleanArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val booleanArray: BooleanArray = BooleanArray(size) { dataProducer.nextBoolean() }
+    override val booleanArray: BooleanArray = BooleanArray(size) { fields.nextBoolean() }
 }
 
 class ByteArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val byteArray: ByteArray = ByteArray(size) { dataProducer.nextByte() }
+    override val byteArray: ByteArray = ByteArray(size) { fields.nextByte() }
 }
 
 class CharArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val charArray: CharArray = CharArray(size) { dataProducer.nextChar() }
+    override val charArray: CharArray = CharArray(size) { fields.nextChar() }
 }
 
 class ShortArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val shortArray: ShortArray = ShortArray(size) { dataProducer.nextShort() }
+    override val shortArray: ShortArray = ShortArray(size) { fields.nextShort() }
 }
 
 class IntArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val intArray: IntArray = IntArray(size) { dataProducer.nextInt() }
+    override val intArray: IntArray = IntArray(size) { fields.nextInt() }
 }
 
 class FloatArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val floatArray: FloatArray = FloatArray(size) { dataProducer.nextFloat() }
+    override val floatArray: FloatArray = FloatArray(size) { fields.nextFloat() }
 }
 
 class LongArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val longArray: LongArray = LongArray(size) { dataProducer.nextLong() }
+    override val longArray: LongArray = LongArray(size) { fields.nextLong() }
 }
 
 class DoubleArrayWrapper(
     size: Int,
-    dataProducer: FlatDataProducer,
+    fields: FieldGenerator,
 ) : ArrayWrapper() {
-    override val doubleArray: DoubleArray = DoubleArray(size) { dataProducer.nextDouble() }
+    override val doubleArray: DoubleArray = DoubleArray(size) { fields.nextDouble() }
 }

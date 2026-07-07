@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -68,14 +69,15 @@ abstract class ObjectCollectionBenchmark<T> {
     @Setup(Level.Trial)
     fun setupCollections() {
         val rngFactory = RngFactory()
+        val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
         val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val objectProducer = objectProducerFactory.create(rngFactory)
+        val objectGenerator = objectProducerFactory.createObjectGenerator(generatorRngs)
 
         data = Array(numCollections) { index ->
             WrapperForCollectionType(
                 sizeDistribution.nextValue(),
                 collectionType = collectionType,
-                objectProducer = objectProducer,
+                objectGenerator = objectGenerator,
             )
         }
     }
