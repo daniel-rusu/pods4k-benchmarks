@@ -3,9 +3,8 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElement
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducerFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -30,8 +29,20 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val objectProducerFactory: ObjectProducerFactory<CompoundElement>
-        get() = CompoundElementProducerFactory
+    override val objectGeneratorFactory: ObjectGeneratorFactory<CompoundElement> =
+        ObjectGeneratorFactory.of<CompoundElement> { fields, references ->
+            CompoundElement(
+                referenceValue = references.next(),
+                booleanValue = fields.nextBoolean(),
+                byteValue = fields.nextByte(),
+                charValue = fields.nextChar(),
+                shortValue = fields.nextShort(),
+                intValue = fields.nextInt(),
+                floatValue = fields.nextFloat(),
+                longValue = fields.nextLong(),
+                doubleValue = fields.nextDouble(),
+            )
+        }
 
     @Benchmark
     fun mapReference(bh: Blackhole) {

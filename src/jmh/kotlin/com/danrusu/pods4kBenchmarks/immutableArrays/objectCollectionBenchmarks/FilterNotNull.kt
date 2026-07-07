@@ -18,14 +18,15 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.NullableDataProducerFactory
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.nullable
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Benchmark
@@ -65,11 +66,11 @@ open class FilterNotNull {
 
     private val sizeDistributionFactory = DistributionFactory.ListSizeDistribution
 
-    /** Responsible for generating the element data that the collections will contain */
-    private val dataProducerFactory = NullableDataProducerFactory(
-        nullRatio = 0.5,
-        flatDataProducerFactory = FlatDataProducerFactory.RandomDataProducerFactory,
-    )
+    /** Creates simple field generators for nullable primitive wrapper elements. */
+    private val fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(nullRatio = 0.5)
+
+    /** Creates reference generators for nullable string elements. */
+    private val referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(nullRatio = 0.5)
 
     /** Using a single list type for each value type as statically-typed lists will never make any difference*/
     private lateinit var listData: Array<List<Any?>>
@@ -100,8 +101,8 @@ open class FilterNotNull {
         val rngFactory = RngFactory()
         val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
         val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val fields = dataProducerFactory.createNullableFieldGenerator(generatorRngs)
-        val references = dataProducerFactory.createNullableStringGenerator(generatorRngs)
+        val fields = fieldGeneratorFactory.create(generatorRngs)
+        val references = referenceGeneratorFactory.create(generatorRngs)
 
         when (collectionType) {
             LIST -> createLists(sizeDistribution, fields, references)

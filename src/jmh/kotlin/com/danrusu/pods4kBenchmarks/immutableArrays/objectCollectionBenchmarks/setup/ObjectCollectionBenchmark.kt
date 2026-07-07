@@ -10,6 +10,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
@@ -55,8 +56,8 @@ abstract class ObjectCollectionBenchmark<T> {
     open val sizeDistributionFactory: DistributionFactory
         get() = DistributionFactory.ListSizeDistribution
 
-    /** Responsible for generated the element data that the collections will contain */
-    abstract val objectProducerFactory: ObjectProducerFactory<T>
+    /** Creates object generators for the element data that the collections will contain. */
+    abstract val objectGeneratorFactory: ObjectGeneratorFactory<T>
 
     /**
      * Note: We're storing an array of [WrapperForCollectionType] instances with each wrapper storing the appropriate
@@ -71,7 +72,7 @@ abstract class ObjectCollectionBenchmark<T> {
         val rngFactory = RngFactory()
         val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
         val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val objectGenerator = objectProducerFactory.createObjectGenerator(generatorRngs)
+        val objectGenerator = objectGeneratorFactory.create(generatorRngs)
 
         data = Array(numCollections) { index ->
             WrapperForCollectionType(

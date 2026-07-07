@@ -3,10 +3,10 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.mapNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValues
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundNullableValuesProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectProducerFactory
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.nullable
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -31,11 +31,23 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val objectProducerFactory: ObjectProducerFactory<CompoundElementOfNullableValues>
-        get() = CompoundNullableValuesProducerFactory(
-            nullRatio = 0.5,
-            flatDataProducerFactory = FlatDataProducerFactory.RandomDataProducerFactory,
-        )
+    override val objectGeneratorFactory: ObjectGeneratorFactory<CompoundElementOfNullableValues> =
+        ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(
+            fieldsFactory = FieldGeneratorFactory.withRandomNullableFields(nullRatio = 0.5),
+            referenceFactory = ObjectGeneratorFactory.randomStrings().nullable(nullRatio = 0.5),
+        ) { fields, references ->
+            CompoundElementOfNullableValues(
+                nullableReference = references.next(),
+                nullableBoolean = fields.nextNullableBoolean(),
+                nullableByte = fields.nextNullableByte(),
+                nullableChar = fields.nextNullableChar(),
+                nullableShort = fields.nextNullableShort(),
+                nullableInt = fields.nextNullableInt(),
+                nullableFloat = fields.nextNullableFloat(),
+                nullableLong = fields.nextNullableLong(),
+                nullableDouble = fields.nextNullableDouble(),
+            )
+        }
 
     @Benchmark
     fun mapNotNullReference(bh: Blackhole) {
