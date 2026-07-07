@@ -1,8 +1,8 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -13,7 +13,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanListWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteArrayWrapper
@@ -52,6 +51,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Sho
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
@@ -96,9 +97,13 @@ abstract class NestedCollectionBenchmark {
     open val nestedCollectionSizeDistributionFactory: DistributionFactory
         get() = DistributionFactory.NestedListSizeDistribution
 
-    /** Responsible for generating the element data that the nested collections will store */
-    open val nestedDataProducerFactory: FlatDataProducerFactory
-        get() = FlatDataProducerFactory.RandomDataProducerFactory
+    /** Creates simple field generators for primitive nested collection elements. */
+    open val nestedFieldGeneratorFactory: FieldGeneratorFactory
+        get() = FieldGeneratorFactory.withRandomFields()
+
+    /** Creates reference generators for nested collection elements. */
+    open val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>
+        get() = ObjectGeneratorFactory.randomStrings()
 
     protected lateinit var data: Array<NestedCollectionWrapper>
 
@@ -109,8 +114,8 @@ abstract class NestedCollectionBenchmark {
 
         val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
         val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
-        val fields = nestedDataProducerFactory.createFieldGenerator(generatorRngs)
-        val references = nestedDataProducerFactory.createStringGenerator(generatorRngs)
+        val fields = nestedFieldGeneratorFactory.create(generatorRngs)
+        val references = nestedReferenceGeneratorFactory.create(generatorRngs)
 
         data = Array(numCollections) { index ->
             NestedCollectionWrapper(
