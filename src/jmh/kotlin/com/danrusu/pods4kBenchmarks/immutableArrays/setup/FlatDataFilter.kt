@@ -3,8 +3,10 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlin.random.Random
 
 /**
@@ -76,6 +78,41 @@ object FlatDataFilter {
                 dataRandom = generatorRngs.dataGenerationRng,
             )
     }
+
+    /**
+     * Creates a [FieldGeneratorFactory] that produces values which will be accepted with a ratio of [acceptRatio].
+     *
+     * acceptRatio = (# of accepted values) / (# of total values)
+     */
+    fun createFieldGeneratorFactory(acceptRatio: Double): FieldGeneratorFactory = object : FieldGeneratorFactory {
+        init {
+            require(acceptRatio in 0.0..1.0)
+        }
+
+        override fun create(generatorRngs: GeneratorRngs): FieldGenerator = FilteredFieldGenerator(
+            acceptRatio = acceptRatio,
+            acceptanceRandom = generatorRngs.filterAcceptanceRng,
+            dataRandom = generatorRngs.dataGenerationRng,
+        )
+    }
+
+    /**
+     * Creates an [ObjectGeneratorFactory] that produces strings which will be accepted with a ratio of [acceptRatio].
+     *
+     * acceptRatio = (# of accepted values) / (# of total values)
+     */
+    fun createStringGeneratorFactory(acceptRatio: Double): ObjectGeneratorFactory<String> =
+        object : ObjectGeneratorFactory<String>() {
+            init {
+                require(acceptRatio in 0.0..1.0)
+            }
+
+            override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<String> = FilteredStringGenerator(
+                acceptRatio = acceptRatio,
+                acceptanceRandom = generatorRngs.filterAcceptanceRng,
+                dataRandom = generatorRngs.dataGenerationRng,
+            )
+        }
 
     /** Produces data that the [FlatDataFilter] will accept [acceptRatio] amount of the time */
     private class FilteredFlatDataProducer(
