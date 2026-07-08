@@ -94,80 +94,39 @@ object FlatDataFilter {
         }
 
     private class FilteredFieldGenerator(
-        private val acceptRatio: Double,
-        private val acceptanceRandom: Random,
+        acceptRatio: Double,
+        acceptanceRandom: Random,
         private val source: FieldGenerator,
     ) : FieldGenerator() {
-        override fun nextBoolean(): Boolean = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextBoolean() },
-        )
+        private val sampler = FilterAcceptanceSampler(acceptRatio, acceptanceRandom)
 
-        override fun nextByte(): Byte = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextByte() },
-        )
+        override fun nextBoolean(): Boolean = sampler.nextValueMatching(::shouldAccept, source::nextBoolean)
 
-        override fun nextChar(): Char = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextChar() },
-        )
+        override fun nextByte(): Byte = sampler.nextValueMatching(::shouldAccept, source::nextByte)
 
-        override fun nextShort(): Short = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextShort() },
-        )
+        override fun nextChar(): Char = sampler.nextValueMatching(::shouldAccept, source::nextChar)
 
-        override fun nextInt(): Int = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextInt() },
-        )
+        override fun nextShort(): Short = sampler.nextValueMatching(::shouldAccept, source::nextShort)
 
-        override fun nextFloat(): Float = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextFloat() },
-        )
+        override fun nextInt(): Int = sampler.nextValueMatching(::shouldAccept, source::nextInt)
 
-        override fun nextLong(): Long = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextLong() },
-        )
+        override fun nextFloat(): Float = sampler.nextValueMatching(::shouldAccept, source::nextFloat)
 
-        override fun nextDouble(): Double = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.nextDouble() },
-        )
+        override fun nextLong(): Long = sampler.nextValueMatching(::shouldAccept, source::nextLong)
+
+        override fun nextDouble(): Double = sampler.nextValueMatching(::shouldAccept, source::nextDouble)
     }
 
     private class FilteredStringGenerator(
-        private val acceptRatio: Double,
-        private val acceptanceRandom: Random,
+        acceptRatio: Double,
+        acceptanceRandom: Random,
         private val source: ObjectGenerator<String>,
     ) : ObjectGenerator<String> {
+        private val sampler = FilterAcceptanceSampler(acceptRatio, acceptanceRandom)
+
         override val objectClass: Class<String> = source.objectClass
 
-        override fun next(): String = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { source.next() },
-        )
+        override fun next(): String = sampler.nextValueMatching(::shouldAccept, source::next)
     }
 }
 
@@ -185,23 +144,26 @@ object FlatDataFilter {
  * An [acceptRatio] of 0.0 is safe because every supported data type can produce values that fail its
  * acceptance predicate.
  */
-private inline fun <T> generateAppropriateValue(
-    acceptRatio: Double,
-    acceptanceRandom: Random,
-    accept: (T) -> Boolean,
-    generate: () -> T,
-): T {
-    val shouldBeAccepted = acceptanceRandom.nextDouble() < acceptRatio
+private class FilterAcceptanceSampler(
+    private val acceptRatio: Double,
+    private val random: Random,
+) {
+    fun <T> nextValueMatching(
+        accept: (T) -> Boolean,
+        generate: () -> T,
+    ): T {
+        val shouldBeAccepted = random.nextDouble() < acceptRatio
 
-    repeat(MAX_VALUE_GENERATION_ATTEMPTS) {
-        val value = generate()
-        if (accept(value) == shouldBeAccepted) {
-            return value
+        repeat(MAX_VALUE_GENERATION_ATTEMPTS) {
+            val value = generate()
+            if (accept(value) == shouldBeAccepted) {
+                return value
+            }
         }
-    }
 
-    throw IllegalStateException(
-        "Unable to generate a value with accepted=$shouldBeAccepted after " +
-            "$MAX_VALUE_GENERATION_ATTEMPTS attempts. Check that the source generator can produce matching values."
-    )
+        throw IllegalStateException(
+            "Unable to generate a value with accepted=$shouldBeAccepted after " +
+                "$MAX_VALUE_GENERATION_ATTEMPTS attempts. Check that the source generator can produce matching values."
+        )
+    }
 }
