@@ -1,12 +1,13 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlin.random.Random
+
+private const val MAX_VALUE_GENERATION_ATTEMPTS = 100
 
 /**
  * Filters data such that all values less than the median will be accepted and all other values will be rejected.
@@ -20,7 +21,7 @@ object FlatDataFilter {
     private const val MAX_STRING_LENGTH = 10
     private val alphanumericCharacters = (('A'..'Z') + ('a'..'z') + ('0'..'9')).sorted()
 
-    const val MEDIAN_STRING_LENGTH: Int = (MAX_STRING_LENGTH - MIN_STRING_LENGTH) / 2
+    const val MEDIAN_STRING_LENGTH: Int = (MIN_STRING_LENGTH + MAX_STRING_LENGTH) / 2
     const val PASSING_BOOLEAN: Boolean = true
     const val MEDIAN_BYTE: Byte = 0
     val MEDIAN_CHAR: Char = alphanumericCharacters[alphanumericCharacters.size / 2]
@@ -53,7 +54,10 @@ object FlatDataFilter {
      *
      * acceptRatio = (# of accepted values) / (# of total values)
      */
-    fun createFieldGeneratorFactory(acceptRatio: Double): FieldGeneratorFactory = object : FieldGeneratorFactory {
+    fun createFieldGeneratorFactory(
+        acceptRatio: Double,
+        sourceFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    ): FieldGeneratorFactory = object : FieldGeneratorFactory {
         init {
             require(acceptRatio in 0.0..1.0)
         }
@@ -61,7 +65,7 @@ object FlatDataFilter {
         override fun create(generatorRngs: GeneratorRngs): FieldGenerator = FilteredFieldGenerator(
             acceptRatio = acceptRatio,
             acceptanceRandom = generatorRngs.filterAcceptanceRng,
-            dataRandom = generatorRngs.dataGenerationRng,
+            source = sourceFactory.create(generatorRngs),
         )
     }
 
@@ -70,7 +74,13 @@ object FlatDataFilter {
      *
      * acceptRatio = (# of accepted values) / (# of total values)
      */
-    fun createStringGeneratorFactory(acceptRatio: Double): ObjectGeneratorFactory<String> =
+    fun createStringGeneratorFactory(
+        acceptRatio: Double,
+        sourceFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(
+            minLength = MIN_STRING_LENGTH,
+            maxLength = MAX_STRING_LENGTH,
+        ),
+    ): ObjectGeneratorFactory<String> =
         object : ObjectGeneratorFactory<String>() {
             init {
                 require(acceptRatio in 0.0..1.0)
@@ -79,88 +89,84 @@ object FlatDataFilter {
             override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<String> = FilteredStringGenerator(
                 acceptRatio = acceptRatio,
                 acceptanceRandom = generatorRngs.filterAcceptanceRng,
-                dataRandom = generatorRngs.dataGenerationRng,
+                source = sourceFactory.create(generatorRngs),
             )
         }
 
     private class FilteredFieldGenerator(
         private val acceptRatio: Double,
         private val acceptanceRandom: Random,
-        private val dataRandom: Random,
+        private val source: FieldGenerator,
     ) : FieldGenerator() {
         override fun nextBoolean(): Boolean = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { dataRandom.nextBoolean() },
+            generate = { source.nextBoolean() },
         )
 
         override fun nextByte(): Byte = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { DataGenerator.randomByte(dataRandom) },
+            generate = { source.nextByte() },
         )
 
         override fun nextChar(): Char = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { alphanumericCharacters.random(dataRandom) },
+            generate = { source.nextChar() },
         )
 
         override fun nextShort(): Short = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { DataGenerator.randomShort(dataRandom) },
+            generate = { source.nextShort() },
         )
 
         override fun nextInt(): Int = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { dataRandom.nextInt() },
+            generate = { source.nextInt() },
         )
 
         override fun nextFloat(): Float = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { dataRandom.nextFloat() },
+            generate = { source.nextFloat() },
         )
 
         override fun nextLong(): Long = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { dataRandom.nextLong() },
+            generate = { source.nextLong() },
         )
 
         override fun nextDouble(): Double = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = { dataRandom.nextDouble() },
+            generate = { source.nextDouble() },
         )
     }
 
     private class FilteredStringGenerator(
         private val acceptRatio: Double,
         private val acceptanceRandom: Random,
-        private val dataRandom: Random,
+        private val source: ObjectGenerator<String>,
     ) : ObjectGenerator<String> {
-        override val objectClass: Class<String> = String::class.java
+        override val objectClass: Class<String> = source.objectClass
 
         override fun next(): String = generateAppropriateValue(
             acceptRatio = acceptRatio,
             acceptanceRandom = acceptanceRandom,
             accept = { shouldAccept(it) },
-            generate = {
-                val length = dataRandom.nextInt(from = MIN_STRING_LENGTH, until = MAX_STRING_LENGTH + 1)
-                val randomChars = CharArray(length) { alphanumericCharacters.random(dataRandom) }
-                String(randomChars)
-            },
+            generate = { source.next() },
         )
     }
 }
@@ -170,16 +176,11 @@ object FlatDataFilter {
  *
  * Data Generation Strategy:
  * 1. Randomly determine whether the new value should be accepted
- * 2. Repeatedly generate random values until a value is found that will be accepted / rejected based on the
- * previous step.
+ * 2. Repeatedly ask the source generator for values until a value is found that will be accepted / rejected based on
+ * the previous step.
  *
- * Since the acceptance is based on the median value, with half of the potential values passing, the second step
- * is expected to terminate in a very short amount of iterations since each iteration has a 50% chance of
- * finding a valid value.  The probability of not finding a valid value after N attempts is equal to (1/2)^N
- * which drops off exponentially.  Note that this is true regardless of the acceptance ratio as a low acceptance
- * ratio just means that most of the generated values will be above the median so they'll be rejected.  So the
- * acceptance ratio doesn't represent the rarity of the generated values but rather how often values will be
- * below the median.
+ * Default source generators usually produce acceptable values quickly, but custom source generators may never produce
+ * values on one side of the predicate. The retry limit fails benchmark setup loudly instead of spinning forever.
  *
  * An [acceptRatio] of 0.0 is safe because every supported data type can produce values that fail its
  * acceptance predicate.
@@ -192,9 +193,15 @@ private inline fun <T> generateAppropriateValue(
 ): T {
     val shouldBeAccepted = acceptanceRandom.nextDouble() < acceptRatio
 
-    var value = generate()
-    while (accept(value) != shouldBeAccepted) {
-        value = generate()
+    repeat(MAX_VALUE_GENERATION_ATTEMPTS) {
+        val value = generate()
+        if (accept(value) == shouldBeAccepted) {
+            return value
+        }
     }
-    return value
+
+    throw IllegalStateException(
+        "Unable to generate a value with accepted=$shouldBeAccepted after " +
+            "$MAX_VALUE_GENERATION_ATTEMPTS attempts. Check that the source generator can produce matching values."
+    )
 }
