@@ -15,12 +15,13 @@ Use this map to jump to the right files for common Codex tasks.
 - Tests: `src/test/kotlin/com/danrusu/pods4kBenchmarks/utils/`.
 - Boundaries: utility source is manual, checked-in Kotlin. It is used by benchmark setup and should stay small/testable.
 - Pitfalls: random data helpers affect benchmark comparability; preserve validation messages when tests assert exact text.
+- Character data: `AlphanumericCharacters` is the single source for generated chars and the filter median derived from them.
 - RNG setup: use `RngFactory` with a constant master seed and give each independent data source its own created stream.
 
 ## Benchmark Setup Model
 
 - Files: `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/`.
-- Key types: `CollectionType`, `DataType`, `FlatDataProducer`, `NullableDataProducer`, `FlatDataFilter`, collection wrappers.
+- Key types: `CollectionType`, `DataType`, `FieldGenerator`, `ObjectGenerator`, `FlatDataFilter`, collection wrappers.
 - Boundaries: benchmark-only source set; not production library code.
 - Tests/benchmarks to inspect: benchmark classes under `flatCollectionBenchmarks`, `objectCollectionBenchmarks`, and `nestedCollectionBenchmarks`.
 - Pitfalls: wrapper properties throw by default; only access the property matching the active `CollectionType` and `DataType`.
@@ -36,7 +37,7 @@ Use this map to jump to the right files for common Codex tasks.
 
 - Files: `src/jmh/kotlin/.../immutableArrays/objectCollectionBenchmarks/`.
 - Base: `objectCollectionBenchmarks/setup/ObjectCollectionBenchmark.kt`.
-- Setup files: `ObjectProducer`, `ObjectProducerFactory`, `CompoundElementProducerFactory`, `CompoundNullableValuesProducerFactory`, `WrapperForCollectionType`, `CompoundElement`, `CompoundElementOfNullableValues`.
+- Setup files: `WrapperForCollectionType`, `CompoundElement`, `CompoundElementOfNullableValues`.
 - Pitfalls: avoid boxing/erasing immutable array variants in ways that make results no longer match normal public API usage.
 
 ## Nested Collection Benchmarks

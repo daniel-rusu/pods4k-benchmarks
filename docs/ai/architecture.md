@@ -18,7 +18,9 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 - `DataType`: reference plus primitive/value families: `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`.
 - `RngFactory`: deterministic source of independent RNG streams created from a constant master seed.
 - `Distribution` and `DistributionFactory`: deterministic collection-size distributions.
-- `FlatDataProducer`, `NullableDataProducer`, `FlatDataFilter`: data generation strategies for benchmark setup.
+- `FieldGenerator`, `ObjectGenerator`, and their factories: generator strategies for benchmark setup.
+- `AlphanumericCharacters`: shared generated character domain and natural-order median used by char/string generators and filters.
+- `FlatDataFilter`: filtered field and string generator factories for predicate-oriented flat benchmarks.
 - `CollectionWrapper` plus concrete wrappers: one for selecting correctly typed lists, arrays, and immutable arrays without changing benchmark methods for every data type.
 - Benchmark bases: `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`.
 
