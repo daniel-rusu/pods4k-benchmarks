@@ -25,7 +25,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ArrayWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CollectionWrapper
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableArrayWrapper
@@ -33,6 +32,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.Lis
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentListWrapper
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.OperationsPerInvocation
@@ -81,9 +82,13 @@ abstract class FlatCollectionBenchmark {
     open val sizeDistributionFactory: DistributionFactory
         get() = DistributionFactory.ListSizeDistribution
 
-    /** Responsible for generating the element data that the collections will contain */
-    open val dataProducerFactory: FlatDataProducerFactory
-        get() = FlatDataProducerFactory.RandomDataProducerFactory
+    /** Responsible for generating primitive field values that the collections will contain */
+    open val fieldGeneratorFactory: FieldGeneratorFactory
+        get() = FieldGeneratorFactory.withRandomFields()
+
+    /** Responsible for generating reference values that the collections will contain */
+    open val referenceGeneratorFactory: ObjectGeneratorFactory<String>
+        get() = ObjectGeneratorFactory.randomStrings()
 
     protected lateinit var data: Array<out CollectionWrapper>
 
@@ -92,8 +97,8 @@ abstract class FlatCollectionBenchmark {
         val rngFactory = RngFactory()
         val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
         val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val fields = dataProducerFactory.createFieldGenerator(generatorRngs)
-        val references = dataProducerFactory.createStringGenerator(generatorRngs)
+        val fields = fieldGeneratorFactory.create(generatorRngs)
+        val references = referenceGeneratorFactory.create(generatorRngs)
 
         data = when (collectionType) {
             LIST -> ListWrapper.createWrappers(

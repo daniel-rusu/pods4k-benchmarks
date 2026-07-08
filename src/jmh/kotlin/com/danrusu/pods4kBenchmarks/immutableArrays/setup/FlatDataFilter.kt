@@ -1,7 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.DataGenerator
-import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
@@ -50,36 +49,6 @@ object FlatDataFilter {
     inline fun shouldAccept(value: Double): Boolean = value < MEDIAN_DOUBLE
 
     /**
-     * Creates a [FlatDataProducerFactory] that produces values which will be accepted with a ratio of [acceptRatio].
-     *
-     * acceptRatio = (# of accepted values) / (# of total values)
-     */
-    fun createDataProducerFactory(acceptRatio: Double): FlatDataProducerFactory = object : FlatDataProducerFactory {
-        init {
-            require(acceptRatio in 0.0..1.0)
-        }
-
-        override fun create(rngFactory: RngFactory): FlatDataProducer = FilteredFlatDataProducer(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = rngFactory.createRng(),
-            dataRandom = rngFactory.createRng(),
-        )
-
-        override fun createFieldGenerator(generatorRngs: GeneratorRngs): FieldGenerator = FilteredFieldGenerator(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = generatorRngs.filterAcceptanceRng,
-            dataRandom = generatorRngs.dataGenerationRng,
-        )
-
-        override fun createStringGenerator(generatorRngs: GeneratorRngs): ObjectGenerator<String> =
-            FilteredStringGenerator(
-                acceptRatio = acceptRatio,
-                acceptanceRandom = generatorRngs.filterAcceptanceRng,
-                dataRandom = generatorRngs.dataGenerationRng,
-            )
-    }
-
-    /**
      * Creates a [FieldGeneratorFactory] that produces values which will be accepted with a ratio of [acceptRatio].
      *
      * acceptRatio = (# of accepted values) / (# of total values)
@@ -113,80 +82,6 @@ object FlatDataFilter {
                 dataRandom = generatorRngs.dataGenerationRng,
             )
         }
-
-    /** Produces data that the [FlatDataFilter] will accept [acceptRatio] amount of the time */
-    private class FilteredFlatDataProducer(
-        private val acceptRatio: Double,
-        private val acceptanceRandom: Random,
-        private val dataRandom: Random,
-    ) : FlatDataProducer {
-        override fun nextReference(): String = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = {
-                val length = dataRandom.nextInt(from = MIN_STRING_LENGTH, until = MAX_STRING_LENGTH + 1)
-                val randomChars = CharArray(length) { alphanumericCharacters.random(dataRandom) }
-                String(randomChars)
-            },
-        )
-
-        override fun nextBoolean(): Boolean = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { dataRandom.nextBoolean() },
-        )
-
-        override fun nextByte(): Byte = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { DataGenerator.randomByte(dataRandom) },
-        )
-
-        override fun nextChar(): Char = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { alphanumericCharacters.random(dataRandom) },
-        )
-
-        override fun nextShort(): Short = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { DataGenerator.randomShort(dataRandom) },
-        )
-
-        override fun nextInt(): Int = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { dataRandom.nextInt() },
-        )
-
-        override fun nextFloat(): Float = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { dataRandom.nextFloat() },
-        )
-
-        override fun nextLong(): Long = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { dataRandom.nextLong() },
-        )
-
-        override fun nextDouble(): Double = generateAppropriateValue(
-            acceptRatio = acceptRatio,
-            acceptanceRandom = acceptanceRandom,
-            accept = { shouldAccept(it) },
-            generate = { dataRandom.nextDouble() },
-        )
-    }
 
     private class FilteredFieldGenerator(
         private val acceptRatio: Double,

@@ -11,7 +11,8 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataProducerFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -26,6 +27,9 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
 
+// Statistically, about half of the values will be on the left and the other half on the right on average.
+private const val ACCEPT_RATIO = 0.5
+
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @OperationsPerInvocation(NUM_COLLECTIONS)
@@ -36,11 +40,11 @@ open class PartitionBenchmarks : FlatCollectionBenchmark() {
     override val numCollections: Int
         get() = NUM_COLLECTIONS
 
-    override val dataProducerFactory: FlatDataProducerFactory
-        get() = FlatDataFilter.createDataProducerFactory(
-            // statistically, about half of the values will be on the left and the other half on the right on average
-            acceptRatio = 0.5,
-        )
+    override val fieldGeneratorFactory: FieldGeneratorFactory
+        get() = FlatDataFilter.createFieldGeneratorFactory(acceptRatio = ACCEPT_RATIO)
+
+    override val referenceGeneratorFactory: ObjectGeneratorFactory<String>
+        get() = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO)
 
     @Benchmark
     fun partition(bh: Blackhole) {
