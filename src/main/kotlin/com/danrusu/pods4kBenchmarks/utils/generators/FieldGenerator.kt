@@ -103,11 +103,15 @@ class RandomFieldGenerator(
 ) : FieldGenerator(nullabilityPolicy) {
     override fun nextBoolean(): Boolean = random.nextBoolean()
 
-    override fun nextByte(): Byte = DataGenerator.randomByte(random)
+    override fun nextByte(): Byte {
+        return random.nextInt(from = Byte.MIN_VALUE.toInt(), until = Byte.MAX_VALUE.toInt() + 1).toByte()
+    }
 
     override fun nextChar(): Char = DataGenerator.randomChar(random)
 
-    override fun nextShort(): Short = DataGenerator.randomShort(random)
+    override fun nextShort(): Short {
+        return random.nextInt(from = Short.MIN_VALUE.toInt(), until = Short.MAX_VALUE.toInt() + 1).toShort()
+    }
 
     override fun nextInt(): Int = random.nextInt()
 

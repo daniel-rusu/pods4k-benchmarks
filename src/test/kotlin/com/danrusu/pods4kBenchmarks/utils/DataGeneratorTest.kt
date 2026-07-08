@@ -2,30 +2,15 @@ package com.danrusu.pods4kBenchmarks.utils
 
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.api.expectThrows
-import strikt.assertions.hasLength
 import strikt.assertions.isEqualTo
-import strikt.assertions.isIn
-import strikt.assertions.length
-import strikt.assertions.message
 import kotlin.random.Random
 
 class DataGeneratorTest {
     @Test
-    fun `randomString validation`() {
-        expectThrows<IllegalArgumentException> {
-            DataGenerator.randomString(minLength = -1, maxLength = 10, Random.Default)
-        }.message.isEqualTo("minLength (-1) cannot be negative")
+    fun `randomChar returns an alphanumeric character`() {
+        val validCharacters = ('A'..'Z') + ('a'..'z') + ('0'..'9')
 
-        expectThrows<IllegalArgumentException> {
-            DataGenerator.randomString(minLength = 10, maxLength = 9, Random.Default)
-        }.message.isEqualTo("minLength (10) cannot be larger than maxLength(9)")
-
-        expectThat(DataGenerator.randomString(minLength = 7, maxLength = 7, Random.Default))
-            .hasLength(7)
-
-        expectThat(
-            DataGenerator.randomString(minLength = 3, maxLength = 6, Random.Default)
-        ).length.isIn(3..6)
+        expectThat(DataGenerator.randomChar(Random(123)) in validCharacters)
+            .isEqualTo(true)
     }
 }
