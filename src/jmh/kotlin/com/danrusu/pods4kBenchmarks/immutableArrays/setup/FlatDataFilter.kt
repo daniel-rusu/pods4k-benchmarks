@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
+import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
@@ -19,12 +20,11 @@ private const val MAX_VALUE_GENERATION_ATTEMPTS = 100
 object FlatDataFilter {
     private const val MIN_STRING_LENGTH = 3
     private const val MAX_STRING_LENGTH = 10
-    private val alphanumericCharacters = (('A'..'Z') + ('a'..'z') + ('0'..'9')).sorted()
 
     const val MEDIAN_STRING_LENGTH: Int = (MIN_STRING_LENGTH + MAX_STRING_LENGTH) / 2
     const val PASSING_BOOLEAN: Boolean = true
     const val MEDIAN_BYTE: Byte = 0
-    val MEDIAN_CHAR: Char = alphanumericCharacters[alphanumericCharacters.size / 2]
+    val MEDIAN_CHAR: Char = AlphanumericCharacters.naturalOrderMedian
     const val MEDIAN_SHORT: Short = 0
     const val MEDIAN_INT: Int = 0
     const val MEDIAN_FLOAT: Float = 0.5f

@@ -1,6 +1,5 @@
 package com.danrusu.pods4kBenchmarks.utils.generators
 
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import kotlin.random.Random
 
 /**
@@ -31,7 +30,7 @@ class StringGenerator(
 
     override fun next(): String {
         val length = random.nextInt(from = minLength, until = maxLength + 1)
-        val randomChars = CharArray(length) { DataGenerator.randomChar(random) }
+        val randomChars = CharArray(length) { AlphanumericCharacters.random(random) }
         return String(randomChars)
     }
 }

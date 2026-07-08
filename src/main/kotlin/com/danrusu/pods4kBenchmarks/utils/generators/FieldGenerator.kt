@@ -1,6 +1,5 @@
 package com.danrusu.pods4kBenchmarks.utils.generators
 
-import com.danrusu.pods4kBenchmarks.utils.DataGenerator
 import kotlin.random.Random
 
 /**
@@ -107,7 +106,7 @@ class RandomFieldGenerator(
         return random.nextInt(from = Byte.MIN_VALUE.toInt(), until = Byte.MAX_VALUE.toInt() + 1).toByte()
     }
 
-    override fun nextChar(): Char = DataGenerator.randomChar(random)
+    override fun nextChar(): Char = AlphanumericCharacters.random(random)
 
     override fun nextShort(): Short {
         return random.nextInt(from = Short.MIN_VALUE.toInt(), until = Short.MAX_VALUE.toInt() + 1).toShort()
