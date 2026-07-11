@@ -43,5 +43,5 @@ Use this checklist when reviewing Codex-generated changes in this repo.
 - Dependency versions belong in `gradle/libs.versions.toml`.
 - Build behavior belongs in `build.gradle.kts`.
 - Main utilities belong in `src/main`; tests in `src/test`; benchmark-only code in `src/jmh`.
-- CI parity remains `./gradlew build --no-daemon`.
+- CI parity remains `./gradlew build jmhJar --no-daemon`.
 - Kotlin style remains compatible with `kotlin.code.style=official`.

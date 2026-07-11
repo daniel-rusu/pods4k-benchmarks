@@ -18,7 +18,8 @@
 
 ## Commands
 
-- `./gradlew build --no-daemon`: CI command; assembles main source and runs tests.
+- `./gradlew build --no-daemon`: assembles main source, runs tests, and compiles JMH benchmark sources.
+- `./gradlew build jmhJar --no-daemon`: CI command; also generates and compiles the JMH harness and packages the JMH jar.
 - `./gradlew test`: cheap utility test run.
 - `./gradlew jmhClasses`: compile JMH benchmark sources without executing benchmarks.
 - `./gradlew jmh`: runs configured benchmarks and writes CSV results under `build/results/jmh/`.

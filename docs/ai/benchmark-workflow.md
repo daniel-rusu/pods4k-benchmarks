@@ -3,14 +3,16 @@
 ## Cheap Validation
 
 - `./gradlew test`: run unit tests for shared utilities.
-- `./gradlew build --no-daemon`: CI-equivalent check; assembles main source and runs tests.
-- Windows: use `.\gradlew.bat test` or `.\gradlew.bat build --no-daemon`.
+- `./gradlew build --no-daemon`: assembles main source, runs tests, and compiles JMH benchmark sources.
+- `./gradlew build jmhJar --no-daemon`: CI-equivalent check; also generates and compiles the JMH harness and packages the JMH jar.
+- Windows: use `.\gradlew.bat test`, `.\gradlew.bat build --no-daemon`, or `.\gradlew.bat build jmhJar --no-daemon`.
 
 ## Benchmark Compile Checks
 
 - Preferred benchmark compile check: `./gradlew jmhClasses`.
+- `./gradlew jmhJar` additionally runs the JMH bytecode generator, compiles its generated harness classes, and packages the executable JMH jar.
 - Narrower tasks shown by Gradle include `compileJmhKotlin`, `compileJmhJava`, `processJmhResources`, `jmhRunBytecodeGenerator`, and `jmhCompileGeneratedClasses`.
-- `./gradlew build --no-daemon` is still useful for CI parity, but Gradle dry-run output shows it does not depend on `jmhClasses`.
+- `./gradlew build --no-daemon` depends on `jmhClasses`, but it does not generate the JMH harness; CI adds `jmhJar` for that validation.
 
 ## Running Benchmarks
 
