@@ -42,6 +42,7 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
 
 jmh {
     jmhVersion = libs.versions.jmh
+    includeTests = false // Benchmarks don't use classes from src/test
     resultFormat = "CSV"
 
     /*
