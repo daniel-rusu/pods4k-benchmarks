@@ -66,3 +66,8 @@ jmh {
 tasks.withType<me.champeau.jmh.JMHTask> {
     outputs.upToDateWhen { false }
 }
+
+// Compile benchmark sources as part of the normal verification lifecycle.
+tasks.named("check") {
+    dependsOn(tasks.named("jmhClasses"))
+}
