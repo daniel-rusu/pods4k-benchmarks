@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.utils.generators
 
 import kotlin.random.Random
+import kotlin.random.nextInt
 
 /**
  * Generates object or reference values for benchmark setup.
@@ -29,7 +30,7 @@ class StringGenerator(
     override val objectClass: Class<String> = String::class.java
 
     override fun next(): String {
-        val length = random.nextInt(from = minLength, until = maxLength + 1)
+        val length = random.nextInt(minLength..maxLength)
         val randomChars = CharArray(length) { AlphanumericCharacters.random(random) }
         return String(randomChars)
     }

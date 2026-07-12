@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
+import strikt.assertions.isIn
 import strikt.assertions.message
 
 class DistributionTest {
@@ -24,6 +25,16 @@ class DistributionTest {
         ) {
             expectThat(averageValue)
                 .isEqualTo((Int.MAX_VALUE - 4).toDouble())
+        }
+    }
+
+    @Test
+    fun `can accept a range up to Int MAX_VALUE`() {
+        val range = Int.MAX_VALUE - 8..Int.MAX_VALUE
+        val distribution = Distribution(RngFactory(), 100.percent inRange range)
+
+        repeat(100) {
+            expectThat(distribution.nextValue()).isIn(range)
         }
     }
 

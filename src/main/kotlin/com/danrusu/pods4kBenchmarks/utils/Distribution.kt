@@ -1,5 +1,7 @@
 package com.danrusu.pods4kBenchmarks.utils
 
+import kotlin.random.nextInt
+
 /**
  * Represents a probability distribution defined by 1 or more buckets. Each bucket defines the probability of that
  * bucket being chosen along with the range of values that this bucket can generate.
@@ -56,7 +58,7 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
         // note that a binary search would perform worse here as most distributions have a small number of boundaries.
         val index = accumulatedPercentages.indexOfFirst { selector < it }
         val values = boundaries[index]
-        return random.nextInt(from = values.first, until = values.last + 1)
+        return random.nextInt(values)
     }
 
     data class Bucket(val percentage: Int, val values: IntRange) {
