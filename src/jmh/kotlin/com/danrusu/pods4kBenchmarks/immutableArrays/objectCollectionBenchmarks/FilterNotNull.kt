@@ -18,7 +18,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
@@ -240,51 +239,41 @@ open class FilterNotNull {
     ) {
         if (dataType == REFERENCE) {
             referenceArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), references.objectClass) { references.next() }
+                Array(sizeDistribution.nextValue()) { references.next() }
             }
         } else if (dataType == BOOLEAN) {
             booleanArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Boolean::class.javaObjectType) {
-                    fields.nextNullableBoolean()
-                }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableBoolean() }
             }
         } else if (dataType == BYTE) {
             byteArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Byte::class.javaObjectType) { fields.nextNullableByte() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableByte() }
             }
         } else if (dataType == CHAR) {
             charArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Char::class.javaObjectType) { fields.nextNullableChar() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableChar() }
             }
         } else if (dataType == SHORT) {
             shortArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Short::class.javaObjectType) { fields.nextNullableShort() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableShort() }
             }
         } else if (dataType == INT) {
             intArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Int::class.javaObjectType) { fields.nextNullableInt() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableInt() }
             }
         } else if (dataType == FLOAT) {
             floatArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Float::class.javaObjectType) { fields.nextNullableFloat() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableFloat() }
             }
         } else if (dataType == LONG) {
             longArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Long::class.javaObjectType) { fields.nextNullableLong() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableLong() }
             }
         } else if (dataType == DOUBLE) {
             doubleArrays = Array(NUM_COLLECTIONS) { index ->
-                createArray(sizeDistribution.nextValue(), Double::class.javaObjectType) { fields.nextNullableDouble() }
+                Array(sizeDistribution.nextValue()) { fields.nextNullableDouble() }
             }
         }
-    }
-
-    private inline fun <T> createArray(
-        size: Int,
-        componentClass: Class<T & Any>,
-        crossinline initializer: () -> T?,
-    ): Array<T?> {
-        return ArrayCreator.createArray(componentClass, size) { initializer() }
     }
 
     private fun createImmutableArrays(
