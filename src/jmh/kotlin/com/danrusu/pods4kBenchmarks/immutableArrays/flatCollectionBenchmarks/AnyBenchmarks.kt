@@ -27,9 +27,9 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
 
-// Statistically, `any` will need to inspect about 68 elements on average before finding a match because
-// the probability of finding 68 consecutive non-matching elements is (1 - 0.01)^68 = 50%.
-private const val ACCEPT_RATIO = 0.01
+// Inspects (1 / 0.02) = 50 elements on average
+// The median is 35 elements because 1 - (1 - 0.02)^35 = ~50.7%.
+private const val ACCEPT_RATIO = 0.02
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
