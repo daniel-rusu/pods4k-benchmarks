@@ -86,23 +86,23 @@ open class GroupByBenchmarks : FlatCollectionBenchmark() {
     }
 }
 
-private inline fun Int.toGroup(): Int {
+private fun Int.toGroup(): Int {
     // mod 16 since N mod (2^x) = N and (2^x - 1)
     return this and 15
 }
 
-private inline fun String.toGroup(): Int = length.toGroup()
+private fun String.toGroup(): Int = length.toGroup()
 
-private inline fun Boolean.toGroup(): Boolean = this
+private fun Boolean.toGroup(): Boolean = this
 
-private inline fun Byte.toGroup(): Int = toInt().toGroup()
+private fun Byte.toGroup(): Int = toInt().toGroup()
 
-private inline fun Char.toGroup(): Int = code.toGroup()
+private fun Char.toGroup(): Int = code.toGroup()
 
-private inline fun Short.toGroup(): Int = toInt().toGroup()
+private fun Short.toGroup(): Int = toInt().toGroup()
 
-private inline fun Float.toGroup(): Int = (this * 16.0f).toInt().toGroup()
+private fun Float.toGroup(): Int = (this * 16.0f).toInt().toGroup()
 
-private inline fun Long.toGroup(): Long = this and 15L
+private fun Long.toGroup(): Long = this and 15L
 
-private inline fun Double.toGroup(): Int = (this * 16.0).toInt().toGroup()
+private fun Double.toGroup(): Int = (this * 16.0).toInt().toGroup()
