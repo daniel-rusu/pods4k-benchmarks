@@ -35,7 +35,7 @@ open class ForLoopBenchmarks : FlatCollectionBenchmark() {
         get() = NUM_COLLECTIONS
 
     @Benchmark
-    fun take(bh: Blackhole) {
+    fun forLoop(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists

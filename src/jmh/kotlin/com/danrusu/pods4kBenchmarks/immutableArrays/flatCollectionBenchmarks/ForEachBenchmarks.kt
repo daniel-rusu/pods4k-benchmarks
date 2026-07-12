@@ -35,7 +35,7 @@ open class ForEachBenchmarks : FlatCollectionBenchmark() {
         get() = NUM_COLLECTIONS
 
     @Benchmark
-    fun take(bh: Blackhole) {
+    fun forEach(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists

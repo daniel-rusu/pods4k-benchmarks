@@ -25,9 +25,9 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
      *
      * For example, a distribution could be specified to generate
      * - values between 0 and 10 for 50% of the time
-     * - and values between 100 and 120 the other 50%
+     * - and values between 100 and 110 the other 50%
      *
-     * but the average value is 26 which is not in any of the bounding intervals.
+     * but the average value is 55 which is not in any of the bounding intervals.
      */
     val averageValue: Double
 

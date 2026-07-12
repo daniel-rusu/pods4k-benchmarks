@@ -40,7 +40,7 @@ and produce more realistic results.
     * Run `./gradlew jmh`
 6. Wait for results
     * A benchmark class can easily last 20 minutes even though each iteration might only be configured to last 1 second.
-    * A class with 3 benchmarks, parameterized with 8 data types, configured with 10 warmup iterations, 5 benchmark
+    * Eg. A class with 3 benchmarks, parameterized with 8 data types, configured with 10 warmup iterations, 5 benchmark
       iterations, and 3 JVM forks takes 3 * 8 * (10 + 5) * 3 * (1 second/iteration) = 1080 seconds = 18 minutes!
 7. Analyze results
     * The results will be saved in [/build/results/jmh/results.csv](./build/results/jmh/results.csv)

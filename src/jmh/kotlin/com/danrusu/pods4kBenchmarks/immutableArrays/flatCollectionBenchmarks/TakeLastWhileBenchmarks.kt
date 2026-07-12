@@ -27,7 +27,8 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
 
-// Statistically, `takeLastWhile` will take about 34 values on average since (0.98)^34 = 50%.
+// Takes 0.98 / (1 - 0.98) = 49 elements on average.
+// The median result contains 34 elements because 1 - (0.98)^35 = ~50.7%.
 private const val ACCEPT_RATIO = 0.98
 
 @BenchmarkMode(Mode.Throughput)
