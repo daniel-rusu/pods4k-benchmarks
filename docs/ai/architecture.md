@@ -23,8 +23,8 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 - `FlatDataFilter`: filtered field and string generator factories for predicate-oriented flat benchmarks.
 - `CollectionOwner`: models the intentional object layer around a nested collection, such as a person with friends.
 - Benchmark bases: `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`.
-- `FlatCollectionBenchmarkData`: strongly typed data for a flat benchmark trial, with deterministic construction in
-  its companion object.
+- `FlatCollectionBenchmarkData` and `NestedCollectionBenchmarkData`: strongly typed data for flat and nested benchmark
+  trials, with deterministic construction in their companion objects.
 
 ## Generated-Code Model
 
@@ -46,8 +46,8 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 - `numCollections` overrides are expected to be fixed values.
 - `@OperationsPerInvocation` represents collections processed per invocation; for pairwise benchmarks it should usually be `NUM_COLLECTIONS / 2`.
 - `@Setup(Level.Trial)` prepares data; benchmark methods should measure the operation, not data construction unless that is the explicit scenario.
-- Flat benchmark setup replaces its data holder for each trial; benchmark states that retain mutable backing fields use
-  `@TearDown` to clear large arrays and reduce cross-trial memory retention.
+- Flat and nested benchmark setup replaces its data holder for each trial; benchmark states that retain mutable backing
+  fields use `@TearDown` to clear large arrays and reduce cross-trial memory retention.
 
 ## Boundaries
 
