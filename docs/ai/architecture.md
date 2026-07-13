@@ -21,7 +21,7 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 - `FieldGenerator`, `ObjectGenerator`, and their factories: generator strategies for benchmark setup.
 - `AlphanumericCharacters`: shared generated character domain and natural-order median used by char/string generators and filters.
 - `FlatDataFilter`: filtered field and string generator factories for predicate-oriented flat benchmarks.
-- `CollectionWrapper` plus concrete wrappers: one for selecting correctly typed lists, arrays, and immutable arrays without changing benchmark methods for every data type.
+- `CollectionOwner`: models the intentional object layer around a nested collection, such as a person with friends.
 - Benchmark bases: `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`.
 
 ## Generated-Code Model

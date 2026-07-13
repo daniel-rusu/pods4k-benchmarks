@@ -21,10 +21,10 @@ Use this map to jump to the right files for common Codex tasks.
 ## Benchmark Setup Model
 
 - Files: `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/`.
-- Key types: `CollectionType`, `DataType`, `FieldGenerator`, `ObjectGenerator`, `FlatDataFilter`, collection wrappers.
+- Key types: `CollectionType`, `DataType`, `FieldGenerator`, `ObjectGenerator`, and `FlatDataFilter`.
 - Boundaries: benchmark-only source set; not production library code.
 - Tests/benchmarks to inspect: benchmark classes under `flatCollectionBenchmarks`, `objectCollectionBenchmarks`, and `nestedCollectionBenchmarks`.
-- Pitfalls: wrapper properties throw by default; only access the property matching the active `CollectionType` and `DataType`.
+- Pitfalls: collection and data-type dispatch happens during trial setup and in benchmark helpers; keep their branches aligned.
 
 ## Flat Collection Benchmarks
 
@@ -44,8 +44,8 @@ Use this map to jump to the right files for common Codex tasks.
 
 - Files: `src/jmh/kotlin/.../immutableArrays/nestedCollectionBenchmarks/`.
 - Base: `nestedCollectionBenchmarks/setup/NestedCollectionBenchmark.kt`.
-- Setup files: `NestedCollectionWrapper`.
-- Pitfalls: top-level and nested collection size distributions are separate; preserve this distinction.
+- Setup files: `CollectionOwner` models the domain object that owns one nested collection.
+- Pitfalls: top-level and nested collection size distributions are separate; preserve this distinction and the intentional owner-object indirection.
 
 ## Generated And Local Artifacts
 

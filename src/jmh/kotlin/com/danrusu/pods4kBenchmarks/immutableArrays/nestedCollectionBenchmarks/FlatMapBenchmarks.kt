@@ -1,44 +1,17 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
+import com.danrusu.pods4k.immutableArrays.ImmutableByteArray
+import com.danrusu.pods4k.immutableArrays.ImmutableCharArray
+import com.danrusu.pods4k.immutableArrays.ImmutableDoubleArray
+import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
+import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
+import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
+import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.flatMap
+import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.CollectionOwner
 import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.NestedCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CharArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CharListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.DoubleArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.DoubleListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.FloatArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.FloatListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableBooleanArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableByteArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableCharArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableDoubleArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableFloatArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableIntArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableLongArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableReferenceArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableShortArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.IntArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.IntListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentBooleanListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentByteListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentCharListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentDoubleListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentFloatListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentIntListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentLongListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentReferenceListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentShortListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -68,50 +41,51 @@ open class FlatMapBenchmarks : NestedCollectionBenchmark() {
         transformEachCollection(
             bh,
             // lists
-            { list: List<ReferenceListWrapper> -> list.flatMap { it.referenceList } },
-            { list: List<BooleanListWrapper> -> list.flatMap { it.booleanList } },
-            { list: List<ByteListWrapper> -> list.flatMap { it.byteList } },
-            { list: List<CharListWrapper> -> list.flatMap { it.charList } },
-            { list: List<ShortListWrapper> -> list.flatMap { it.shortList } },
-            { list: List<IntListWrapper> -> list.flatMap { it.intList } },
-            { list: List<FloatListWrapper> -> list.flatMap { it.floatList } },
-            { list: List<LongListWrapper> -> list.flatMap { it.longList } },
-            { list: List<DoubleListWrapper> -> list.flatMap { it.doubleList } },
+            { list: List<CollectionOwner<List<String>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Boolean>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Byte>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Char>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Short>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Int>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Float>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Long>>> -> list.flatMap { it.nestedCollection } },
+            { list: List<CollectionOwner<List<Double>>> -> list.flatMap { it.nestedCollection } },
 
             // persistent lists
-            { list: PersistentList<PersistentReferenceListWrapper> -> list.flatMap { it.persistentReferenceList } },
-            { list: PersistentList<PersistentBooleanListWrapper> -> list.flatMap { it.persistentBooleanList } },
-            { list: PersistentList<PersistentByteListWrapper> -> list.flatMap { it.persistentByteList } },
-            { list: PersistentList<PersistentCharListWrapper> -> list.flatMap { it.persistentCharList } },
-            { list: PersistentList<PersistentShortListWrapper> -> list.flatMap { it.persistentShortList } },
-            { list: PersistentList<PersistentIntListWrapper> -> list.flatMap { it.persistentIntList } },
-            { list: PersistentList<PersistentFloatListWrapper> -> list.flatMap { it.persistentFloatList } },
-            { list: PersistentList<PersistentLongListWrapper> -> list.flatMap { it.persistentLongList } },
-            { list: PersistentList<PersistentDoubleListWrapper> -> list.flatMap { it.persistentDoubleList } },
+            { list: PersistentList<CollectionOwner<PersistentList<String>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Boolean>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Byte>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Char>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Short>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Int>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Float>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Long>>> -> list.flatMap { it.nestedCollection } },
+            { list: PersistentList<CollectionOwner<PersistentList<Double>>> -> list.flatMap { it.nestedCollection } },
 
             // arrays
-            // Note that array.flatMap requires a nested iterable, so we need to call asList() on each nested array. The
-            // asList() function wraps the array without copying the data by using the same array as the backing data
-            { array: Array<ReferenceArrayWrapper> -> array.flatMap { it.referenceArray.asList() } },
-            { array: Array<BooleanArrayWrapper> -> array.flatMap { it.booleanArray.asList() } },
-            { array: Array<ByteArrayWrapper> -> array.flatMap { it.byteArray.asList() } },
-            { array: Array<CharArrayWrapper> -> array.flatMap { it.charArray.asList() } },
-            { array: Array<ShortArrayWrapper> -> array.flatMap { it.shortArray.asList() } },
-            { array: Array<IntArrayWrapper> -> array.flatMap { it.intArray.asList() } },
-            { array: Array<FloatArrayWrapper> -> array.flatMap { it.floatArray.asList() } },
-            { array: Array<LongArrayWrapper> -> array.flatMap { it.longArray.asList() } },
-            { array: Array<DoubleArrayWrapper> -> array.flatMap { it.doubleArray.asList() } },
+            // Array.flatMap requires a nested iterable. Using asList() wraps each nested array without copying its data.
+            { array: Array<CollectionOwner<Array<String>>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<BooleanArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<ByteArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<CharArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<ShortArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<IntArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<FloatArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<LongArray>> -> array.flatMap { it.nestedCollection.asList() } },
+            { array: Array<CollectionOwner<DoubleArray>> -> array.flatMap { it.nestedCollection.asList() } },
 
             // immutable arrays
-            { array: ImmutableArray<ImmutableReferenceArrayWrapper> -> array.flatMap { it.immutableReferenceArray } },
-            { array: ImmutableArray<ImmutableBooleanArrayWrapper> -> array.flatMap { it.immutableBooleanArray } },
-            { array: ImmutableArray<ImmutableByteArrayWrapper> -> array.flatMap { it.immutableByteArray } },
-            { array: ImmutableArray<ImmutableCharArrayWrapper> -> array.flatMap { it.immutableCharArray } },
-            { array: ImmutableArray<ImmutableShortArrayWrapper> -> array.flatMap { it.immutableShortArray } },
-            { array: ImmutableArray<ImmutableIntArrayWrapper> -> array.flatMap { it.immutableIntArray } },
-            { array: ImmutableArray<ImmutableFloatArrayWrapper> -> array.flatMap { it.immutableFloatArray } },
-            { array: ImmutableArray<ImmutableLongArrayWrapper> -> array.flatMap { it.immutableLongArray } },
-            { array: ImmutableArray<ImmutableDoubleArrayWrapper> -> array.flatMap { it.immutableDoubleArray } },
+            { array: ImmutableArray<CollectionOwner<ImmutableArray<String>>> ->
+                array.flatMap { it.nestedCollection }
+            },
+            { array: ImmutableArray<CollectionOwner<ImmutableBooleanArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableByteArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableCharArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableShortArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableIntArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableFloatArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableLongArray>> -> array.flatMap { it.nestedCollection } },
+            { array: ImmutableArray<CollectionOwner<ImmutableDoubleArray>> -> array.flatMap { it.nestedCollection } },
         )
     }
 }

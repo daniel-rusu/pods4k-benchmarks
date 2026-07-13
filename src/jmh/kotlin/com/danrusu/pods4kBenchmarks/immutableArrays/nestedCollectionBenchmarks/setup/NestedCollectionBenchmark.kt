@@ -1,8 +1,20 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
+import com.danrusu.pods4k.immutableArrays.ImmutableByteArray
+import com.danrusu.pods4k.immutableArrays.ImmutableCharArray
+import com.danrusu.pods4k.immutableArrays.ImmutableDoubleArray
+import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
+import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
+import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
+import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -13,47 +25,15 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.BooleanListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ByteListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CharArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.CharListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.DoubleArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.DoubleListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.FloatArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.FloatListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableBooleanArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableByteArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableCharArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableDoubleArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableFloatArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableIntArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableLongArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableReferenceArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ImmutableShortArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.IntArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.IntListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.LongListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentBooleanListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentByteListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentCharListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentDoubleListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentFloatListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentIntListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentLongListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentReferenceListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.PersistentShortListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ReferenceListWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortArrayWrapper
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.collectionWrappers.ShortListWrapper
+import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
@@ -64,36 +44,31 @@ import org.openjdk.jmh.infra.Blackhole
 
 /**
  * Represents a benchmark that measures the performance of operating on nested collections, such as a list of orders
- * with each order containing a list of products.  Note that the term collection is used loosely to represent a [List],
+ * with each order containing a list of products. Note that the term collection is used loosely to represent a [List],
  * [Array], or [ImmutableArray] rather than the actual [Collection] interface.
  */
 @State(Scope.Benchmark)
 abstract class NestedCollectionBenchmark {
-    /** Repeat the benchmarks for each collection type */
+    /** Repeat the benchmarks for each collection type. */
     @Param
     protected lateinit var collectionType: CollectionType
 
-    /**
-     * Repeat the benchmarks for each of the 8 base data types plus a String reference type.  Each scenario will
-     * prepare the data to have nested collections of this type.
-     */
+    /** Repeat the benchmarks for each of the eight base data types plus a String reference type. */
     @Param
     protected lateinit var dataType: DataType
 
     /**
-     * The number of collections to benchmark against in order to avoid repeating the operation being measured from
-     * being performed on the same collection repeatedly.  This number should be sufficiently large, like 1000, to
-     * avoid misleading results from optimizations like caching etc.
+     * The number of collections to benchmark against in order to avoid repeatedly operating on the same collection.
      *
      * Contract: The subclass overriding this value must return a fixed value that never changes.
      */
     abstract val numCollections: Int
 
-    /** Controls the sizes of the parent collections that will be generated */
+    /** Controls the sizes of the parent collections that will be generated. */
     open val topLevelSizeDistributionFactory: DistributionFactory
         get() = DistributionFactory.ListSizeDistribution
 
-    /** Controls the sizes of the nested collections that will be generated */
+    /** Controls the sizes of the nested collections that will be generated. */
     open val nestedCollectionSizeDistributionFactory: DistributionFactory
         get() = DistributionFactory.NestedListSizeDistribution
 
@@ -105,190 +80,446 @@ abstract class NestedCollectionBenchmark {
     open val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>
         get() = ObjectGeneratorFactory.randomStrings()
 
-    protected lateinit var data: Array<NestedCollectionWrapper>
+    // List element types are erased, so one data array is sufficient for all nine data types.
+    // These fields are published internally because the protected benchmark helper is inline.
+    @PublishedApi
+    internal var listData: Array<List<CollectionOwner<List<Any>>>> = emptyArray()
+
+    @PublishedApi
+    internal var persistentListData: Array<PersistentList<CollectionOwner<PersistentList<Any>>>> = emptyArray()
+
+    @PublishedApi
+    internal var referenceArrayData: Array<Array<CollectionOwner<Array<String>>>> = emptyArray()
+
+    @PublishedApi
+    internal var booleanArrayData: Array<Array<CollectionOwner<BooleanArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var byteArrayData: Array<Array<CollectionOwner<ByteArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var charArrayData: Array<Array<CollectionOwner<CharArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var shortArrayData: Array<Array<CollectionOwner<ShortArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var intArrayData: Array<Array<CollectionOwner<IntArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var floatArrayData: Array<Array<CollectionOwner<FloatArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var longArrayData: Array<Array<CollectionOwner<LongArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var doubleArrayData: Array<Array<CollectionOwner<DoubleArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableReferenceArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableArray<String>>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableBooleanArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableByteArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableByteArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableCharArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableCharArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableShortArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableShortArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableIntArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableIntArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableFloatArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableFloatArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableLongArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableLongArray>>> = emptyArray()
+
+    @PublishedApi
+    internal var immutableDoubleArrayData:
+        Array<ImmutableArray<CollectionOwner<ImmutableDoubleArray>>> = emptyArray()
 
     @Setup(Level.Trial)
     fun setupCollections() {
         val rngFactory = RngFactory()
         val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
-
         val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
         val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
         val fields = nestedFieldGeneratorFactory.create(generatorRngs)
         val references = nestedReferenceGeneratorFactory.create(generatorRngs)
 
-        data = Array(numCollections) { index ->
-            NestedCollectionWrapper(
-                numNestedCollections = topLevelSizeDistribution.nextValue(),
-                nestedSizeDistribution = nestedSizeDistribution,
-                collectionType = collectionType,
-                dataType = dataType,
-                fields = fields,
-                references = references,
-            )
+        when (collectionType) {
+            LIST -> createLists(topLevelSizeDistribution, nestedSizeDistribution, fields, references)
+            PERSISTENT_LIST -> createPersistentLists(topLevelSizeDistribution, nestedSizeDistribution, fields, references)
+            ARRAY -> createArrays(topLevelSizeDistribution, nestedSizeDistribution, fields, references)
+            IMMUTABLE_ARRAY -> createImmutableArrays(topLevelSizeDistribution, nestedSizeDistribution, fields, references)
         }
     }
 
     @TearDown
     fun tearDown() {
-        data = emptyArray()
+        listData = emptyArray()
+        persistentListData = emptyArray()
+
+        referenceArrayData = emptyArray()
+        booleanArrayData = emptyArray()
+        byteArrayData = emptyArray()
+        charArrayData = emptyArray()
+        shortArrayData = emptyArray()
+        intArrayData = emptyArray()
+        floatArrayData = emptyArray()
+        longArrayData = emptyArray()
+        doubleArrayData = emptyArray()
+
+        immutableReferenceArrayData = emptyArray()
+        immutableBooleanArrayData = emptyArray()
+        immutableByteArrayData = emptyArray()
+        immutableCharArrayData = emptyArray()
+        immutableShortArrayData = emptyArray()
+        immutableIntArrayData = emptyArray()
+        immutableFloatArrayData = emptyArray()
+        immutableLongArrayData = emptyArray()
+        immutableDoubleArrayData = emptyArray()
     }
 
     @Suppress("UNCHECKED_CAST")
+    @PublishedApi
+    internal fun <T> typedListData(): Array<List<CollectionOwner<List<T>>>> {
+        return listData as Array<List<CollectionOwner<List<T>>>>
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @PublishedApi
+    internal fun <T> typedPersistentListData(): Array<PersistentList<CollectionOwner<PersistentList<T>>>> {
+        return persistentListData as Array<PersistentList<CollectionOwner<PersistentList<T>>>>
+    }
+
+    /** Performs the associated operation on every top-level collection and consumes each result. */
     protected inline fun transformEachCollection(
         bh: Blackhole,
 
         // lists
-        transformNestedLists: (List<ReferenceListWrapper>) -> Any?,
-        transformNestedBooleanLists: (List<BooleanListWrapper>) -> Any?,
-        transformNestedByteLists: (List<ByteListWrapper>) -> Any?,
-        transformNestedCharLists: (List<CharListWrapper>) -> Any?,
-        transformNestedShortLists: (List<ShortListWrapper>) -> Any?,
-        transformNestedIntLists: (List<IntListWrapper>) -> Any?,
-        transformNestedFloatLists: (List<FloatListWrapper>) -> Any?,
-        transformNestedLongLists: (List<LongListWrapper>) -> Any?,
-        transformNestedDoubleLists: (List<DoubleListWrapper>) -> Any?,
+        transformNestedLists: (List<CollectionOwner<List<String>>>) -> Any?,
+        transformNestedBooleanLists: (List<CollectionOwner<List<Boolean>>>) -> Any?,
+        transformNestedByteLists: (List<CollectionOwner<List<Byte>>>) -> Any?,
+        transformNestedCharLists: (List<CollectionOwner<List<Char>>>) -> Any?,
+        transformNestedShortLists: (List<CollectionOwner<List<Short>>>) -> Any?,
+        transformNestedIntLists: (List<CollectionOwner<List<Int>>>) -> Any?,
+        transformNestedFloatLists: (List<CollectionOwner<List<Float>>>) -> Any?,
+        transformNestedLongLists: (List<CollectionOwner<List<Long>>>) -> Any?,
+        transformNestedDoubleLists: (List<CollectionOwner<List<Double>>>) -> Any?,
 
         // persistent lists
-        transformNestedPersistentLists: (PersistentList<PersistentReferenceListWrapper>) -> Any?,
-        transformNestedPersistentBooleanLists: (PersistentList<PersistentBooleanListWrapper>) -> Any?,
-        transformNestedPersistentByteLists: (PersistentList<PersistentByteListWrapper>) -> Any?,
-        transformNestedPersistentCharLists: (PersistentList<PersistentCharListWrapper>) -> Any?,
-        transformNestedPersistentShortLists: (PersistentList<PersistentShortListWrapper>) -> Any?,
-        transformNestedPersistentIntLists: (PersistentList<PersistentIntListWrapper>) -> Any?,
-        transformNestedPersistentFloatLists: (PersistentList<PersistentFloatListWrapper>) -> Any?,
-        transformNestedPersistentLongLists: (PersistentList<PersistentLongListWrapper>) -> Any?,
-        transformNestedPersistentDoubleLists: (PersistentList<PersistentDoubleListWrapper>) -> Any?,
+        transformNestedPersistentLists: (PersistentList<CollectionOwner<PersistentList<String>>>) -> Any?,
+        transformNestedPersistentBooleanLists: (PersistentList<CollectionOwner<PersistentList<Boolean>>>) -> Any?,
+        transformNestedPersistentByteLists: (PersistentList<CollectionOwner<PersistentList<Byte>>>) -> Any?,
+        transformNestedPersistentCharLists: (PersistentList<CollectionOwner<PersistentList<Char>>>) -> Any?,
+        transformNestedPersistentShortLists: (PersistentList<CollectionOwner<PersistentList<Short>>>) -> Any?,
+        transformNestedPersistentIntLists: (PersistentList<CollectionOwner<PersistentList<Int>>>) -> Any?,
+        transformNestedPersistentFloatLists: (PersistentList<CollectionOwner<PersistentList<Float>>>) -> Any?,
+        transformNestedPersistentLongLists: (PersistentList<CollectionOwner<PersistentList<Long>>>) -> Any?,
+        transformNestedPersistentDoubleLists: (PersistentList<CollectionOwner<PersistentList<Double>>>) -> Any?,
 
         // arrays
-        transformNestedArrays: (Array<ReferenceArrayWrapper>) -> Any?,
-        transformNestedBooleanArrays: (Array<BooleanArrayWrapper>) -> Any?,
-        transformNestedByteArrays: (Array<ByteArrayWrapper>) -> Any?,
-        transformNestedCharArrays: (Array<CharArrayWrapper>) -> Any?,
-        transformNestedShortArrays: (Array<ShortArrayWrapper>) -> Any?,
-        transformNestedIntArrays: (Array<IntArrayWrapper>) -> Any?,
-        transformNestedFloatArrays: (Array<FloatArrayWrapper>) -> Any?,
-        transformNestedLongArrays: (Array<LongArrayWrapper>) -> Any?,
-        transformNestedDoubleArrays: (Array<DoubleArrayWrapper>) -> Any?,
+        transformNestedArrays: (Array<CollectionOwner<Array<String>>>) -> Any?,
+        transformNestedBooleanArrays: (Array<CollectionOwner<BooleanArray>>) -> Any?,
+        transformNestedByteArrays: (Array<CollectionOwner<ByteArray>>) -> Any?,
+        transformNestedCharArrays: (Array<CollectionOwner<CharArray>>) -> Any?,
+        transformNestedShortArrays: (Array<CollectionOwner<ShortArray>>) -> Any?,
+        transformNestedIntArrays: (Array<CollectionOwner<IntArray>>) -> Any?,
+        transformNestedFloatArrays: (Array<CollectionOwner<FloatArray>>) -> Any?,
+        transformNestedLongArrays: (Array<CollectionOwner<LongArray>>) -> Any?,
+        transformNestedDoubleArrays: (Array<CollectionOwner<DoubleArray>>) -> Any?,
 
         // immutable arrays
-        transformNestedImmutableArrays: (ImmutableArray<ImmutableReferenceArrayWrapper>) -> Any?,
-        transformNestedImmutableBooleanArrays: (ImmutableArray<ImmutableBooleanArrayWrapper>) -> Any?,
-        transformNestedImmutableByteArrays: (ImmutableArray<ImmutableByteArrayWrapper>) -> Any?,
-        transformNestedImmutableCharArrays: (ImmutableArray<ImmutableCharArrayWrapper>) -> Any?,
-        transformNestedImmutableShortArrays: (ImmutableArray<ImmutableShortArrayWrapper>) -> Any?,
-        transformNestedImmutableIntArrays: (ImmutableArray<ImmutableIntArrayWrapper>) -> Any?,
-        transformNestedImmutableFloatArrays: (ImmutableArray<ImmutableFloatArrayWrapper>) -> Any?,
-        transformNestedImmutableLongArrays: (ImmutableArray<ImmutableLongArrayWrapper>) -> Any?,
-        transformNestedImmutableDoubleArrays: (ImmutableArray<ImmutableDoubleArrayWrapper>) -> Any?,
-    ) = when (collectionType) {
-        CollectionType.LIST -> when (dataType) {
-            REFERENCE -> data.forEach { bh.consume(transformNestedLists(it.list as List<ReferenceListWrapper>)) }
-            BOOLEAN -> data.forEach { bh.consume(transformNestedBooleanLists(it.list as List<BooleanListWrapper>)) }
-            BYTE -> data.forEach { bh.consume(transformNestedByteLists(it.list as List<ByteListWrapper>)) }
-            CHAR -> data.forEach { bh.consume(transformNestedCharLists(it.list as List<CharListWrapper>)) }
-            SHORT -> data.forEach { bh.consume(transformNestedShortLists(it.list as List<ShortListWrapper>)) }
-            INT -> data.forEach { bh.consume(transformNestedIntLists(it.list as List<IntListWrapper>)) }
-            FLOAT -> data.forEach { bh.consume(transformNestedFloatLists(it.list as List<FloatListWrapper>)) }
-            LONG -> data.forEach { bh.consume(transformNestedLongLists(it.list as List<LongListWrapper>)) }
-            DOUBLE -> data.forEach { bh.consume(transformNestedDoubleLists(it.list as List<DoubleListWrapper>)) }
-        }
-
-        CollectionType.PERSISTENT_LIST -> when (dataType) {
-            REFERENCE -> data.forEach {
-                bh.consume(transformNestedPersistentLists(it.persistentList as PersistentList<PersistentReferenceListWrapper>))
+        transformNestedImmutableArrays: (ImmutableArray<CollectionOwner<ImmutableArray<String>>>) -> Any?,
+        transformNestedImmutableBooleanArrays: (ImmutableArray<CollectionOwner<ImmutableBooleanArray>>) -> Any?,
+        transformNestedImmutableByteArrays: (ImmutableArray<CollectionOwner<ImmutableByteArray>>) -> Any?,
+        transformNestedImmutableCharArrays: (ImmutableArray<CollectionOwner<ImmutableCharArray>>) -> Any?,
+        transformNestedImmutableShortArrays: (ImmutableArray<CollectionOwner<ImmutableShortArray>>) -> Any?,
+        transformNestedImmutableIntArrays: (ImmutableArray<CollectionOwner<ImmutableIntArray>>) -> Any?,
+        transformNestedImmutableFloatArrays: (ImmutableArray<CollectionOwner<ImmutableFloatArray>>) -> Any?,
+        transformNestedImmutableLongArrays: (ImmutableArray<CollectionOwner<ImmutableLongArray>>) -> Any?,
+        transformNestedImmutableDoubleArrays: (ImmutableArray<CollectionOwner<ImmutableDoubleArray>>) -> Any?,
+    ) {
+        when (collectionType) {
+            LIST -> when (dataType) {
+                REFERENCE -> typedListData<String>().forEach { bh.consume(transformNestedLists(it)) }
+                BOOLEAN -> typedListData<Boolean>().forEach { bh.consume(transformNestedBooleanLists(it)) }
+                BYTE -> typedListData<Byte>().forEach { bh.consume(transformNestedByteLists(it)) }
+                CHAR -> typedListData<Char>().forEach { bh.consume(transformNestedCharLists(it)) }
+                SHORT -> typedListData<Short>().forEach { bh.consume(transformNestedShortLists(it)) }
+                INT -> typedListData<Int>().forEach { bh.consume(transformNestedIntLists(it)) }
+                FLOAT -> typedListData<Float>().forEach { bh.consume(transformNestedFloatLists(it)) }
+                LONG -> typedListData<Long>().forEach { bh.consume(transformNestedLongLists(it)) }
+                DOUBLE -> typedListData<Double>().forEach { bh.consume(transformNestedDoubleLists(it)) }
             }
 
-            BOOLEAN -> data.forEach {
-                bh.consume(transformNestedPersistentBooleanLists(it.persistentList as PersistentList<PersistentBooleanListWrapper>))
+            PERSISTENT_LIST -> when (dataType) {
+                REFERENCE -> typedPersistentListData<String>().forEach {
+                    bh.consume(transformNestedPersistentLists(it))
+                }
+
+                BOOLEAN -> typedPersistentListData<Boolean>().forEach {
+                    bh.consume(transformNestedPersistentBooleanLists(it))
+                }
+
+                BYTE -> typedPersistentListData<Byte>().forEach {
+                    bh.consume(transformNestedPersistentByteLists(it))
+                }
+
+                CHAR -> typedPersistentListData<Char>().forEach {
+                    bh.consume(transformNestedPersistentCharLists(it))
+                }
+
+                SHORT -> typedPersistentListData<Short>().forEach {
+                    bh.consume(transformNestedPersistentShortLists(it))
+                }
+
+                INT -> typedPersistentListData<Int>().forEach {
+                    bh.consume(transformNestedPersistentIntLists(it))
+                }
+
+                FLOAT -> typedPersistentListData<Float>().forEach {
+                    bh.consume(transformNestedPersistentFloatLists(it))
+                }
+
+                LONG -> typedPersistentListData<Long>().forEach {
+                    bh.consume(transformNestedPersistentLongLists(it))
+                }
+
+                DOUBLE -> typedPersistentListData<Double>().forEach {
+                    bh.consume(transformNestedPersistentDoubleLists(it))
+                }
             }
 
-            BYTE -> data.forEach {
-                bh.consume(transformNestedPersistentByteLists(it.persistentList as PersistentList<PersistentByteListWrapper>))
+            ARRAY -> when (dataType) {
+                REFERENCE -> referenceArrayData.forEach { bh.consume(transformNestedArrays(it)) }
+                BOOLEAN -> booleanArrayData.forEach { bh.consume(transformNestedBooleanArrays(it)) }
+                BYTE -> byteArrayData.forEach { bh.consume(transformNestedByteArrays(it)) }
+                CHAR -> charArrayData.forEach { bh.consume(transformNestedCharArrays(it)) }
+                SHORT -> shortArrayData.forEach { bh.consume(transformNestedShortArrays(it)) }
+                INT -> intArrayData.forEach { bh.consume(transformNestedIntArrays(it)) }
+                FLOAT -> floatArrayData.forEach { bh.consume(transformNestedFloatArrays(it)) }
+                LONG -> longArrayData.forEach { bh.consume(transformNestedLongArrays(it)) }
+                DOUBLE -> doubleArrayData.forEach { bh.consume(transformNestedDoubleArrays(it)) }
             }
 
-            CHAR -> data.forEach {
-                bh.consume(transformNestedPersistentCharLists(it.persistentList as PersistentList<PersistentCharListWrapper>))
-            }
-
-            SHORT -> data.forEach {
-                bh.consume(transformNestedPersistentShortLists(it.persistentList as PersistentList<PersistentShortListWrapper>))
-            }
-
-            INT -> data.forEach {
-                bh.consume(transformNestedPersistentIntLists(it.persistentList as PersistentList<PersistentIntListWrapper>))
-            }
-
-            FLOAT -> data.forEach {
-                bh.consume(transformNestedPersistentFloatLists(it.persistentList as PersistentList<PersistentFloatListWrapper>))
-            }
-
-            LONG -> data.forEach {
-                bh.consume(transformNestedPersistentLongLists(it.persistentList as PersistentList<PersistentLongListWrapper>))
-            }
-
-            DOUBLE -> data.forEach {
-                bh.consume(transformNestedPersistentDoubleLists(it.persistentList as PersistentList<PersistentDoubleListWrapper>))
-            }
-        }
-
-        CollectionType.ARRAY -> when (dataType) {
-            REFERENCE -> data.forEach { bh.consume(transformNestedArrays(it.array as Array<ReferenceArrayWrapper>)) }
-            BOOLEAN -> data.forEach { bh.consume(transformNestedBooleanArrays(it.array as Array<BooleanArrayWrapper>)) }
-            BYTE -> data.forEach { bh.consume(transformNestedByteArrays(it.array as Array<ByteArrayWrapper>)) }
-            CHAR -> data.forEach { bh.consume(transformNestedCharArrays(it.array as Array<CharArrayWrapper>)) }
-            SHORT -> data.forEach { bh.consume(transformNestedShortArrays(it.array as Array<ShortArrayWrapper>)) }
-            INT -> data.forEach { bh.consume(transformNestedIntArrays(it.array as Array<IntArrayWrapper>)) }
-            FLOAT -> data.forEach { bh.consume(transformNestedFloatArrays(it.array as Array<FloatArrayWrapper>)) }
-            LONG -> data.forEach { bh.consume(transformNestedLongArrays(it.array as Array<LongArrayWrapper>)) }
-            DOUBLE -> data.forEach { bh.consume(transformNestedDoubleArrays(it.array as Array<DoubleArrayWrapper>)) }
-        }
-
-        CollectionType.IMMUTABLE_ARRAY -> when (dataType) {
-            REFERENCE -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableReferenceArrayWrapper>
-                bh.consume(transformNestedImmutableArrays(array))
-            }
-
-            BOOLEAN -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableBooleanArrayWrapper>
-                bh.consume(transformNestedImmutableBooleanArrays(array))
-            }
-
-            BYTE -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableByteArrayWrapper>
-                bh.consume(transformNestedImmutableByteArrays(array))
-            }
-
-            CHAR -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableCharArrayWrapper>
-                bh.consume(transformNestedImmutableCharArrays(array))
-            }
-
-            SHORT -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableShortArrayWrapper>
-                bh.consume(transformNestedImmutableShortArrays(array))
-            }
-
-            INT -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableIntArrayWrapper>
-                bh.consume(transformNestedImmutableIntArrays(array))
-            }
-
-            FLOAT -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableFloatArrayWrapper>
-                bh.consume(transformNestedImmutableFloatArrays(array))
-            }
-
-            LONG -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableLongArrayWrapper>
-                bh.consume(transformNestedImmutableLongArrays(array))
-            }
-
-            DOUBLE -> data.forEach {
-                val array = it.immutableArray as ImmutableArray<ImmutableDoubleArrayWrapper>
-                bh.consume(transformNestedImmutableDoubleArrays(array))
+            IMMUTABLE_ARRAY -> when (dataType) {
+                REFERENCE -> immutableReferenceArrayData.forEach { bh.consume(transformNestedImmutableArrays(it)) }
+                BOOLEAN -> immutableBooleanArrayData.forEach { bh.consume(transformNestedImmutableBooleanArrays(it)) }
+                BYTE -> immutableByteArrayData.forEach { bh.consume(transformNestedImmutableByteArrays(it)) }
+                CHAR -> immutableCharArrayData.forEach { bh.consume(transformNestedImmutableCharArrays(it)) }
+                SHORT -> immutableShortArrayData.forEach { bh.consume(transformNestedImmutableShortArrays(it)) }
+                INT -> immutableIntArrayData.forEach { bh.consume(transformNestedImmutableIntArrays(it)) }
+                FLOAT -> immutableFloatArrayData.forEach { bh.consume(transformNestedImmutableFloatArrays(it)) }
+                LONG -> immutableLongArrayData.forEach { bh.consume(transformNestedImmutableLongArrays(it)) }
+                DOUBLE -> immutableDoubleArrayData.forEach { bh.consume(transformNestedImmutableDoubleArrays(it)) }
             }
         }
+    }
+
+    private fun createLists(
+        topLevelSizeDistribution: Distribution,
+        nestedSizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String>,
+    ) {
+        listData = Array(numCollections) {
+            createList(topLevelSizeDistribution.nextValue()) {
+                when (dataType) {
+                    REFERENCE -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { references.next() })
+                    BOOLEAN -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextBoolean() })
+                    BYTE -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextByte() })
+                    CHAR -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextChar() })
+                    SHORT -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextShort() })
+                    INT -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextInt() })
+                    FLOAT -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
+                    LONG -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextLong() })
+                    DOUBLE -> CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
+                }
+            }
+        }
+    }
+
+    private fun createPersistentLists(
+        topLevelSizeDistribution: Distribution,
+        nestedSizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String>,
+    ) {
+        persistentListData = Array(numCollections) {
+            createPersistentList(topLevelSizeDistribution.nextValue()) {
+                when (dataType) {
+                    REFERENCE -> CollectionOwner(
+                        createPersistentList(nestedSizeDistribution.nextValue()) { references.next() }
+                    )
+
+                    BOOLEAN -> CollectionOwner(
+                        createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextBoolean() }
+                    )
+
+                    BYTE -> CollectionOwner(createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextByte() })
+                    CHAR -> CollectionOwner(createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextChar() })
+                    SHORT -> CollectionOwner(createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextShort() })
+                    INT -> CollectionOwner(createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextInt() })
+                    FLOAT -> CollectionOwner(createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
+                    LONG -> CollectionOwner(createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextLong() })
+                    DOUBLE -> CollectionOwner(
+                        createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextDouble() }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun createArrays(
+        topLevelSizeDistribution: Distribution,
+        nestedSizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String>,
+    ) {
+        when (dataType) {
+            REFERENCE -> referenceArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(Array(nestedSizeDistribution.nextValue()) { references.next() })
+                }
+            }
+
+            BOOLEAN -> booleanArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(BooleanArray(nestedSizeDistribution.nextValue()) { fields.nextBoolean() })
+                }
+            }
+
+            BYTE -> byteArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ByteArray(nestedSizeDistribution.nextValue()) { fields.nextByte() })
+                }
+            }
+
+            CHAR -> charArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(CharArray(nestedSizeDistribution.nextValue()) { fields.nextChar() })
+                }
+            }
+
+            SHORT -> shortArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ShortArray(nestedSizeDistribution.nextValue()) { fields.nextShort() })
+                }
+            }
+
+            INT -> intArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(IntArray(nestedSizeDistribution.nextValue()) { fields.nextInt() })
+                }
+            }
+
+            FLOAT -> floatArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(FloatArray(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
+                }
+            }
+
+            LONG -> longArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(LongArray(nestedSizeDistribution.nextValue()) { fields.nextLong() })
+                }
+            }
+
+            DOUBLE -> doubleArrayData = Array(numCollections) {
+                Array(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(DoubleArray(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
+                }
+            }
+        }
+    }
+
+    private fun createImmutableArrays(
+        topLevelSizeDistribution: Distribution,
+        nestedSizeDistribution: Distribution,
+        fields: FieldGenerator,
+        references: ObjectGenerator<String>,
+    ) {
+        when (dataType) {
+            REFERENCE -> immutableReferenceArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableArray(nestedSizeDistribution.nextValue()) { references.next() })
+                }
+            }
+
+            BOOLEAN -> immutableBooleanArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableBooleanArray(nestedSizeDistribution.nextValue()) { fields.nextBoolean() })
+                }
+            }
+
+            BYTE -> immutableByteArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableByteArray(nestedSizeDistribution.nextValue()) { fields.nextByte() })
+                }
+            }
+
+            CHAR -> immutableCharArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableCharArray(nestedSizeDistribution.nextValue()) { fields.nextChar() })
+                }
+            }
+
+            SHORT -> immutableShortArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableShortArray(nestedSizeDistribution.nextValue()) { fields.nextShort() })
+                }
+            }
+
+            INT -> immutableIntArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableIntArray(nestedSizeDistribution.nextValue()) { fields.nextInt() })
+                }
+            }
+
+            FLOAT -> immutableFloatArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableFloatArray(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
+                }
+            }
+
+            LONG -> immutableLongArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableLongArray(nestedSizeDistribution.nextValue()) { fields.nextLong() })
+                }
+            }
+
+            DOUBLE -> immutableDoubleArrayData = Array(numCollections) {
+                ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                    CollectionOwner(ImmutableDoubleArray(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
+                }
+            }
+        }
+    }
+
+    private inline fun <T> createList(size: Int, initializer: () -> T): List<T> {
+        val result = ArrayList<T>(size)
+        repeat(size) { result.add(initializer()) }
+        return result
+    }
+
+    private inline fun <T> createPersistentList(size: Int, crossinline initializer: () -> T): PersistentList<T> {
+        val builder = persistentListOf<T>().builder()
+        repeat(size) { builder.add(initializer()) }
+        return builder.build()
     }
 }
