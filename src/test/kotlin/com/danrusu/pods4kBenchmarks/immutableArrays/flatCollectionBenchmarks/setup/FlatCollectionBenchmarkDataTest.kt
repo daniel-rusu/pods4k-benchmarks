@@ -62,7 +62,7 @@ class FlatCollectionBenchmarkDataTest {
         collectionType = collectionType,
         dataType = dataType,
         numCollections = 5,
-        sizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
+        sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
         fieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
         referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
     )

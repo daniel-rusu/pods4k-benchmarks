@@ -1,25 +1,20 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
-import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.infra.Blackhole
 
 /**
@@ -62,69 +57,16 @@ abstract class ObjectCollectionBenchmark<T> {
     abstract val objectGeneratorFactory: ObjectGeneratorFactory<T>
 
     @PublishedApi
-    internal lateinit var listData: Array<List<T>>
-
-    @PublishedApi
-    internal lateinit var persistentListData: Array<PersistentList<T>>
-
-    @PublishedApi
-    internal lateinit var arrayData: Array<Array<T>>
-
-    @PublishedApi
-    internal lateinit var immutableArrayData: Array<ImmutableArray<T>>
+    internal lateinit var data: ObjectCollectionBenchmarkData<T>
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        val rngFactory = RngFactory()
-        val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
-        val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val objectGenerator = objectGeneratorFactory.create(generatorRngs)
-
-        listData = emptyArray()
-        persistentListData = emptyArray()
-        arrayData = emptyArrayData()
-        immutableArrayData = emptyArray()
-
-        when (collectionType) {
-            LIST -> {
-                listData = Array(numCollections) {
-                    List(sizeDistribution.nextValue()) { objectGenerator.next() }
-                }
-            }
-
-            PERSISTENT_LIST -> {
-                persistentListData = Array(numCollections) {
-                    val builder = persistentListOf<T>().builder()
-                    repeat(sizeDistribution.nextValue()) { builder.add(objectGenerator.next()) }
-                    builder.build()
-                }
-            }
-
-            ARRAY -> {
-                val arrays = arrayOfNulls<Array<*>>(numCollections)
-                repeat(numCollections) { index ->
-                    arrays[index] = ArrayCreator.createArray(objectGenerator.objectClass, sizeDistribution.nextValue()) {
-                        objectGenerator.next()
-                    }
-                }
-                @Suppress("UNCHECKED_CAST")
-                arrayData = arrays as Array<Array<T>>
-            }
-
-            IMMUTABLE_ARRAY -> {
-                immutableArrayData = Array(numCollections) {
-                    ImmutableArray(sizeDistribution.nextValue()) { objectGenerator.next() }
-                }
-            }
-        }
-    }
-
-    @TearDown
-    fun tearDown() {
-        listData = emptyArray()
-        persistentListData = emptyArray()
-        arrayData = emptyArrayData()
-        immutableArrayData = emptyArray()
+        data = ObjectCollectionBenchmarkData.create(
+            collectionType = collectionType,
+            numCollections = numCollections,
+            sizeDistributionFactory = sizeDistributionFactory,
+            objectGeneratorFactory = objectGeneratorFactory,
+        )
     }
 
     /**
@@ -141,13 +83,10 @@ abstract class ObjectCollectionBenchmark<T> {
         transformImmutableArray: (ImmutableArray<T>) -> Any?,
     ) {
         when (collectionType) {
-            LIST -> listData.forEach { bh.consume(transformList(it)) }
-            PERSISTENT_LIST -> persistentListData.forEach { bh.consume(transformPersistentList(it)) }
-            ARRAY -> arrayData.forEach { bh.consume(transformArray(it)) }
-            IMMUTABLE_ARRAY -> immutableArrayData.forEach { bh.consume(transformImmutableArray(it)) }
+            LIST -> data.listData.forEach { bh.consume(transformList(it)) }
+            PERSISTENT_LIST -> data.persistentListData.forEach { bh.consume(transformPersistentList(it)) }
+            ARRAY -> data.arrayData.forEach { bh.consume(transformArray(it)) }
+            IMMUTABLE_ARRAY -> data.immutableArrayData.forEach { bh.consume(transformImmutableArray(it)) }
         }
     }
 }
-
-@Suppress("UNCHECKED_CAST")
-private fun <T> emptyArrayData(): Array<Array<T>> = emptyArray<Array<*>>() as Array<Array<T>>
