@@ -3,13 +3,13 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.filterNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -48,6 +48,8 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
 
+private const val NULL_RATIO = 0.5
+
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -67,10 +69,10 @@ open class FilterNotNull {
     private val sizeDistributionFactory = DistributionFactory.ListSizeDistribution
 
     /** Creates simple field generators for nullable primitive wrapper elements. */
-    private val fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(nullRatio = 0.5)
+    private val fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO)
 
     /** Creates reference generators for nullable string elements. */
-    private val referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(nullRatio = 0.5)
+    private val referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO)
 
     /** Using a single list type for each value type as statically-typed lists will never make any difference*/
     private lateinit var listData: Array<List<Any?>>
