@@ -25,25 +25,22 @@ private const val NUM_COLLECTIONS = 1000
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
-open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
-    override val objectGeneratorFactory: ObjectGeneratorFactory<CompoundElement> =
-        ObjectGeneratorFactory.of<CompoundElement> { fields, references ->
-            CompoundElement(
-                referenceValue = references.next(),
-                booleanValue = fields.nextBoolean(),
-                byteValue = fields.nextByte(),
-                charValue = fields.nextChar(),
-                shortValue = fields.nextShort(),
-                intValue = fields.nextInt(),
-                floatValue = fields.nextFloat(),
-                longValue = fields.nextLong(),
-                doubleValue = fields.nextDouble(),
-            )
-        }
-
+open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>(
+    numCollections = NUM_COLLECTIONS,
+    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { fields, references ->
+        CompoundElement(
+            referenceValue = references.next(),
+            booleanValue = fields.nextBoolean(),
+            byteValue = fields.nextByte(),
+            charValue = fields.nextChar(),
+            shortValue = fields.nextShort(),
+            intValue = fields.nextInt(),
+            floatValue = fields.nextFloat(),
+            longValue = fields.nextLong(),
+            doubleValue = fields.nextDouble(),
+        )
+    },
+) {
     @Benchmark
     fun mapReference(bh: Blackhole) {
         transformEachCollection(

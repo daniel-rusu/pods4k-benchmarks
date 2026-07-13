@@ -33,28 +33,23 @@ import org.openjdk.jmh.infra.Blackhole
  * collection transform will be called for each of the 500 collections.
  */
 @State(Scope.Benchmark)
-abstract class ObjectCollectionBenchmark<T> {
+abstract class ObjectCollectionBenchmark<T>(
+    /**
+     * The number of collections to benchmark against in order to avoid repeating the operation being measured from
+     * being performed on the same collection repeatedly. This number should be sufficiently large, like 1000, to
+     * avoid misleading results from optimizations like caching etc.
+     */
+    private val numCollections: Int,
+    /** Controls the sizes of the collections that will be generated */
+    private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
+    /** Creates object generators for the element data that the collections will contain. */
+    private val objectGeneratorFactory: ObjectGeneratorFactory<T>,
+) {
     /**
      * Repeat the benchmark for each of the 8 base data types plus a String reference type.
      */
     @Param
     protected lateinit var collectionType: CollectionType
-
-    /**
-     * The number of collections to benchmark against in order to avoid repeating the operation being measured from
-     * being performed on the same collection repeatedly.  This number should be sufficiently large, like 1000, to
-     * avoid misleading results from optimizations like caching etc.
-     *
-     * Contract: The subclass overriding this value must return a fixed value that never changes.
-     */
-    abstract val numCollections: Int
-
-    /** Controls the sizes of the collections that will be generated */
-    open val sizeDistributionFactory: DistributionFactory
-        get() = DistributionFactory.ListSizeDistribution
-
-    /** Creates object generators for the element data that the collections will contain. */
-    abstract val objectGeneratorFactory: ObjectGeneratorFactory<T>
 
     @PublishedApi
     internal lateinit var data: ObjectCollectionBenchmarkData<T>

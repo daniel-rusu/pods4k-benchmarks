@@ -20,6 +20,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
+private const val NULL_RATIO = 0.5
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -27,28 +28,25 @@ private const val NUM_COLLECTIONS = 1000
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
-open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
-    override val objectGeneratorFactory: ObjectGeneratorFactory<CompoundElementOfNullableValues> =
-        ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(
-            fieldsFactory = FieldGeneratorFactory.withRandomNullableFields(nullRatio = 0.5),
-            referenceFactory = ObjectGeneratorFactory.randomStrings().nullable(nullRatio = 0.5),
-        ) { fields, references ->
-            CompoundElementOfNullableValues(
-                nullableReference = references.next(),
-                nullableBoolean = fields.nextNullableBoolean(),
-                nullableByte = fields.nextNullableByte(),
-                nullableChar = fields.nextNullableChar(),
-                nullableShort = fields.nextNullableShort(),
-                nullableInt = fields.nextNullableInt(),
-                nullableFloat = fields.nextNullableFloat(),
-                nullableLong = fields.nextNullableLong(),
-                nullableDouble = fields.nextNullableDouble(),
-            )
-        }
-
+open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
+    numCollections = NUM_COLLECTIONS,
+    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(
+        fieldsFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO),
+        referenceFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
+    ) { fields, references ->
+        CompoundElementOfNullableValues(
+            nullableReference = references.next(),
+            nullableBoolean = fields.nextNullableBoolean(),
+            nullableByte = fields.nextNullableByte(),
+            nullableChar = fields.nextNullableChar(),
+            nullableShort = fields.nextNullableShort(),
+            nullableInt = fields.nextNullableInt(),
+            nullableFloat = fields.nextNullableFloat(),
+            nullableLong = fields.nextNullableLong(),
+            nullableDouble = fields.nextNullableDouble(),
+        )
+    },
+) {
     @Benchmark
     fun mapNotNullReference(bh: Blackhole) {
         transformEachCollection(
