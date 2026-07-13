@@ -15,6 +15,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -33,7 +35,6 @@ import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
@@ -511,15 +512,4 @@ abstract class NestedCollectionBenchmark {
         }
     }
 
-    private inline fun <T> createList(size: Int, initializer: () -> T): List<T> {
-        val result = ArrayList<T>(size)
-        repeat(size) { result.add(initializer()) }
-        return result
-    }
-
-    private inline fun <T> createPersistentList(size: Int, crossinline initializer: () -> T): PersistentList<T> {
-        val builder = persistentListOf<T>().builder()
-        repeat(size) { builder.add(initializer()) }
-        return builder.build()
-    }
 }

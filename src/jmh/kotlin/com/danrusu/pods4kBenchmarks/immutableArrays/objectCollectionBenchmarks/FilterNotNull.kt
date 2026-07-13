@@ -8,6 +8,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -27,7 +29,6 @@ import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.nullable
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -197,15 +198,6 @@ open class FilterNotNull {
         }
     }
 
-    private inline fun <T> createList(
-        listSize: Int,
-        initializer: () -> T,
-    ): List<T> {
-        val result = ArrayList<T>(listSize)
-        repeat(listSize) { result.add(initializer()) }
-        return result
-    }
-
     private fun createPersistentLists(
         sizeDistribution: Distribution,
         fields: FieldGenerator,
@@ -224,12 +216,6 @@ open class FilterNotNull {
                 DOUBLE -> createPersistentList(sizeDistribution.nextValue()) { fields.nextNullableDouble() }
             }
         }
-    }
-
-    private inline fun <T> createPersistentList(listSize: Int, crossinline initializer: () -> T): PersistentList<T> {
-        val builder = persistentListOf<T>().builder()
-        repeat(listSize) { builder.add(initializer()) }
-        return builder.build()
     }
 
     private fun createArrays(
