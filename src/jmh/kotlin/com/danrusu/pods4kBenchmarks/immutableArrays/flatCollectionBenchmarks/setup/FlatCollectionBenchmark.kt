@@ -46,13 +46,26 @@ import org.openjdk.jmh.infra.Blackhole
  * Benchmarks are parameterized by every combination of [CollectionType] and [DataType].  Subclasses should create a
  * benchmark method that calls [transformEachCollection] to measure the performance of each scenario.
  *
- * For example, if [numCollections] returns 500, and the collection type & data type pair being measured is
+ * For example, if [numCollections] is 500, and the collection type & data type pair being measured is
  * [CollectionType.LIST] & [DataType.BOOLEAN], then 500 List<Boolean> collections will be created.  When the subclass
  * calls [transformEachCollection], the provided boolean collection transform will be called for each of the 500
  * collections.
  */
 @State(Scope.Benchmark)
-abstract class FlatCollectionBenchmark {
+abstract class FlatCollectionBenchmark(
+    /**
+     * The number of collections to benchmark against in order to avoid repeating the operation being measured from
+     * being performed on the same collection repeatedly.  This number should be sufficiently large, like 1000, to
+     * avoid misleading results from optimizations like caching etc.
+     */
+    private val numCollections: Int,
+    /** Controls the sizes of the collections that will be generated */
+    private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
+    /** Responsible for generating primitive field values that the collections will contain */
+    private val fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    /** Responsible for generating reference values that the collections will contain */
+    private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
+) {
     /** Repeat the benchmark for each collection type */
     @Param
     protected lateinit var collectionType: CollectionType
@@ -60,27 +73,6 @@ abstract class FlatCollectionBenchmark {
     /** Repeat the benchmark for each of the 8 base data types plus a String reference type */
     @Param
     protected lateinit var dataType: DataType
-
-    /**
-     * The number of collections to benchmark against in order to avoid repeating the operation being measured from
-     * being performed on the same collection repeatedly.  This number should be sufficiently large, like 1000, to
-     * avoid misleading results from optimizations like caching etc.
-     *
-     * Contract: The subclass overriding this value must return a fixed value that never changes.
-     */
-    abstract val numCollections: Int
-
-    /** Controls the sizes of the collections that will be generated */
-    open val sizeDistributionFactory: DistributionFactory
-        get() = DistributionFactory.ListSizeDistribution
-
-    /** Responsible for generating primitive field values that the collections will contain */
-    open val fieldGeneratorFactory: FieldGeneratorFactory
-        get() = FieldGeneratorFactory.withRandomFields()
-
-    /** Responsible for generating reference values that the collections will contain */
-    open val referenceGeneratorFactory: ObjectGeneratorFactory<String>
-        get() = ObjectGeneratorFactory.randomStrings()
 
     @PublishedApi
     internal lateinit var data: FlatCollectionBenchmarkData

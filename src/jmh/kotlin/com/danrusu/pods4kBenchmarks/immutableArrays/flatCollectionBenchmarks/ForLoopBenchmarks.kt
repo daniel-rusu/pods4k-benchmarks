@@ -30,10 +30,7 @@ private const val NUM_COLLECTIONS = 1000
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
-open class ForLoopBenchmarks : FlatCollectionBenchmark() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
+open class ForLoopBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun forLoop(bh: Blackhole) {
         transformEachCollection(

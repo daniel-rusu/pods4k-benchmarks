@@ -30,10 +30,7 @@ private const val NUM_COLLECTIONS = 1000
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class DropLastBenchmarks : FlatCollectionBenchmark() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
+open class DropLastBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun dropLast(bh: Blackhole) {
         transformEachCollection(

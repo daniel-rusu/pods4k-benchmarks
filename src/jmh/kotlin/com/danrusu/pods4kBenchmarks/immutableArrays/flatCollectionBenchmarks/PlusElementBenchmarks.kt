@@ -41,10 +41,7 @@ const val DOUBLE_ELEMENT = 0.0
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class PlusElementBenchmarks : FlatCollectionBenchmark() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
+open class PlusElementBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun plusElement(bh: Blackhole) {
         transformEachCollection(

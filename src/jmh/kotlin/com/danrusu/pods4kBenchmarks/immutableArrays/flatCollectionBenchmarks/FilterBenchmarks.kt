@@ -11,8 +11,6 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -36,16 +34,11 @@ private const val ACCEPT_RATIO = 0.5
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
-open class FilterBenchmarks : FlatCollectionBenchmark() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
-    override val fieldGeneratorFactory: FieldGeneratorFactory
-        get() = FlatDataFilter.createFieldGeneratorFactory(acceptRatio = ACCEPT_RATIO)
-
-    override val referenceGeneratorFactory: ObjectGeneratorFactory<String>
-        get() = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO)
-
+open class FilterBenchmarks : FlatCollectionBenchmark(
+    numCollections = NUM_COLLECTIONS,
+    fieldGeneratorFactory = FlatDataFilter.createFieldGeneratorFactory(acceptRatio = ACCEPT_RATIO),
+    referenceGeneratorFactory = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO),
+) {
     @Benchmark
     fun filter(bh: Blackhole) {
         transformEachCollection(
