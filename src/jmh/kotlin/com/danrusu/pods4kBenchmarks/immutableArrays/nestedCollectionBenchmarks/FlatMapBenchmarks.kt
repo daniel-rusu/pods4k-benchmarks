@@ -32,10 +32,7 @@ private const val NUM_COLLECTIONS = 250
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
-open class FlatMapBenchmarks : NestedCollectionBenchmark() {
-    override val numCollections: Int
-        get() = NUM_COLLECTIONS
-
+open class FlatMapBenchmarks : NestedCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun flatMap(bh: Blackhole) {
         transformEachCollection(

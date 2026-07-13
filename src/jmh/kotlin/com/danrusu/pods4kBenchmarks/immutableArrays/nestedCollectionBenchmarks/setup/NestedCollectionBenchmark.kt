@@ -41,7 +41,21 @@ import org.openjdk.jmh.infra.Blackhole
  * [Array], or [ImmutableArray] rather than the actual [Collection] interface.
  */
 @State(Scope.Benchmark)
-abstract class NestedCollectionBenchmark {
+abstract class NestedCollectionBenchmark(
+    /**
+     * The number of collections to benchmark against in order to avoid repeatedly operating on the same collection.
+     */
+    private val numCollections: Int,
+    /** Controls the sizes of the parent collections that will be generated. */
+    private val topLevelSizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
+    /** Controls the sizes of the nested collections that will be generated. */
+    private val nestedCollectionSizeDistributionFactory: DistributionFactory =
+        DistributionFactory.NestedListSizeDistribution,
+    /** Creates simple field generators for primitive nested collection elements. */
+    private val nestedFieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    /** Creates reference generators for nested collection elements. */
+    private val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
+) {
     /** Repeat the benchmarks for each collection type. */
     @Param
     protected lateinit var collectionType: CollectionType
@@ -49,29 +63,6 @@ abstract class NestedCollectionBenchmark {
     /** Repeat the benchmarks for each of the eight base data types plus a String reference type. */
     @Param
     protected lateinit var dataType: DataType
-
-    /**
-     * The number of collections to benchmark against in order to avoid repeatedly operating on the same collection.
-     *
-     * Contract: The subclass overriding this value must return a fixed value that never changes.
-     */
-    abstract val numCollections: Int
-
-    /** Controls the sizes of the parent collections that will be generated. */
-    open val topLevelSizeDistributionFactory: DistributionFactory
-        get() = DistributionFactory.ListSizeDistribution
-
-    /** Controls the sizes of the nested collections that will be generated. */
-    open val nestedCollectionSizeDistributionFactory: DistributionFactory
-        get() = DistributionFactory.NestedListSizeDistribution
-
-    /** Creates simple field generators for primitive nested collection elements. */
-    open val nestedFieldGeneratorFactory: FieldGeneratorFactory
-        get() = FieldGeneratorFactory.withRandomFields()
-
-    /** Creates reference generators for nested collection elements. */
-    open val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>
-        get() = ObjectGeneratorFactory.randomStrings()
 
     @PublishedApi
     internal lateinit var data: NestedCollectionBenchmarkData
