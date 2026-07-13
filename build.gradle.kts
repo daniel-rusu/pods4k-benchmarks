@@ -18,12 +18,12 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.pods4k)
+    implementation(libs.kotlinxCollectionsImmutable)
+
     jmhImplementation(libs.jmhCore)
     jmhImplementation(libs.jmhAnnotations)
     jmhImplementation(libs.jmhGenerator)
-
-    jmhImplementation(libs.pods4k)
-    jmhImplementation(libs.kotlinxCollectionsImmutable)
 }
 
 plugins.withId("org.jetbrains.kotlin.jvm") {

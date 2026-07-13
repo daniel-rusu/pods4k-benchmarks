@@ -6,7 +6,7 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 
 ## Source Sets And Layout
 
-- `src/main/kotlin`: shared utilities used by benchmarks and tested by unit tests.
+- `src/main/kotlin`: shared utilities and deterministic benchmark-data builders tested by unit tests.
 - `src/test/kotlin`: JUnit 5 + Strikt tests for shared utilities.
 - `src/jmh/kotlin`: JMH benchmarks plus benchmark-only setup and wrapper code.
 - `src/*/java` and `src/*/resources`: present as source-set directories but currently empty in the inspected tree.
@@ -23,6 +23,8 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 - `FlatDataFilter`: filtered field and string generator factories for predicate-oriented flat benchmarks.
 - `CollectionOwner`: models the intentional object layer around a nested collection, such as a person with friends.
 - Benchmark bases: `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`.
+- `FlatCollectionBenchmarkData`: strongly typed data for a flat benchmark trial, with deterministic construction in
+  its companion object.
 
 ## Generated-Code Model
 
@@ -44,7 +46,8 @@ This repo benchmarks the published `pods4k` dependency in an environment that do
 - `numCollections` overrides are expected to be fixed values.
 - `@OperationsPerInvocation` represents collections processed per invocation; for pairwise benchmarks it should usually be `NUM_COLLECTIONS / 2`.
 - `@Setup(Level.Trial)` prepares data; benchmark methods should measure the operation, not data construction unless that is the explicit scenario.
-- `@TearDown` clears large arrays to reduce cross-trial memory retention.
+- Flat benchmark setup replaces its data holder for each trial; benchmark states that retain mutable backing fields use
+  `@TearDown` to clear large arrays and reduce cross-trial memory retention.
 
 ## Boundaries
 

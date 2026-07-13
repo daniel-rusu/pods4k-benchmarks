@@ -9,14 +9,11 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BOOLEAN
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.BYTE
@@ -27,12 +24,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
@@ -41,7 +34,6 @@ import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
-import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.infra.Blackhole
 
 /**
@@ -90,118 +82,19 @@ abstract class FlatCollectionBenchmark {
     open val referenceGeneratorFactory: ObjectGeneratorFactory<String>
         get() = ObjectGeneratorFactory.randomStrings()
 
-    // List element types are erased, so one data array is sufficient for all nine data types.
-    // These fields are published internally because the protected benchmark helpers are inline.
     @PublishedApi
-    internal var listData: Array<List<Any>> = emptyArray()
-
-    @PublishedApi
-    internal var persistentListData: Array<PersistentList<Any>> = emptyArray()
-
-    @PublishedApi
-    internal var referenceArrays: Array<Array<String>> = emptyArray()
-
-    @PublishedApi
-    internal var booleanArrays: Array<BooleanArray> = emptyArray()
-
-    @PublishedApi
-    internal var byteArrays: Array<ByteArray> = emptyArray()
-
-    @PublishedApi
-    internal var charArrays: Array<CharArray> = emptyArray()
-
-    @PublishedApi
-    internal var shortArrays: Array<ShortArray> = emptyArray()
-
-    @PublishedApi
-    internal var intArrays: Array<IntArray> = emptyArray()
-
-    @PublishedApi
-    internal var floatArrays: Array<FloatArray> = emptyArray()
-
-    @PublishedApi
-    internal var longArrays: Array<LongArray> = emptyArray()
-
-    @PublishedApi
-    internal var doubleArrays: Array<DoubleArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableReferenceArrays: Array<ImmutableArray<String>> = emptyArray()
-
-    @PublishedApi
-    internal var immutableBooleanArrays: Array<ImmutableBooleanArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableByteArrays: Array<ImmutableByteArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableCharArrays: Array<ImmutableCharArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableShortArrays: Array<ImmutableShortArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableIntArrays: Array<ImmutableIntArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableFloatArrays: Array<ImmutableFloatArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableLongArrays: Array<ImmutableLongArray> = emptyArray()
-
-    @PublishedApi
-    internal var immutableDoubleArrays: Array<ImmutableDoubleArray> = emptyArray()
+    internal lateinit var data: FlatCollectionBenchmarkData
 
     @Setup(Level.Trial)
     fun setupCollections() {
-        val rngFactory = RngFactory()
-        val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
-        val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-        val fields = fieldGeneratorFactory.create(generatorRngs)
-        val references = referenceGeneratorFactory.create(generatorRngs)
-
-        when (collectionType) {
-            LIST -> createLists(sizeDistribution, fields, references)
-            PERSISTENT_LIST -> createPersistentLists(sizeDistribution, fields, references)
-            ARRAY -> createArrays(sizeDistribution, fields, references)
-            IMMUTABLE_ARRAY -> createImmutableArrays(sizeDistribution, fields, references)
-        }
-    }
-
-    @TearDown
-    fun tearDown() {
-        listData = emptyArray()
-        persistentListData = emptyArray()
-
-        referenceArrays = emptyArray()
-        booleanArrays = emptyArray()
-        byteArrays = emptyArray()
-        charArrays = emptyArray()
-        shortArrays = emptyArray()
-        intArrays = emptyArray()
-        floatArrays = emptyArray()
-        longArrays = emptyArray()
-        doubleArrays = emptyArray()
-
-        immutableReferenceArrays = emptyArray()
-        immutableBooleanArrays = emptyArray()
-        immutableByteArrays = emptyArray()
-        immutableCharArrays = emptyArray()
-        immutableShortArrays = emptyArray()
-        immutableIntArrays = emptyArray()
-        immutableFloatArrays = emptyArray()
-        immutableLongArrays = emptyArray()
-        immutableDoubleArrays = emptyArray()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    @PublishedApi
-    internal fun <T> typedListData(): Array<List<T>> = listData as Array<List<T>>
-
-    @Suppress("UNCHECKED_CAST")
-    @PublishedApi
-    internal fun <T> typedPersistentListData(): Array<PersistentList<T>> {
-        return persistentListData as Array<PersistentList<T>>
+        data = FlatCollectionBenchmarkData.create(
+            collectionType = collectionType,
+            dataType = dataType,
+            numCollections = numCollections,
+            sizeDistributionFactory = sizeDistributionFactory,
+            fieldGeneratorFactory = fieldGeneratorFactory,
+            referenceGeneratorFactory = referenceGeneratorFactory,
+        )
     }
 
     /**
@@ -252,51 +145,51 @@ abstract class FlatCollectionBenchmark {
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> typedListData<String>().forEach { bh.consume(transformList(it)) }
-                BOOLEAN -> typedListData<Boolean>().forEach { bh.consume(transformBooleanList(it)) }
-                BYTE -> typedListData<Byte>().forEach { bh.consume(transformByteList(it)) }
-                CHAR -> typedListData<Char>().forEach { bh.consume(transformCharList(it)) }
-                SHORT -> typedListData<Short>().forEach { bh.consume(transformShortList(it)) }
-                INT -> typedListData<Int>().forEach { bh.consume(transformIntList(it)) }
-                FLOAT -> typedListData<Float>().forEach { bh.consume(transformFloatList(it)) }
-                LONG -> typedListData<Long>().forEach { bh.consume(transformLongList(it)) }
-                DOUBLE -> typedListData<Double>().forEach { bh.consume(transformDoubleList(it)) }
+                REFERENCE -> data.typedListData<String>().forEach { bh.consume(transformList(it)) }
+                BOOLEAN -> data.typedListData<Boolean>().forEach { bh.consume(transformBooleanList(it)) }
+                BYTE -> data.typedListData<Byte>().forEach { bh.consume(transformByteList(it)) }
+                CHAR -> data.typedListData<Char>().forEach { bh.consume(transformCharList(it)) }
+                SHORT -> data.typedListData<Short>().forEach { bh.consume(transformShortList(it)) }
+                INT -> data.typedListData<Int>().forEach { bh.consume(transformIntList(it)) }
+                FLOAT -> data.typedListData<Float>().forEach { bh.consume(transformFloatList(it)) }
+                LONG -> data.typedListData<Long>().forEach { bh.consume(transformLongList(it)) }
+                DOUBLE -> data.typedListData<Double>().forEach { bh.consume(transformDoubleList(it)) }
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> typedPersistentListData<String>().forEach { bh.consume(transformPersistentList(it)) }
-                BOOLEAN -> typedPersistentListData<Boolean>().forEach { bh.consume(transformPersistentBooleanList(it)) }
-                BYTE -> typedPersistentListData<Byte>().forEach { bh.consume(transformPersistentByteList(it)) }
-                CHAR -> typedPersistentListData<Char>().forEach { bh.consume(transformPersistentCharList(it)) }
-                SHORT -> typedPersistentListData<Short>().forEach { bh.consume(transformPersistentShortList(it)) }
-                INT -> typedPersistentListData<Int>().forEach { bh.consume(transformPersistentIntList(it)) }
-                FLOAT -> typedPersistentListData<Float>().forEach { bh.consume(transformPersistentFloatList(it)) }
-                LONG -> typedPersistentListData<Long>().forEach { bh.consume(transformPersistentLongList(it)) }
-                DOUBLE -> typedPersistentListData<Double>().forEach { bh.consume(transformPersistentDoubleList(it)) }
+                REFERENCE -> data.typedPersistentListData<String>().forEach { bh.consume(transformPersistentList(it)) }
+                BOOLEAN -> data.typedPersistentListData<Boolean>().forEach { bh.consume(transformPersistentBooleanList(it)) }
+                BYTE -> data.typedPersistentListData<Byte>().forEach { bh.consume(transformPersistentByteList(it)) }
+                CHAR -> data.typedPersistentListData<Char>().forEach { bh.consume(transformPersistentCharList(it)) }
+                SHORT -> data.typedPersistentListData<Short>().forEach { bh.consume(transformPersistentShortList(it)) }
+                INT -> data.typedPersistentListData<Int>().forEach { bh.consume(transformPersistentIntList(it)) }
+                FLOAT -> data.typedPersistentListData<Float>().forEach { bh.consume(transformPersistentFloatList(it)) }
+                LONG -> data.typedPersistentListData<Long>().forEach { bh.consume(transformPersistentLongList(it)) }
+                DOUBLE -> data.typedPersistentListData<Double>().forEach { bh.consume(transformPersistentDoubleList(it)) }
             }
 
             ARRAY -> when (dataType) {
-                REFERENCE -> referenceArrays.forEach { bh.consume(transformArray(it)) }
-                BOOLEAN -> booleanArrays.forEach { bh.consume(transformBooleanArray(it)) }
-                BYTE -> byteArrays.forEach { bh.consume(transformByteArray(it)) }
-                CHAR -> charArrays.forEach { bh.consume(transformCharArray(it)) }
-                SHORT -> shortArrays.forEach { bh.consume(transformShortArray(it)) }
-                INT -> intArrays.forEach { bh.consume(transformIntArray(it)) }
-                FLOAT -> floatArrays.forEach { bh.consume(transformFloatArray(it)) }
-                LONG -> longArrays.forEach { bh.consume(transformLongArray(it)) }
-                DOUBLE -> doubleArrays.forEach { bh.consume(transformDoubleArray(it)) }
+                REFERENCE -> data.referenceArrays.forEach { bh.consume(transformArray(it)) }
+                BOOLEAN -> data.booleanArrays.forEach { bh.consume(transformBooleanArray(it)) }
+                BYTE -> data.byteArrays.forEach { bh.consume(transformByteArray(it)) }
+                CHAR -> data.charArrays.forEach { bh.consume(transformCharArray(it)) }
+                SHORT -> data.shortArrays.forEach { bh.consume(transformShortArray(it)) }
+                INT -> data.intArrays.forEach { bh.consume(transformIntArray(it)) }
+                FLOAT -> data.floatArrays.forEach { bh.consume(transformFloatArray(it)) }
+                LONG -> data.longArrays.forEach { bh.consume(transformLongArray(it)) }
+                DOUBLE -> data.doubleArrays.forEach { bh.consume(transformDoubleArray(it)) }
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> immutableReferenceArrays.forEach { bh.consume(transformImmutableArray(it)) }
-                BOOLEAN -> immutableBooleanArrays.forEach { bh.consume(transformImmutableBooleanArray(it)) }
-                BYTE -> immutableByteArrays.forEach { bh.consume(transformImmutableByteArray(it)) }
-                CHAR -> immutableCharArrays.forEach { bh.consume(transformImmutableCharArray(it)) }
-                SHORT -> immutableShortArrays.forEach { bh.consume(transformImmutableShortArray(it)) }
-                INT -> immutableIntArrays.forEach { bh.consume(transformImmutableIntArray(it)) }
-                FLOAT -> immutableFloatArrays.forEach { bh.consume(transformImmutableFloatArray(it)) }
-                LONG -> immutableLongArrays.forEach { bh.consume(transformImmutableLongArray(it)) }
-                DOUBLE -> immutableDoubleArrays.forEach { bh.consume(transformImmutableDoubleArray(it)) }
+                REFERENCE -> data.immutableReferenceArrays.forEach { bh.consume(transformImmutableArray(it)) }
+                BOOLEAN -> data.immutableBooleanArrays.forEach { bh.consume(transformImmutableBooleanArray(it)) }
+                BYTE -> data.immutableByteArrays.forEach { bh.consume(transformImmutableByteArray(it)) }
+                CHAR -> data.immutableCharArrays.forEach { bh.consume(transformImmutableCharArray(it)) }
+                SHORT -> data.immutableShortArrays.forEach { bh.consume(transformImmutableShortArray(it)) }
+                INT -> data.immutableIntArrays.forEach { bh.consume(transformImmutableIntArray(it)) }
+                FLOAT -> data.immutableFloatArrays.forEach { bh.consume(transformImmutableFloatArray(it)) }
+                LONG -> data.immutableLongArrays.forEach { bh.consume(transformImmutableLongArray(it)) }
+                DOUBLE -> data.immutableDoubleArrays.forEach { bh.consume(transformImmutableDoubleArray(it)) }
             }
         }
     }
@@ -353,51 +246,51 @@ abstract class FlatCollectionBenchmark {
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> consumePairs(bh, typedListData(), transformLists)
-                BOOLEAN -> consumePairs(bh, typedListData(), transformBooleanLists)
-                BYTE -> consumePairs(bh, typedListData(), transformByteLists)
-                CHAR -> consumePairs(bh, typedListData(), transformCharLists)
-                SHORT -> consumePairs(bh, typedListData(), transformShortLists)
-                INT -> consumePairs(bh, typedListData(), transformIntLists)
-                FLOAT -> consumePairs(bh, typedListData(), transformFloatLists)
-                LONG -> consumePairs(bh, typedListData(), transformLongLists)
-                DOUBLE -> consumePairs(bh, typedListData(), transformDoubleLists)
+                REFERENCE -> consumePairs(bh, data.typedListData(), transformLists)
+                BOOLEAN -> consumePairs(bh, data.typedListData(), transformBooleanLists)
+                BYTE -> consumePairs(bh, data.typedListData(), transformByteLists)
+                CHAR -> consumePairs(bh, data.typedListData(), transformCharLists)
+                SHORT -> consumePairs(bh, data.typedListData(), transformShortLists)
+                INT -> consumePairs(bh, data.typedListData(), transformIntLists)
+                FLOAT -> consumePairs(bh, data.typedListData(), transformFloatLists)
+                LONG -> consumePairs(bh, data.typedListData(), transformLongLists)
+                DOUBLE -> consumePairs(bh, data.typedListData(), transformDoubleLists)
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> consumePairs(bh, typedPersistentListData<String>(), transformPersistentLists)
-                BOOLEAN -> consumePairs(bh, typedPersistentListData<Boolean>(), transformPersistentBooleanLists)
-                BYTE -> consumePairs(bh, typedPersistentListData<Byte>(), transformPersistentByteLists)
-                CHAR -> consumePairs(bh, typedPersistentListData<Char>(), transformPersistentCharLists)
-                SHORT -> consumePairs(bh, typedPersistentListData<Short>(), transformPersistentShortLists)
-                INT -> consumePairs(bh, typedPersistentListData<Int>(), transformPersistentIntLists)
-                FLOAT -> consumePairs(bh, typedPersistentListData<Float>(), transformPersistentFloatLists)
-                LONG -> consumePairs(bh, typedPersistentListData<Long>(), transformPersistentLongLists)
-                DOUBLE -> consumePairs(bh, typedPersistentListData<Double>(), transformPersistentDoubleLists)
+                REFERENCE -> consumePairs(bh, data.typedPersistentListData<String>(), transformPersistentLists)
+                BOOLEAN -> consumePairs(bh, data.typedPersistentListData<Boolean>(), transformPersistentBooleanLists)
+                BYTE -> consumePairs(bh, data.typedPersistentListData<Byte>(), transformPersistentByteLists)
+                CHAR -> consumePairs(bh, data.typedPersistentListData<Char>(), transformPersistentCharLists)
+                SHORT -> consumePairs(bh, data.typedPersistentListData<Short>(), transformPersistentShortLists)
+                INT -> consumePairs(bh, data.typedPersistentListData<Int>(), transformPersistentIntLists)
+                FLOAT -> consumePairs(bh, data.typedPersistentListData<Float>(), transformPersistentFloatLists)
+                LONG -> consumePairs(bh, data.typedPersistentListData<Long>(), transformPersistentLongLists)
+                DOUBLE -> consumePairs(bh, data.typedPersistentListData<Double>(), transformPersistentDoubleLists)
             }
 
             ARRAY -> when (dataType) {
-                REFERENCE -> consumePairs(bh, referenceArrays, transformArrays)
-                BOOLEAN -> consumePairs(bh, booleanArrays, transformBooleanArrays)
-                BYTE -> consumePairs(bh, byteArrays, transformByteArrays)
-                CHAR -> consumePairs(bh, charArrays, transformCharArrays)
-                SHORT -> consumePairs(bh, shortArrays, transformShortArrays)
-                INT -> consumePairs(bh, intArrays, transformIntArrays)
-                FLOAT -> consumePairs(bh, floatArrays, transformFloatArrays)
-                LONG -> consumePairs(bh, longArrays, transformLongArrays)
-                DOUBLE -> consumePairs(bh, doubleArrays, transformDoubleArrays)
+                REFERENCE -> consumePairs(bh, data.referenceArrays, transformArrays)
+                BOOLEAN -> consumePairs(bh, data.booleanArrays, transformBooleanArrays)
+                BYTE -> consumePairs(bh, data.byteArrays, transformByteArrays)
+                CHAR -> consumePairs(bh, data.charArrays, transformCharArrays)
+                SHORT -> consumePairs(bh, data.shortArrays, transformShortArrays)
+                INT -> consumePairs(bh, data.intArrays, transformIntArrays)
+                FLOAT -> consumePairs(bh, data.floatArrays, transformFloatArrays)
+                LONG -> consumePairs(bh, data.longArrays, transformLongArrays)
+                DOUBLE -> consumePairs(bh, data.doubleArrays, transformDoubleArrays)
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> consumePairs(bh, immutableReferenceArrays, transformImmutableArrays)
-                BOOLEAN -> consumePairs(bh, immutableBooleanArrays, transformImmutableBooleanArrays)
-                BYTE -> consumePairs(bh, immutableByteArrays, transformImmutableByteArrays)
-                CHAR -> consumePairs(bh, immutableCharArrays, transformImmutableCharArrays)
-                SHORT -> consumePairs(bh, immutableShortArrays, transformImmutableShortArrays)
-                INT -> consumePairs(bh, immutableIntArrays, transformImmutableIntArrays)
-                FLOAT -> consumePairs(bh, immutableFloatArrays, transformImmutableFloatArrays)
-                LONG -> consumePairs(bh, immutableLongArrays, transformImmutableLongArrays)
-                DOUBLE -> consumePairs(bh, immutableDoubleArrays, transformImmutableDoubleArrays)
+                REFERENCE -> consumePairs(bh, data.immutableReferenceArrays, transformImmutableArrays)
+                BOOLEAN -> consumePairs(bh, data.immutableBooleanArrays, transformImmutableBooleanArrays)
+                BYTE -> consumePairs(bh, data.immutableByteArrays, transformImmutableByteArrays)
+                CHAR -> consumePairs(bh, data.immutableCharArrays, transformImmutableCharArrays)
+                SHORT -> consumePairs(bh, data.immutableShortArrays, transformImmutableShortArrays)
+                INT -> consumePairs(bh, data.immutableIntArrays, transformImmutableIntArrays)
+                FLOAT -> consumePairs(bh, data.immutableFloatArrays, transformImmutableFloatArrays)
+                LONG -> consumePairs(bh, data.immutableLongArrays, transformImmutableLongArrays)
+                DOUBLE -> consumePairs(bh, data.immutableDoubleArrays, transformImmutableDoubleArrays)
             }
         }
     }
@@ -410,134 +303,6 @@ abstract class FlatCollectionBenchmark {
     ) {
         for (i in 0..<data.lastIndex step 2) {
             bh.consume(transform(data[i], data[i + 1]))
-        }
-    }
-
-    private fun createLists(
-        sizeDistribution: Distribution,
-        fields: FieldGenerator,
-        references: ObjectGenerator<String>,
-    ) {
-        listData = Array(numCollections) {
-            when (dataType) {
-                REFERENCE -> createList(sizeDistribution.nextValue()) { references.next() }
-                BOOLEAN -> createList(sizeDistribution.nextValue()) { fields.nextBoolean() }
-                BYTE -> createList(sizeDistribution.nextValue()) { fields.nextByte() }
-                CHAR -> createList(sizeDistribution.nextValue()) { fields.nextChar() }
-                SHORT -> createList(sizeDistribution.nextValue()) { fields.nextShort() }
-                INT -> createList(sizeDistribution.nextValue()) { fields.nextInt() }
-                FLOAT -> createList(sizeDistribution.nextValue()) { fields.nextFloat() }
-                LONG -> createList(sizeDistribution.nextValue()) { fields.nextLong() }
-                DOUBLE -> createList(sizeDistribution.nextValue()) { fields.nextDouble() }
-            }
-        }
-    }
-
-    private fun createPersistentLists(
-        sizeDistribution: Distribution,
-        fields: FieldGenerator,
-        references: ObjectGenerator<String>,
-    ) {
-        persistentListData = Array(numCollections) {
-            when (dataType) {
-                REFERENCE -> createPersistentList(sizeDistribution.nextValue()) { references.next() }
-                BOOLEAN -> createPersistentList(sizeDistribution.nextValue()) { fields.nextBoolean() }
-                BYTE -> createPersistentList(sizeDistribution.nextValue()) { fields.nextByte() }
-                CHAR -> createPersistentList(sizeDistribution.nextValue()) { fields.nextChar() }
-                SHORT -> createPersistentList(sizeDistribution.nextValue()) { fields.nextShort() }
-                INT -> createPersistentList(sizeDistribution.nextValue()) { fields.nextInt() }
-                FLOAT -> createPersistentList(sizeDistribution.nextValue()) { fields.nextFloat() }
-                LONG -> createPersistentList(sizeDistribution.nextValue()) { fields.nextLong() }
-                DOUBLE -> createPersistentList(sizeDistribution.nextValue()) { fields.nextDouble() }
-            }
-        }
-    }
-
-    private fun createArrays(
-        sizeDistribution: Distribution,
-        fields: FieldGenerator,
-        references: ObjectGenerator<String>,
-    ) {
-        when (dataType) {
-            REFERENCE -> referenceArrays = Array(numCollections) {
-                Array(sizeDistribution.nextValue()) { references.next() }
-            }
-
-            BOOLEAN -> booleanArrays = Array(numCollections) {
-                BooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
-            }
-
-            BYTE -> byteArrays = Array(numCollections) {
-                ByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
-            }
-
-            CHAR -> charArrays = Array(numCollections) {
-                CharArray(sizeDistribution.nextValue()) { fields.nextChar() }
-            }
-
-            SHORT -> shortArrays = Array(numCollections) {
-                ShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
-            }
-
-            INT -> intArrays = Array(numCollections) {
-                IntArray(sizeDistribution.nextValue()) { fields.nextInt() }
-            }
-
-            FLOAT -> floatArrays = Array(numCollections) {
-                FloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
-            }
-
-            LONG -> longArrays = Array(numCollections) {
-                LongArray(sizeDistribution.nextValue()) { fields.nextLong() }
-            }
-
-            DOUBLE -> doubleArrays = Array(numCollections) {
-                DoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
-            }
-        }
-    }
-
-    private fun createImmutableArrays(
-        sizeDistribution: Distribution,
-        fields: FieldGenerator,
-        references: ObjectGenerator<String>,
-    ) {
-        when (dataType) {
-            REFERENCE -> immutableReferenceArrays = Array(numCollections) {
-                ImmutableArray(sizeDistribution.nextValue()) { references.next() }
-            }
-
-            BOOLEAN -> immutableBooleanArrays = Array(numCollections) {
-                ImmutableBooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
-            }
-
-            BYTE -> immutableByteArrays = Array(numCollections) {
-                ImmutableByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
-            }
-
-            CHAR -> immutableCharArrays = Array(numCollections) {
-                ImmutableCharArray(sizeDistribution.nextValue()) { fields.nextChar() }
-            }
-
-            SHORT -> immutableShortArrays = Array(numCollections) {
-                ImmutableShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
-            }
-
-            INT -> immutableIntArrays = Array(numCollections) {
-                ImmutableIntArray(sizeDistribution.nextValue()) { fields.nextInt() }
-            }
-
-            FLOAT -> immutableFloatArrays = Array(numCollections) {
-                ImmutableFloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
-            }
-
-            LONG -> immutableLongArrays = Array(numCollections) {
-                ImmutableLongArray(sizeDistribution.nextValue()) { fields.nextLong() }
-            }
-
-            DOUBLE -> immutableDoubleArrays = Array(numCollections) {
-                ImmutableDoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
-            }
         }
     }
 }
