@@ -28,16 +28,35 @@ class FlatCollectionBenchmarkDataTest {
     }
 
     @Test
-    fun `requires exactly one populated backing array`() {
-        assertThrows<IllegalArgumentException> {
-            FlatCollectionBenchmarkData()
+    fun `rejects access using the wrong element type`() {
+        val data = createData(CollectionType.LIST, DataType.BOOLEAN)
+
+        assertThrows<IllegalStateException> {
+            data.listData<Int>()
+        }
+    }
+
+    @Test
+    fun `rejects access using the wrong collection type in either direction`() {
+        val listData = createData(CollectionType.LIST, DataType.BOOLEAN)
+        val persistentListData = createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)
+        val arrayData = createData(CollectionType.ARRAY, DataType.BOOLEAN)
+        val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)
+
+        assertThrows<ClassCastException> {
+            listData.persistentListData<Boolean>()
         }
 
-        assertThrows<IllegalArgumentException> {
-            FlatCollectionBenchmarkData(
-                booleanArrays = arrayOf(booleanArrayOf()),
-                intArrays = arrayOf(intArrayOf()),
-            )
+        assertThrows<ClassCastException> {
+            persistentListData.listData<Boolean>()
+        }
+
+        assertThrows<ClassCastException> {
+            arrayData.immutableBooleanArrays
+        }
+
+        assertThrows<ClassCastException> {
+            immutableArrayData.booleanArrays
         }
     }
 
@@ -71,8 +90,28 @@ class FlatCollectionBenchmarkDataTest {
         collectionType: CollectionType,
         dataType: DataType,
     ): List<List<Any>> = when (collectionType) {
-        CollectionType.LIST -> listData.map { it.toList() }
-        CollectionType.PERSISTENT_LIST -> persistentListData.map { it.toList() }
+        CollectionType.LIST -> when (dataType) {
+            DataType.REFERENCE -> listData<String>().map { it.toList() }
+            DataType.BOOLEAN -> listData<Boolean>().map { it.toList() }
+            DataType.BYTE -> listData<Byte>().map { it.toList() }
+            DataType.CHAR -> listData<Char>().map { it.toList() }
+            DataType.SHORT -> listData<Short>().map { it.toList() }
+            DataType.INT -> listData<Int>().map { it.toList() }
+            DataType.FLOAT -> listData<Float>().map { it.toList() }
+            DataType.LONG -> listData<Long>().map { it.toList() }
+            DataType.DOUBLE -> listData<Double>().map { it.toList() }
+        }
+        CollectionType.PERSISTENT_LIST -> when (dataType) {
+            DataType.REFERENCE -> persistentListData<String>().map { it.toList() }
+            DataType.BOOLEAN -> persistentListData<Boolean>().map { it.toList() }
+            DataType.BYTE -> persistentListData<Byte>().map { it.toList() }
+            DataType.CHAR -> persistentListData<Char>().map { it.toList() }
+            DataType.SHORT -> persistentListData<Short>().map { it.toList() }
+            DataType.INT -> persistentListData<Int>().map { it.toList() }
+            DataType.FLOAT -> persistentListData<Float>().map { it.toList() }
+            DataType.LONG -> persistentListData<Long>().map { it.toList() }
+            DataType.DOUBLE -> persistentListData<Double>().map { it.toList() }
+        }
         CollectionType.ARRAY -> when (dataType) {
             DataType.REFERENCE -> referenceArrays.map { it.toList() }
             DataType.BOOLEAN -> booleanArrays.map { it.toList() }

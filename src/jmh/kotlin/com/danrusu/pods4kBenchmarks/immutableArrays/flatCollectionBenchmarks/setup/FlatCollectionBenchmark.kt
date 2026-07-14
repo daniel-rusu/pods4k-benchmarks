@@ -137,27 +137,27 @@ abstract class FlatCollectionBenchmark(
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> data.typedListData<String>().forEach { bh.consume(transformList(it)) }
-                BOOLEAN -> data.typedListData<Boolean>().forEach { bh.consume(transformBooleanList(it)) }
-                BYTE -> data.typedListData<Byte>().forEach { bh.consume(transformByteList(it)) }
-                CHAR -> data.typedListData<Char>().forEach { bh.consume(transformCharList(it)) }
-                SHORT -> data.typedListData<Short>().forEach { bh.consume(transformShortList(it)) }
-                INT -> data.typedListData<Int>().forEach { bh.consume(transformIntList(it)) }
-                FLOAT -> data.typedListData<Float>().forEach { bh.consume(transformFloatList(it)) }
-                LONG -> data.typedListData<Long>().forEach { bh.consume(transformLongList(it)) }
-                DOUBLE -> data.typedListData<Double>().forEach { bh.consume(transformDoubleList(it)) }
+                REFERENCE -> data.listData<String>().forEach { bh.consume(transformList(it)) }
+                BOOLEAN -> data.listData<Boolean>().forEach { bh.consume(transformBooleanList(it)) }
+                BYTE -> data.listData<Byte>().forEach { bh.consume(transformByteList(it)) }
+                CHAR -> data.listData<Char>().forEach { bh.consume(transformCharList(it)) }
+                SHORT -> data.listData<Short>().forEach { bh.consume(transformShortList(it)) }
+                INT -> data.listData<Int>().forEach { bh.consume(transformIntList(it)) }
+                FLOAT -> data.listData<Float>().forEach { bh.consume(transformFloatList(it)) }
+                LONG -> data.listData<Long>().forEach { bh.consume(transformLongList(it)) }
+                DOUBLE -> data.listData<Double>().forEach { bh.consume(transformDoubleList(it)) }
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> data.typedPersistentListData<String>().forEach { bh.consume(transformPersistentList(it)) }
-                BOOLEAN -> data.typedPersistentListData<Boolean>().forEach { bh.consume(transformPersistentBooleanList(it)) }
-                BYTE -> data.typedPersistentListData<Byte>().forEach { bh.consume(transformPersistentByteList(it)) }
-                CHAR -> data.typedPersistentListData<Char>().forEach { bh.consume(transformPersistentCharList(it)) }
-                SHORT -> data.typedPersistentListData<Short>().forEach { bh.consume(transformPersistentShortList(it)) }
-                INT -> data.typedPersistentListData<Int>().forEach { bh.consume(transformPersistentIntList(it)) }
-                FLOAT -> data.typedPersistentListData<Float>().forEach { bh.consume(transformPersistentFloatList(it)) }
-                LONG -> data.typedPersistentListData<Long>().forEach { bh.consume(transformPersistentLongList(it)) }
-                DOUBLE -> data.typedPersistentListData<Double>().forEach { bh.consume(transformPersistentDoubleList(it)) }
+                REFERENCE -> data.persistentListData<String>().forEach { bh.consume(transformPersistentList(it)) }
+                BOOLEAN -> data.persistentListData<Boolean>().forEach { bh.consume(transformPersistentBooleanList(it)) }
+                BYTE -> data.persistentListData<Byte>().forEach { bh.consume(transformPersistentByteList(it)) }
+                CHAR -> data.persistentListData<Char>().forEach { bh.consume(transformPersistentCharList(it)) }
+                SHORT -> data.persistentListData<Short>().forEach { bh.consume(transformPersistentShortList(it)) }
+                INT -> data.persistentListData<Int>().forEach { bh.consume(transformPersistentIntList(it)) }
+                FLOAT -> data.persistentListData<Float>().forEach { bh.consume(transformPersistentFloatList(it)) }
+                LONG -> data.persistentListData<Long>().forEach { bh.consume(transformPersistentLongList(it)) }
+                DOUBLE -> data.persistentListData<Double>().forEach { bh.consume(transformPersistentDoubleList(it)) }
             }
 
             ARRAY -> when (dataType) {
@@ -238,27 +238,27 @@ abstract class FlatCollectionBenchmark(
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> consumePairs(bh, data.typedListData(), transformLists)
-                BOOLEAN -> consumePairs(bh, data.typedListData(), transformBooleanLists)
-                BYTE -> consumePairs(bh, data.typedListData(), transformByteLists)
-                CHAR -> consumePairs(bh, data.typedListData(), transformCharLists)
-                SHORT -> consumePairs(bh, data.typedListData(), transformShortLists)
-                INT -> consumePairs(bh, data.typedListData(), transformIntLists)
-                FLOAT -> consumePairs(bh, data.typedListData(), transformFloatLists)
-                LONG -> consumePairs(bh, data.typedListData(), transformLongLists)
-                DOUBLE -> consumePairs(bh, data.typedListData(), transformDoubleLists)
+                REFERENCE -> consumePairs(bh, data.listData(), transformLists)
+                BOOLEAN -> consumePairs(bh, data.listData(), transformBooleanLists)
+                BYTE -> consumePairs(bh, data.listData(), transformByteLists)
+                CHAR -> consumePairs(bh, data.listData(), transformCharLists)
+                SHORT -> consumePairs(bh, data.listData(), transformShortLists)
+                INT -> consumePairs(bh, data.listData(), transformIntLists)
+                FLOAT -> consumePairs(bh, data.listData(), transformFloatLists)
+                LONG -> consumePairs(bh, data.listData(), transformLongLists)
+                DOUBLE -> consumePairs(bh, data.listData(), transformDoubleLists)
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> consumePairs(bh, data.typedPersistentListData<String>(), transformPersistentLists)
-                BOOLEAN -> consumePairs(bh, data.typedPersistentListData<Boolean>(), transformPersistentBooleanLists)
-                BYTE -> consumePairs(bh, data.typedPersistentListData<Byte>(), transformPersistentByteLists)
-                CHAR -> consumePairs(bh, data.typedPersistentListData<Char>(), transformPersistentCharLists)
-                SHORT -> consumePairs(bh, data.typedPersistentListData<Short>(), transformPersistentShortLists)
-                INT -> consumePairs(bh, data.typedPersistentListData<Int>(), transformPersistentIntLists)
-                FLOAT -> consumePairs(bh, data.typedPersistentListData<Float>(), transformPersistentFloatLists)
-                LONG -> consumePairs(bh, data.typedPersistentListData<Long>(), transformPersistentLongLists)
-                DOUBLE -> consumePairs(bh, data.typedPersistentListData<Double>(), transformPersistentDoubleLists)
+                REFERENCE -> consumePairs(bh, data.persistentListData<String>(), transformPersistentLists)
+                BOOLEAN -> consumePairs(bh, data.persistentListData<Boolean>(), transformPersistentBooleanLists)
+                BYTE -> consumePairs(bh, data.persistentListData<Byte>(), transformPersistentByteLists)
+                CHAR -> consumePairs(bh, data.persistentListData<Char>(), transformPersistentCharLists)
+                SHORT -> consumePairs(bh, data.persistentListData<Short>(), transformPersistentShortLists)
+                INT -> consumePairs(bh, data.persistentListData<Int>(), transformPersistentIntLists)
+                FLOAT -> consumePairs(bh, data.persistentListData<Float>(), transformPersistentFloatLists)
+                LONG -> consumePairs(bh, data.persistentListData<Long>(), transformPersistentLongLists)
+                DOUBLE -> consumePairs(bh, data.persistentListData<Double>(), transformPersistentDoubleLists)
             }
 
             ARRAY -> when (dataType) {
