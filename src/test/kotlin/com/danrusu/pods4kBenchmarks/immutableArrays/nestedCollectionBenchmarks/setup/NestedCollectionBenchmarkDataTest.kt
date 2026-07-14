@@ -28,16 +28,35 @@ class NestedCollectionBenchmarkDataTest {
     }
 
     @Test
-    fun `requires exactly one populated backing array`() {
-        assertThrows<IllegalArgumentException> {
-            NestedCollectionBenchmarkData()
+    fun `rejects access using the wrong element type`() {
+        val data = createData(CollectionType.LIST, DataType.BOOLEAN)
+
+        assertThrows<IllegalStateException> {
+            data.listData<Int>()
+        }
+    }
+
+    @Test
+    fun `rejects access using the wrong collection type in either direction`() {
+        val listData = createData(CollectionType.LIST, DataType.BOOLEAN)
+        val persistentListData = createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)
+        val arrayData = createData(CollectionType.ARRAY, DataType.BOOLEAN)
+        val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)
+
+        assertThrows<ClassCastException> {
+            listData.persistentListData<Boolean>()
         }
 
-        assertThrows<IllegalArgumentException> {
-            NestedCollectionBenchmarkData(
-                booleanArrayData = arrayOf(emptyArray()),
-                intArrayData = arrayOf(emptyArray()),
-            )
+        assertThrows<ClassCastException> {
+            persistentListData.listData<Boolean>()
+        }
+
+        assertThrows<ClassCastException> {
+            arrayData.immutableBooleanArrayData
+        }
+
+        assertThrows<ClassCastException> {
+            immutableArrayData.booleanArrayData
         }
     }
 
@@ -73,11 +92,27 @@ class NestedCollectionBenchmarkDataTest {
         collectionType: CollectionType,
         dataType: DataType,
     ): List<List<List<Any>>> = when (collectionType) {
-        CollectionType.LIST -> listData.map { collection ->
-            collection.map { it.nestedCollection.toList() }
+        CollectionType.LIST -> when (dataType) {
+            DataType.REFERENCE -> listData<String>().normalize()
+            DataType.BOOLEAN -> listData<Boolean>().normalize()
+            DataType.BYTE -> listData<Byte>().normalize()
+            DataType.CHAR -> listData<Char>().normalize()
+            DataType.SHORT -> listData<Short>().normalize()
+            DataType.INT -> listData<Int>().normalize()
+            DataType.FLOAT -> listData<Float>().normalize()
+            DataType.LONG -> listData<Long>().normalize()
+            DataType.DOUBLE -> listData<Double>().normalize()
         }
-        CollectionType.PERSISTENT_LIST -> persistentListData.map { collection ->
-            collection.map { it.nestedCollection.toList() }
+        CollectionType.PERSISTENT_LIST -> when (dataType) {
+            DataType.REFERENCE -> persistentListData<String>().normalize()
+            DataType.BOOLEAN -> persistentListData<Boolean>().normalize()
+            DataType.BYTE -> persistentListData<Byte>().normalize()
+            DataType.CHAR -> persistentListData<Char>().normalize()
+            DataType.SHORT -> persistentListData<Short>().normalize()
+            DataType.INT -> persistentListData<Int>().normalize()
+            DataType.FLOAT -> persistentListData<Float>().normalize()
+            DataType.LONG -> persistentListData<Long>().normalize()
+            DataType.DOUBLE -> persistentListData<Double>().normalize()
         }
         CollectionType.ARRAY -> when (dataType) {
             DataType.REFERENCE -> referenceArrayData.map { collection ->
@@ -138,5 +173,9 @@ class NestedCollectionBenchmarkDataTest {
                 collection.toList().map { it.nestedCollection.toList() }
             }
         }
+    }
+
+    private fun <T> Array<out List<CollectionOwner<out List<T>>>>.normalize(): List<List<List<T>>> {
+        return map { collection -> collection.map { it.nestedCollection.toList() } }
     }
 }

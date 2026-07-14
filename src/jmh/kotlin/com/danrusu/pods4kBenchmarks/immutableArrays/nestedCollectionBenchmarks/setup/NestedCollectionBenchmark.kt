@@ -130,51 +130,51 @@ abstract class NestedCollectionBenchmark(
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> data.typedListData<String>().forEach { bh.consume(transformNestedLists(it)) }
-                BOOLEAN -> data.typedListData<Boolean>().forEach { bh.consume(transformNestedBooleanLists(it)) }
-                BYTE -> data.typedListData<Byte>().forEach { bh.consume(transformNestedByteLists(it)) }
-                CHAR -> data.typedListData<Char>().forEach { bh.consume(transformNestedCharLists(it)) }
-                SHORT -> data.typedListData<Short>().forEach { bh.consume(transformNestedShortLists(it)) }
-                INT -> data.typedListData<Int>().forEach { bh.consume(transformNestedIntLists(it)) }
-                FLOAT -> data.typedListData<Float>().forEach { bh.consume(transformNestedFloatLists(it)) }
-                LONG -> data.typedListData<Long>().forEach { bh.consume(transformNestedLongLists(it)) }
-                DOUBLE -> data.typedListData<Double>().forEach { bh.consume(transformNestedDoubleLists(it)) }
+                REFERENCE -> data.listData<String>().forEach { bh.consume(transformNestedLists(it)) }
+                BOOLEAN -> data.listData<Boolean>().forEach { bh.consume(transformNestedBooleanLists(it)) }
+                BYTE -> data.listData<Byte>().forEach { bh.consume(transformNestedByteLists(it)) }
+                CHAR -> data.listData<Char>().forEach { bh.consume(transformNestedCharLists(it)) }
+                SHORT -> data.listData<Short>().forEach { bh.consume(transformNestedShortLists(it)) }
+                INT -> data.listData<Int>().forEach { bh.consume(transformNestedIntLists(it)) }
+                FLOAT -> data.listData<Float>().forEach { bh.consume(transformNestedFloatLists(it)) }
+                LONG -> data.listData<Long>().forEach { bh.consume(transformNestedLongLists(it)) }
+                DOUBLE -> data.listData<Double>().forEach { bh.consume(transformNestedDoubleLists(it)) }
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> data.typedPersistentListData<String>().forEach {
+                REFERENCE -> data.persistentListData<String>().forEach {
                     bh.consume(transformNestedPersistentLists(it))
                 }
 
-                BOOLEAN -> data.typedPersistentListData<Boolean>().forEach {
+                BOOLEAN -> data.persistentListData<Boolean>().forEach {
                     bh.consume(transformNestedPersistentBooleanLists(it))
                 }
 
-                BYTE -> data.typedPersistentListData<Byte>().forEach {
+                BYTE -> data.persistentListData<Byte>().forEach {
                     bh.consume(transformNestedPersistentByteLists(it))
                 }
 
-                CHAR -> data.typedPersistentListData<Char>().forEach {
+                CHAR -> data.persistentListData<Char>().forEach {
                     bh.consume(transformNestedPersistentCharLists(it))
                 }
 
-                SHORT -> data.typedPersistentListData<Short>().forEach {
+                SHORT -> data.persistentListData<Short>().forEach {
                     bh.consume(transformNestedPersistentShortLists(it))
                 }
 
-                INT -> data.typedPersistentListData<Int>().forEach {
+                INT -> data.persistentListData<Int>().forEach {
                     bh.consume(transformNestedPersistentIntLists(it))
                 }
 
-                FLOAT -> data.typedPersistentListData<Float>().forEach {
+                FLOAT -> data.persistentListData<Float>().forEach {
                     bh.consume(transformNestedPersistentFloatLists(it))
                 }
 
-                LONG -> data.typedPersistentListData<Long>().forEach {
+                LONG -> data.persistentListData<Long>().forEach {
                     bh.consume(transformNestedPersistentLongLists(it))
                 }
 
-                DOUBLE -> data.typedPersistentListData<Double>().forEach {
+                DOUBLE -> data.persistentListData<Double>().forEach {
                     bh.consume(transformNestedPersistentDoubleLists(it))
                 }
             }

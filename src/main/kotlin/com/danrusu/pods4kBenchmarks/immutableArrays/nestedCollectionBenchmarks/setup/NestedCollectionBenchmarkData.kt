@@ -13,7 +13,12 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
@@ -24,70 +29,91 @@ import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
- * The strongly typed backing collections for one nested benchmark parameter combination.
+ * The backing collections for one nested benchmark CollectionType/DataType combination.
  *
- * Only the property selected by the collection and data types passed to [create] is populated. Keeping the primitive
- * arrays strongly typed avoids introducing boxing or unchecked casts into benchmark execution.
+ * The [collectionData] is stored in a single array. This is safer than storing the unused types as empty arrays as it
+ * prevents benchmarks from silently operating on unrelated empty arrays.
+ *
+ * Accessors validate the [elementClass] to ensure the nested collections store the appropriate element types and then
+ * cast the array to the selected collection representation. Arrays store the component type, preventing an array of
+ * ArrayList from being treated as an array of PersistentList etc.
  */
-class NestedCollectionBenchmarkData internal constructor(
-    val listData: Array<List<CollectionOwner<List<Any>>>> = emptyArray(),
-    val persistentListData: Array<PersistentList<CollectionOwner<PersistentList<Any>>>> = emptyArray(),
-    val referenceArrayData: Array<Array<CollectionOwner<Array<String>>>> = emptyArray(),
-    val booleanArrayData: Array<Array<CollectionOwner<BooleanArray>>> = emptyArray(),
-    val byteArrayData: Array<Array<CollectionOwner<ByteArray>>> = emptyArray(),
-    val charArrayData: Array<Array<CollectionOwner<CharArray>>> = emptyArray(),
-    val shortArrayData: Array<Array<CollectionOwner<ShortArray>>> = emptyArray(),
-    val intArrayData: Array<Array<CollectionOwner<IntArray>>> = emptyArray(),
-    val floatArrayData: Array<Array<CollectionOwner<FloatArray>>> = emptyArray(),
-    val longArrayData: Array<Array<CollectionOwner<LongArray>>> = emptyArray(),
-    val doubleArrayData: Array<Array<CollectionOwner<DoubleArray>>> = emptyArray(),
-    val immutableReferenceArrayData: Array<ImmutableArray<CollectionOwner<ImmutableArray<String>>>> = emptyArray(),
-    val immutableBooleanArrayData: Array<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>> = emptyArray(),
-    val immutableByteArrayData: Array<ImmutableArray<CollectionOwner<ImmutableByteArray>>> = emptyArray(),
-    val immutableCharArrayData: Array<ImmutableArray<CollectionOwner<ImmutableCharArray>>> = emptyArray(),
-    val immutableShortArrayData: Array<ImmutableArray<CollectionOwner<ImmutableShortArray>>> = emptyArray(),
-    val immutableIntArrayData: Array<ImmutableArray<CollectionOwner<ImmutableIntArray>>> = emptyArray(),
-    val immutableFloatArrayData: Array<ImmutableArray<CollectionOwner<ImmutableFloatArray>>> = emptyArray(),
-    val immutableLongArrayData: Array<ImmutableArray<CollectionOwner<ImmutableLongArray>>> = emptyArray(),
-    val immutableDoubleArrayData: Array<ImmutableArray<CollectionOwner<ImmutableDoubleArray>>> = emptyArray(),
+class NestedCollectionBenchmarkData private constructor(
+    @PublishedApi internal val elementClass: Class<*>,
+    @PublishedApi internal val collectionData: Array<*>,
 ) {
-    init {
-        val populatedArrayCount = listOf(
-            listData,
-            persistentListData,
-            referenceArrayData,
-            booleanArrayData,
-            byteArrayData,
-            charArrayData,
-            shortArrayData,
-            intArrayData,
-            floatArrayData,
-            longArrayData,
-            doubleArrayData,
-            immutableReferenceArrayData,
-            immutableBooleanArrayData,
-            immutableByteArrayData,
-            immutableCharArrayData,
-            immutableShortArrayData,
-            immutableIntArrayData,
-            immutableFloatArrayData,
-            immutableLongArrayData,
-            immutableDoubleArrayData,
-        ).count { it.isNotEmpty() }
+    inline fun <reified T : Any> listData(): Array<ArrayList<CollectionOwner<ArrayList<T>>>> {
+        return typedCollectionData<T, ArrayList<CollectionOwner<ArrayList<T>>>>()
+    }
 
-        require(populatedArrayCount == 1) {
-            "Exactly one backing array must be populated (found $populatedArrayCount)"
+    inline fun <reified T : Any> persistentListData(): Array<PersistentList<CollectionOwner<PersistentList<T>>>> {
+        return typedCollectionData<T, PersistentList<CollectionOwner<PersistentList<T>>>>()
+    }
+
+    val referenceArrayData: Array<Array<CollectionOwner<Array<String>>>>
+        get() = typedCollectionData<String, Array<CollectionOwner<Array<String>>>>()
+
+    val booleanArrayData: Array<Array<CollectionOwner<BooleanArray>>>
+        get() = typedCollectionData<Boolean, Array<CollectionOwner<BooleanArray>>>()
+
+    val byteArrayData: Array<Array<CollectionOwner<ByteArray>>>
+        get() = typedCollectionData<Byte, Array<CollectionOwner<ByteArray>>>()
+
+    val charArrayData: Array<Array<CollectionOwner<CharArray>>>
+        get() = typedCollectionData<Char, Array<CollectionOwner<CharArray>>>()
+
+    val shortArrayData: Array<Array<CollectionOwner<ShortArray>>>
+        get() = typedCollectionData<Short, Array<CollectionOwner<ShortArray>>>()
+
+    val intArrayData: Array<Array<CollectionOwner<IntArray>>>
+        get() = typedCollectionData<Int, Array<CollectionOwner<IntArray>>>()
+
+    val floatArrayData: Array<Array<CollectionOwner<FloatArray>>>
+        get() = typedCollectionData<Float, Array<CollectionOwner<FloatArray>>>()
+
+    val longArrayData: Array<Array<CollectionOwner<LongArray>>>
+        get() = typedCollectionData<Long, Array<CollectionOwner<LongArray>>>()
+
+    val doubleArrayData: Array<Array<CollectionOwner<DoubleArray>>>
+        get() = typedCollectionData<Double, Array<CollectionOwner<DoubleArray>>>()
+
+    val immutableReferenceArrayData: Array<ImmutableArray<CollectionOwner<ImmutableArray<String>>>>
+        get() = typedCollectionData<String, ImmutableArray<CollectionOwner<ImmutableArray<String>>>>()
+
+    val immutableBooleanArrayData: Array<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>
+        get() = typedCollectionData<Boolean, ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>()
+
+    val immutableByteArrayData: Array<ImmutableArray<CollectionOwner<ImmutableByteArray>>>
+        get() = typedCollectionData<Byte, ImmutableArray<CollectionOwner<ImmutableByteArray>>>()
+
+    val immutableCharArrayData: Array<ImmutableArray<CollectionOwner<ImmutableCharArray>>>
+        get() = typedCollectionData<Char, ImmutableArray<CollectionOwner<ImmutableCharArray>>>()
+
+    val immutableShortArrayData: Array<ImmutableArray<CollectionOwner<ImmutableShortArray>>>
+        get() = typedCollectionData<Short, ImmutableArray<CollectionOwner<ImmutableShortArray>>>()
+
+    val immutableIntArrayData: Array<ImmutableArray<CollectionOwner<ImmutableIntArray>>>
+        get() = typedCollectionData<Int, ImmutableArray<CollectionOwner<ImmutableIntArray>>>()
+
+    val immutableFloatArrayData: Array<ImmutableArray<CollectionOwner<ImmutableFloatArray>>>
+        get() = typedCollectionData<Float, ImmutableArray<CollectionOwner<ImmutableFloatArray>>>()
+
+    val immutableLongArrayData: Array<ImmutableArray<CollectionOwner<ImmutableLongArray>>>
+        get() = typedCollectionData<Long, ImmutableArray<CollectionOwner<ImmutableLongArray>>>()
+
+    val immutableDoubleArrayData: Array<ImmutableArray<CollectionOwner<ImmutableDoubleArray>>>
+        get() = typedCollectionData<Double, ImmutableArray<CollectionOwner<ImmutableDoubleArray>>>()
+
+    /** Validates nested element type [T] and casts the array to the appropriate top-level collection type [C]. */
+    @PublishedApi
+    internal inline fun <reified T : Any, reified C : Any> typedCollectionData(): Array<C> {
+        val requestedElementClass = T::class.javaObjectType
+        check(elementClass === requestedElementClass) {
+            "Requested ${requestedElementClass.name} elements, but the data contains ${elementClass.name} elements"
         }
-    }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> typedListData(): Array<List<CollectionOwner<List<T>>>> {
-        return listData as Array<List<CollectionOwner<List<T>>>>
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T> typedPersistentListData(): Array<PersistentList<CollectionOwner<PersistentList<T>>>> {
-        return persistentListData as Array<PersistentList<CollectionOwner<PersistentList<T>>>>
+        @Suppress("UNCHECKED_CAST")
+        return collectionData as Array<C>
     }
 
     companion object {
@@ -111,7 +137,7 @@ class NestedCollectionBenchmarkData internal constructor(
             val references = nestedReferenceGeneratorFactory.create(generatorRngs)
 
             return when (collectionType) {
-                CollectionType.LIST -> createLists(
+                LIST -> createLists(
                     numCollections,
                     dataType,
                     topLevelSizeDistribution,
@@ -119,7 +145,7 @@ class NestedCollectionBenchmarkData internal constructor(
                     fields,
                     references,
                 )
-                CollectionType.PERSISTENT_LIST -> createPersistentLists(
+                PERSISTENT_LIST -> createPersistentLists(
                     numCollections,
                     dataType,
                     topLevelSizeDistribution,
@@ -127,7 +153,7 @@ class NestedCollectionBenchmarkData internal constructor(
                     fields,
                     references,
                 )
-                CollectionType.ARRAY -> createArrays(
+                ARRAY -> createArrays(
                     numCollections,
                     dataType,
                     topLevelSizeDistribution,
@@ -135,7 +161,7 @@ class NestedCollectionBenchmarkData internal constructor(
                     fields,
                     references,
                 )
-                CollectionType.IMMUTABLE_ARRAY -> createImmutableArrays(
+                IMMUTABLE_ARRAY -> createImmutableArrays(
                     numCollections,
                     dataType,
                     topLevelSizeDistribution,
@@ -153,32 +179,64 @@ class NestedCollectionBenchmarkData internal constructor(
             nestedSizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): NestedCollectionBenchmarkData = NestedCollectionBenchmarkData(
-            listData = Array(numCollections) {
-                createList(topLevelSizeDistribution.nextValue()) {
-                    when (dataType) {
-                        DataType.REFERENCE ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { references.next() })
-                        DataType.BOOLEAN ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextBoolean() })
-                        DataType.BYTE ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextByte() })
-                        DataType.CHAR ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextChar() })
-                        DataType.SHORT ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextShort() })
-                        DataType.INT ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextInt() })
-                        DataType.FLOAT ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
-                        DataType.LONG ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextLong() })
-                        DataType.DOUBLE ->
-                            CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
+        ): NestedCollectionBenchmarkData {
+            val data: Array<*> = when (dataType) {
+                DataType.REFERENCE -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { references.next() })
                     }
                 }
-            },
-        )
+
+                DataType.BOOLEAN -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextBoolean() })
+                    }
+                }
+
+                DataType.BYTE -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextByte() })
+                    }
+                }
+
+                DataType.CHAR -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextChar() })
+                    }
+                }
+
+                DataType.SHORT -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextShort() })
+                    }
+                }
+
+                DataType.INT -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextInt() })
+                    }
+                }
+
+                DataType.FLOAT -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
+                    }
+                }
+
+                DataType.LONG -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextLong() })
+                    }
+                }
+
+                DataType.DOUBLE -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(createList(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
+                    }
+                }
+            }
+            return NestedCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+        }
 
         private fun createPersistentLists(
             numCollections: Int,
@@ -187,41 +245,82 @@ class NestedCollectionBenchmarkData internal constructor(
             nestedSizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): NestedCollectionBenchmarkData = NestedCollectionBenchmarkData(
-            persistentListData = Array(numCollections) {
-                createPersistentList(topLevelSizeDistribution.nextValue()) {
-                    when (dataType) {
-                        DataType.REFERENCE -> CollectionOwner(
+        ): NestedCollectionBenchmarkData {
+            val data: Array<*> = when (dataType) {
+                DataType.REFERENCE -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { references.next() }
                         )
-                        DataType.BOOLEAN -> CollectionOwner(
+                    }
+                }
+
+                DataType.BOOLEAN -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextBoolean() }
                         )
-                        DataType.BYTE -> CollectionOwner(
+                    }
+                }
+
+                DataType.BYTE -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextByte() }
                         )
-                        DataType.CHAR -> CollectionOwner(
+                    }
+                }
+
+                DataType.CHAR -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextChar() }
                         )
-                        DataType.SHORT -> CollectionOwner(
+                    }
+                }
+
+                DataType.SHORT -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextShort() }
                         )
-                        DataType.INT -> CollectionOwner(
+                    }
+                }
+
+                DataType.INT -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextInt() }
                         )
-                        DataType.FLOAT -> CollectionOwner(
+                    }
+                }
+
+                DataType.FLOAT -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextFloat() }
                         )
-                        DataType.LONG -> CollectionOwner(
+                    }
+                }
+
+                DataType.LONG -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextLong() }
                         )
-                        DataType.DOUBLE -> CollectionOwner(
+                    }
+                }
+
+                DataType.DOUBLE -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
                             createPersistentList(nestedSizeDistribution.nextValue()) { fields.nextDouble() }
                         )
                     }
                 }
-            },
-        )
+            }
+            return NestedCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+        }
 
         private fun createArrays(
             numCollections: Int,
@@ -230,70 +329,63 @@ class NestedCollectionBenchmarkData internal constructor(
             nestedSizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): NestedCollectionBenchmarkData = when (dataType) {
-            DataType.REFERENCE -> NestedCollectionBenchmarkData(
-                referenceArrayData = Array(numCollections) {
+        ): NestedCollectionBenchmarkData {
+            val data: Array<*> = when (dataType) {
+                DataType.REFERENCE -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(Array(nestedSizeDistribution.nextValue()) { references.next() })
                     }
-                },
-            )
-            DataType.BOOLEAN -> NestedCollectionBenchmarkData(
-                booleanArrayData = Array(numCollections) {
+                }
+
+                DataType.BOOLEAN -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(BooleanArray(nestedSizeDistribution.nextValue()) { fields.nextBoolean() })
                     }
-                },
-            )
-            DataType.BYTE -> NestedCollectionBenchmarkData(
-                byteArrayData = Array(numCollections) {
+                }
+
+                DataType.BYTE -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ByteArray(nestedSizeDistribution.nextValue()) { fields.nextByte() })
                     }
-                },
-            )
-            DataType.CHAR -> NestedCollectionBenchmarkData(
-                charArrayData = Array(numCollections) {
+                }
+
+                DataType.CHAR -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(CharArray(nestedSizeDistribution.nextValue()) { fields.nextChar() })
                     }
-                },
-            )
-            DataType.SHORT -> NestedCollectionBenchmarkData(
-                shortArrayData = Array(numCollections) {
+                }
+
+                DataType.SHORT -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ShortArray(nestedSizeDistribution.nextValue()) { fields.nextShort() })
                     }
-                },
-            )
-            DataType.INT -> NestedCollectionBenchmarkData(
-                intArrayData = Array(numCollections) {
+                }
+
+                DataType.INT -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(IntArray(nestedSizeDistribution.nextValue()) { fields.nextInt() })
                     }
-                },
-            )
-            DataType.FLOAT -> NestedCollectionBenchmarkData(
-                floatArrayData = Array(numCollections) {
+                }
+
+                DataType.FLOAT -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(FloatArray(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
                     }
-                },
-            )
-            DataType.LONG -> NestedCollectionBenchmarkData(
-                longArrayData = Array(numCollections) {
+                }
+
+                DataType.LONG -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(LongArray(nestedSizeDistribution.nextValue()) { fields.nextLong() })
                     }
-                },
-            )
-            DataType.DOUBLE -> NestedCollectionBenchmarkData(
-                doubleArrayData = Array(numCollections) {
+                }
+
+                DataType.DOUBLE -> Array(numCollections) {
                     Array(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(DoubleArray(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
                     }
-                },
-            )
+                }
+            }
+            return NestedCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }
 
         private fun createImmutableArrays(
@@ -303,72 +395,65 @@ class NestedCollectionBenchmarkData internal constructor(
             nestedSizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): NestedCollectionBenchmarkData = when (dataType) {
-            DataType.REFERENCE -> NestedCollectionBenchmarkData(
-                immutableReferenceArrayData = Array(numCollections) {
+        ): NestedCollectionBenchmarkData {
+            val data: Array<*> = when (dataType) {
+                DataType.REFERENCE -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableArray(nestedSizeDistribution.nextValue()) { references.next() })
                     }
-                },
-            )
-            DataType.BOOLEAN -> NestedCollectionBenchmarkData(
-                immutableBooleanArrayData = Array(numCollections) {
+                }
+
+                DataType.BOOLEAN -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(
                             ImmutableBooleanArray(nestedSizeDistribution.nextValue()) { fields.nextBoolean() }
                         )
                     }
-                },
-            )
-            DataType.BYTE -> NestedCollectionBenchmarkData(
-                immutableByteArrayData = Array(numCollections) {
+                }
+
+                DataType.BYTE -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableByteArray(nestedSizeDistribution.nextValue()) { fields.nextByte() })
                     }
-                },
-            )
-            DataType.CHAR -> NestedCollectionBenchmarkData(
-                immutableCharArrayData = Array(numCollections) {
+                }
+
+                DataType.CHAR -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableCharArray(nestedSizeDistribution.nextValue()) { fields.nextChar() })
                     }
-                },
-            )
-            DataType.SHORT -> NestedCollectionBenchmarkData(
-                immutableShortArrayData = Array(numCollections) {
+                }
+
+                DataType.SHORT -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableShortArray(nestedSizeDistribution.nextValue()) { fields.nextShort() })
                     }
-                },
-            )
-            DataType.INT -> NestedCollectionBenchmarkData(
-                immutableIntArrayData = Array(numCollections) {
+                }
+
+                DataType.INT -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableIntArray(nestedSizeDistribution.nextValue()) { fields.nextInt() })
                     }
-                },
-            )
-            DataType.FLOAT -> NestedCollectionBenchmarkData(
-                immutableFloatArrayData = Array(numCollections) {
+                }
+
+                DataType.FLOAT -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableFloatArray(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
                     }
-                },
-            )
-            DataType.LONG -> NestedCollectionBenchmarkData(
-                immutableLongArrayData = Array(numCollections) {
+                }
+
+                DataType.LONG -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableLongArray(nestedSizeDistribution.nextValue()) { fields.nextLong() })
                     }
-                },
-            )
-            DataType.DOUBLE -> NestedCollectionBenchmarkData(
-                immutableDoubleArrayData = Array(numCollections) {
+                }
+
+                DataType.DOUBLE -> Array(numCollections) {
                     ImmutableArray(topLevelSizeDistribution.nextValue()) {
                         CollectionOwner(ImmutableDoubleArray(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
                     }
-                },
-            )
+                }
+            }
+            return NestedCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }
     }
 }
