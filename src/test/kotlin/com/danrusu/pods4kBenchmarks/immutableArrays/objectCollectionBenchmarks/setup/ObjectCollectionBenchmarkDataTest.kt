@@ -1,6 +1,5 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
-import com.danrusu.pods4k.immutableArrays.emptyImmutableArray
 import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
@@ -25,16 +24,26 @@ class ObjectCollectionBenchmarkDataTest {
     }
 
     @Test
-    fun `requires exactly one populated backing array`() {
-        assertThrows<IllegalArgumentException> {
-            ObjectCollectionBenchmarkData<String>()
+    fun `rejects access using the wrong collection type in either direction`() {
+        val listData = createData(CollectionType.LIST)
+        val persistentListData = createData(CollectionType.PERSISTENT_LIST)
+        val arrayData = createData(CollectionType.ARRAY)
+        val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY)
+
+        assertThrows<ClassCastException> {
+            listData.persistentListData
         }
 
-        assertThrows<IllegalArgumentException> {
-            ObjectCollectionBenchmarkData<String>(
-                listData = arrayOf(emptyList()),
-                immutableArrayData = arrayOf(emptyImmutableArray()),
-            )
+        assertThrows<ClassCastException> {
+            persistentListData.listData
+        }
+
+        assertThrows<ClassCastException> {
+            arrayData.immutableArrayData
+        }
+
+        assertThrows<ClassCastException> {
+            immutableArrayData.arrayData
         }
     }
 

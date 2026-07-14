@@ -2,37 +2,46 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
 
 /**
- * The strongly typed backing collections for one object benchmark parameter combination.
+ * The backing collections for one object benchmark parameter combination.
  *
- * Only the property selected by the collection type passed to [create] is populated.
+ * The [collectionData] is stored in a single array. This is safer than storing the unused types as empty arrays as it
+ * prevents benchmarks from silently operating on unrelated empty arrays.
+ *
+ * Accessors cast the array to the selected collection representation. Arrays store the component type, preventing an
+ * array of ArrayList from being treated as an array of PersistentList etc.
  */
-class ObjectCollectionBenchmarkData<T> internal constructor(
-    val listData: Array<List<T>> = emptyArray(),
-    val persistentListData: Array<PersistentList<T>> = emptyArray(),
-    val arrayData: Array<Array<T>> = emptyArrayData(),
-    val immutableArrayData: Array<ImmutableArray<T>> = emptyArray(),
+class ObjectCollectionBenchmarkData<T> private constructor(
+    private val collectionData: Array<*>,
 ) {
-    init {
-        val populatedArrayCount = listOf(
-            listData,
-            persistentListData,
-            arrayData,
-            immutableArrayData,
-        ).count { it.isNotEmpty() }
+    @Suppress("UNCHECKED_CAST")
+    val listData: Array<ArrayList<T>>
+        get() = collectionData as Array<ArrayList<T>>
 
-        require(populatedArrayCount == 1) {
-            "Exactly one backing array must be populated (found $populatedArrayCount)"
-        }
-    }
+    @Suppress("UNCHECKED_CAST")
+    val persistentListData: Array<PersistentList<T>>
+        get() = collectionData as Array<PersistentList<T>>
+
+    @Suppress("UNCHECKED_CAST")
+    val arrayData: Array<Array<T>>
+        get() = collectionData as Array<Array<T>>
+
+    @Suppress("UNCHECKED_CAST")
+    val immutableArrayData: Array<ImmutableArray<T>>
+        get() = collectionData as Array<ImmutableArray<T>>
 
     companion object {
         /** Creates deterministic data for one object benchmark parameter combination. */
@@ -49,22 +58,16 @@ class ObjectCollectionBenchmarkData<T> internal constructor(
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
 
-            return when (collectionType) {
-                CollectionType.LIST -> ObjectCollectionBenchmarkData(
-                    listData = Array(numCollections) {
-                        List(sizeDistribution.nextValue()) { objectGenerator.next() }
-                    },
-                )
+            val data: Array<*> = when (collectionType) {
+                LIST -> Array(numCollections) {
+                    createList(sizeDistribution.nextValue()) { objectGenerator.next() }
+                }
 
-                CollectionType.PERSISTENT_LIST -> ObjectCollectionBenchmarkData(
-                    persistentListData = Array(numCollections) {
-                        val builder = persistentListOf<T>().builder()
-                        repeat(sizeDistribution.nextValue()) { builder.add(objectGenerator.next()) }
-                        builder.build()
-                    },
-                )
+                PERSISTENT_LIST -> Array(numCollections) {
+                    createPersistentList(sizeDistribution.nextValue()) { objectGenerator.next() }
+                }
 
-                CollectionType.ARRAY -> {
+                ARRAY -> {
                     val arrays = arrayOfNulls<Array<*>>(numCollections)
                     repeat(numCollections) { index ->
                         arrays[index] = ArrayCreator.createArray(
@@ -75,18 +78,14 @@ class ObjectCollectionBenchmarkData<T> internal constructor(
                         }
                     }
                     @Suppress("UNCHECKED_CAST")
-                    ObjectCollectionBenchmarkData(arrayData = arrays as Array<Array<T>>)
+                    arrays as Array<Array<T>>
                 }
 
-                CollectionType.IMMUTABLE_ARRAY -> ObjectCollectionBenchmarkData(
-                    immutableArrayData = Array(numCollections) {
-                        ImmutableArray(sizeDistribution.nextValue()) { objectGenerator.next() }
-                    },
-                )
+                IMMUTABLE_ARRAY -> Array(numCollections) {
+                    ImmutableArray(sizeDistribution.nextValue()) { objectGenerator.next() }
+                }
             }
+            return ObjectCollectionBenchmarkData(data)
         }
     }
 }
-
-@Suppress("UNCHECKED_CAST")
-private fun <T> emptyArrayData(): Array<Array<T>> = emptyArray<Array<*>>() as Array<Array<T>>
