@@ -16,13 +16,13 @@ import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
- * The backing collections for one object benchmark parameter combination.
+ * Materialized collections for one object benchmark trial.
  *
- * The [collectionData] is stored in a single array. This is safer than storing the unused types as empty arrays as it
- * prevents benchmarks from silently operating on unrelated empty arrays.
+ * Storing only the active representation avoids unused empty fields and prevents benchmarks from accidentally operating
+ * on unrelated empty arrays.
  *
  * Accessors cast the array to the selected collection representation. Arrays store the component type, preventing an
- * array of ArrayList from being treated as an array of PersistentList etc.
+ * Array<ArrayList> from being treated as an Array<PersistentList> etc.
  */
 class ObjectCollectionBenchmarkData<T> private constructor(
     private val collectionData: Array<*>,

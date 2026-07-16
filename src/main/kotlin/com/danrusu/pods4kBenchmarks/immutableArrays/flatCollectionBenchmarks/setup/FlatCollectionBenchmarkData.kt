@@ -29,14 +29,13 @@ import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
- * The backing collections for one flat benchmark CollectionType/DataType combination.
+ * Materialized collections for one [CollectionType]/[DataType] trial.
  *
- * The [collectionData] is stored in a single array.  This is safer than storing the unused types as empty arrays as it
- * prevents benchmarks from silently operating on unrelated empty arrays.
+ * Storing only the active representation avoids unused empty fields and prevents benchmarks from accidentally operating
+ * on unrelated empty arrays.
  *
- * Accessors validate the [elementClass] to ensure the collections store the appropriate element types and then cast
- * the array to the selected collection representation.  Arrays store the component type preventing treating an array of
- * ArrayList as an array of PersistentList etc.
+ * Typed accessors validate the nested [elementClass], while the outer array's runtime component type prevents an
+ * Array<ArrayList> from being treated as an Array<PersistentList> etc.
  */
 class FlatCollectionBenchmarkData private constructor(
     @PublishedApi internal val elementClass: Class<*>,
@@ -105,12 +104,8 @@ class FlatCollectionBenchmarkData private constructor(
         get() = typedCollectionData<Double, ImmutableDoubleArray>()
 
     /**
-     * Validates the element type [T] and casts the array as an array of the appropriate collection type [C].
-     *
-     * Important:
-     * Although an array of primitive arrays already implicitly validates the element type when casting (since the
-     * element type is encoded in the primitive array type eg. IntArray), we should use this same method for accessing
-     * all types so that the benchmarks don't get any unfair advantage from reduced checks.
+     * Validates element type [T] and casts to collection type [C]. Every accessor uses this path so the overhead is
+     * consistent across benchmarks, including for primitive arrays whose runtime type already encodes the element type.
      */
     @PublishedApi
     internal inline fun <reified T : Any, reified C : Any> typedCollectionData(): Array<C> {

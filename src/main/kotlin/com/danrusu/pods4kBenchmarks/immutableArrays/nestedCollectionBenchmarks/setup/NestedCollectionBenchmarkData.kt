@@ -29,14 +29,13 @@ import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
- * The backing collections for one nested benchmark CollectionType/DataType combination.
+ * Materialized parent and nested collections for one [CollectionType]/[DataType] trial.
  *
- * The [collectionData] is stored in a single array. This is safer than storing the unused types as empty arrays as it
- * prevents benchmarks from silently operating on unrelated empty arrays.
+ * Storing only the active representation avoids unused empty fields and prevents benchmarks from accidentally operating
+ * on unrelated empty arrays.
  *
- * Accessors validate the [elementClass] to ensure the nested collections store the appropriate element types and then
- * cast the array to the selected collection representation. Arrays store the component type, preventing an array of
- * ArrayList from being treated as an array of PersistentList etc.
+ * Typed accessors validate the nested [elementClass], while the outer array's runtime component type prevents an
+ * Array<ArrayList> from being treated as an Array<PersistentList> etc.
  */
 class NestedCollectionBenchmarkData private constructor(
     @PublishedApi internal val elementClass: Class<*>,
@@ -145,6 +144,7 @@ class NestedCollectionBenchmarkData private constructor(
                     fields,
                     references,
                 )
+
                 PERSISTENT_LIST -> createPersistentLists(
                     numCollections,
                     dataType,
@@ -153,6 +153,7 @@ class NestedCollectionBenchmarkData private constructor(
                     fields,
                     references,
                 )
+
                 ARRAY -> createArrays(
                     numCollections,
                     dataType,
@@ -161,6 +162,7 @@ class NestedCollectionBenchmarkData private constructor(
                     fields,
                     references,
                 )
+
                 IMMUTABLE_ARRAY -> createImmutableArrays(
                     numCollections,
                     dataType,
