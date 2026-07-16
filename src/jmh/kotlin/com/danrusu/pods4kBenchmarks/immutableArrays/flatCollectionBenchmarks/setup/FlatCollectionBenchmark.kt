@@ -37,40 +37,28 @@ import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.infra.Blackhole
 
 /**
- * Represents a benchmark that measures the performance of operating on flat collections.  Note that the term collection
- * is used loosely to represent a [List], [Array], or [ImmutableArray] rather than the actual [Collection] interface.
+ * Base state for flat-collection benchmarks across every [CollectionType]/[DataType] combination.
  *
- * A flat collection represents a collection that stores one of the 8 base types, such as a collection of [Boolean]
- * values, or a collection containing simple reference types (with the most common reference type being [String]).
- *
- * Benchmarks are parameterized by every combination of [CollectionType] and [DataType].  Subclasses should create a
- * benchmark method that calls [transformEachCollection] to measure the performance of each scenario.
- *
- * For example, if [numCollections] is 500, and the collection type & data type pair being measured is
- * [CollectionType.LIST] & [DataType.BOOLEAN], then 500 List<Boolean> collections will be created.  When the subclass
- * calls [transformEachCollection], the provided boolean collection transform will be called for each of the 500
- * collections.
+ * Each trial materializes [numCollections] collections containing strings or one of the eight primitive families.
+ * Subclasses pass equivalent statically typed operations to [transformEachCollection] or
+ * [transformEachPairOfCollections].
  */
 @State(Scope.Benchmark)
 abstract class FlatCollectionBenchmark(
-    /**
-     * The number of collections to benchmark against in order to avoid repeating the operation being measured from
-     * being performed on the same collection repeatedly.  This number should be sufficiently large, like 1000, to
-     * avoid misleading results from optimizations like caching etc.
-     */
+    /** Number of distinct collections processed by each invocation, or paired without reuse. */
     private val numCollections: Int,
-    /** Controls the sizes of the collections that will be generated */
+    /** Controls generated collection sizes. */
     private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
-    /** Responsible for generating primitive field values that the collections will contain */
+    /** Creates primitive element values. */
     private val fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-    /** Responsible for generating reference values that the collections will contain */
+    /** Creates reference element values. */
     private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
 ) {
-    /** Repeat the benchmark for each collection type */
+    /** Repeats each benchmark for every collection representation. */
     @Param
     protected lateinit var collectionType: CollectionType
 
-    /** Repeat the benchmark for each of the 8 base data types plus a String reference type */
+    /** Repeats each benchmark for `REFERENCE` and the eight primitive families. */
     @Param
     protected lateinit var dataType: DataType
 
@@ -90,12 +78,9 @@ abstract class FlatCollectionBenchmark(
     }
 
     /**
-     * Loops through all the collections of the current [CollectionType] and current [dataType] and performs the
-     * associated operation consuming each result with the [Blackhole].
-     *
-     * E.g. If the current collectionType is [CollectionType.LIST] and dataType is [DataType.BOOLEAN], then it calls
-     * [transformBooleanList] on each boolean list.
-     */
+     * Applies the appropriate transform to every collection and consumes each result.  The selected transform is based
+     * on the active [collectionType] & [dataType].
+     **/
     protected inline fun transformEachCollection(
         bh: Blackhole,
         transformList: (List<String>) -> Any?,
@@ -187,15 +172,10 @@ abstract class FlatCollectionBenchmark(
     }
 
     /**
-     * Loops through all pairs of collections of the current [CollectionType] and current [dataType] and performs the
-     * associated operation consuming each result with the [Blackhole].
+     * Applies the appropriate transform to adjacent pairs of collections and consumes each result.  The selected
+     * transform is based on the active [collectionType] & [dataType].
      *
-     * E.g. If the current collectionType is [CollectionType.LIST] and dataType is [DataType.BOOLEAN], then it calls
-     * [transformBooleanLists] on each pair of boolean lists.
-     *
-     * IMPORTANT:
-     * Since this processes 2 collections at a time without re-using any of them, the number of operations per
-     * benchmark iteration is half of [numCollections] so [OperationsPerInvocation] should be divided by 2.
+     * One invocation performs [numCollections] / 2 operations, which must match [OperationsPerInvocation].
      */
     protected inline fun transformEachPairOfCollections(
         bh: Blackhole,
