@@ -84,7 +84,7 @@ open class GroupByBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLL
 }
 
 private fun Int.toGroup(): Int {
-    // mod 16 since N mod (2^x) = N and (2^x - 1)
+    // Masking the low four bits creates 16 stable groups without division.
     return this and 15
 }
 

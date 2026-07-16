@@ -58,11 +58,11 @@ private const val NULL_RATIO = 0.5
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
 open class FilterNotNull {
-    /** Repeat the benchmark for each collection type */
+    /** Repeats the benchmark for every collection type */
     @Param
     private lateinit var collectionType: CollectionType
 
-    /** Repeat the benchmark for each of the 8 base data types plus a String reference type */
+    /** Repeats the benchmark for nullable references and all eight primitive wrapper types */
     @Param
     private lateinit var dataType: DataType
 
@@ -74,7 +74,8 @@ open class FilterNotNull {
     /** Creates reference generators for nullable string elements. */
     private val referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO)
 
-    /** Using a single list type for each value type as statically-typed lists will never make any difference*/
+    // Generic list element types are erased, so all data types can share these fields. Arrays retain separate runtime
+    // component types and specialized filterNotNull overloads.
     private lateinit var listData: Array<List<Any?>>
     private lateinit var persistentListData: Array<PersistentList<Any?>>
 
@@ -145,12 +146,10 @@ open class FilterNotNull {
     fun filterNotNull(bh: Blackhole) {
         when (collectionType) {
             LIST -> {
-                // no need to check the dataType since we always use the same listData
                 listData.forEach { bh.consume(it.filterNotNull()) }
             }
 
             PERSISTENT_LIST -> {
-                // no need to check the dataType since we always use persistentListData
                 persistentListData.forEach { bh.consume(it.filterNotNull()) }
             }
 
