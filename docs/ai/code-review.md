@@ -26,8 +26,8 @@ Use this checklist when reviewing Codex-generated changes in this repo.
 - Benchmark methods use JMH annotations consistent with neighboring benchmarks.
 - `Blackhole` consumes measured results.
 - Data setup happens in `@Setup(Level.Trial)` unless construction cost is the benchmark target.
-- Constant master seeds and separate `RngFactory` streams are preserved so collection sizes, null placement, and data values do not pollute each other.
-- Filter acceptance decisions and nullable null-placement decisions use RNG streams separate from value generation.
+- Constant master seeds and purpose-specific RNG streams keep sizes, values, null placement, and filter decisions
+  independent where required.
 - `@OperationsPerInvocation` matches collections processed per invocation, including pairwise loops.
 - `jmh.includes` changes are intentional and called out.
 - Benchmark claims distinguish compile checks from actual JMH runs.
@@ -42,6 +42,7 @@ Use this checklist when reviewing Codex-generated changes in this repo.
 
 - Dependency versions belong in `gradle/libs.versions.toml`.
 - Build behavior belongs in `build.gradle.kts`.
-- Main utilities belong in `src/main`; tests in `src/test`; benchmark-only code in `src/jmh`.
+- Reusable data construction belongs in `src/main`; tests in `src/test`; JMH lifecycle and scenario-only code in
+  `src/jmh`.
 - CI parity remains `./gradlew build jmhJar --no-daemon`.
 - Kotlin style remains compatible with `kotlin.code.style=official`.

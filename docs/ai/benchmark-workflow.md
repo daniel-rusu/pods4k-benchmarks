@@ -3,15 +3,14 @@
 ## Cheap Validation
 
 - `./gradlew test`: run unit tests for shared utilities.
-- `./gradlew build --no-daemon`: assembles main source, runs tests, and compiles JMH benchmark sources.
-- `./gradlew build jmhJar --no-daemon`: CI-equivalent check; also generates and compiles the JMH harness and packages the JMH jar.
+- `./gradlew build --no-daemon`: assemble main source, run tests, and compile JMH benchmark sources.
+- `./gradlew build jmhJar --no-daemon`: CI-equivalent check; also generate, compile, and package the JMH harness.
 - Windows: use `.\gradlew.bat test`, `.\gradlew.bat build --no-daemon`, or `.\gradlew.bat build jmhJar --no-daemon`.
 
 ## Benchmark Compile Checks
 
 - Preferred benchmark compile check: `./gradlew jmhClasses`.
 - `./gradlew jmhJar` additionally runs the JMH bytecode generator, compiles its generated harness classes, and packages the executable JMH jar.
-- Narrower tasks shown by Gradle include `compileJmhKotlin`, `compileJmhJava`, `processJmhResources`, `jmhRunBytecodeGenerator`, and `jmhCompileGeneratedClasses`.
 - `./gradlew build --no-daemon` depends on `jmhClasses`, but it does not generate the JMH harness; CI adds `jmhJar` for that validation.
 
 ## Running Benchmarks
@@ -19,7 +18,8 @@
 - Configure `jmh.includes` in `build.gradle.kts` to target the class/package being investigated.
 - Run: `./gradlew jmh`.
 - Results: `build/results/jmh/results.csv`.
-- README guidance says a benchmark class can take about 20 minutes, and broader categories can take hours.
+- A benchmark class can take tens of minutes after JMH expands its parameter combinations; broader categories can take
+  hours.
 - Prepare the machine first: plugged in, performance power profile, sleep/screensaver disabled, background work minimized.
 
 ## When Not To Run Benchmarks

@@ -9,10 +9,11 @@
 
 ## Important Directories
 
-- `src/main/kotlin/com/danrusu/pods4kBenchmarks/utils`: shared benchmark data utilities with unit tests.
-- `src/test/kotlin/com/danrusu/pods4kBenchmarks/utils`: JUnit 5 + Strikt tests for shared utilities.
-- `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays`: JMH benchmarks and benchmark-only setup code.
-- `src/jmh/kotlin/.../setup`: common `CollectionType`, `DataType`, data producers, and wrappers.
+- `src/main/kotlin/com/danrusu/pods4kBenchmarks/utils`: reusable distributions, RNGs, and data generators.
+- `src/main/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays`: shared parameters, factories, and deterministic
+  benchmark-data builders.
+- `src/test/kotlin/com/danrusu/pods4kBenchmarks`: JUnit 5 + Strikt tests for shared utilities and data builders.
+- `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays`: JMH states, benchmark-only fixtures, and benchmarks.
 - `build.gradle.kts`, `gradle/libs.versions.toml`: single Gradle module, Kotlin/JVM, JMH plugin, and dependency versions.
 - `README.md`: human benchmark-running instructions and machine-preparation notes.
 
@@ -35,7 +36,7 @@
 ## Kotlin And API Conventions
 
 - Use package `com.danrusu.pods4kBenchmarks...`.
-- Keep benchmark helpers in `src/main` only when they are reusable and unit-testable; keep benchmark fixtures in `src/jmh`.
+- Keep reusable, unit-testable data construction in `src/main`; keep JMH states and scenario-only fixtures in `src/jmh`.
 - Tests use JUnit 5 `@Test` and Strikt assertions.
 - Keep tests focused by behavior or class under test. Put reusable test fakes/fixtures in clearly named fixture packages and files instead of bundling unrelated helpers into one catch-all test-support file.
 - Benchmark code should compare `List`, `PersistentList`, JVM arrays, and `ImmutableArray` variants through public `pods4k` APIs.
@@ -43,7 +44,9 @@
 
 ## Performance Constraints
 
-- Preserve deterministic setup data unless intentionally changing benchmark scenarios: current base fixtures use `Random(0)` and separate RNG streams so data types that consume more random values do not also change collection sizes or null placement.
+- Preserve deterministic setup data unless intentionally changing benchmark scenarios: data builders use a constant
+  `RngFactory` master seed and purpose-specific streams so value generation does not also change collection sizes,
+  null placement, or filter acceptance.
 - Consume benchmark results with JMH `Blackhole`.
 - Keep `@OperationsPerInvocation` aligned with the number of collections processed per invocation; pairwise benchmarks usually process `NUM_COLLECTIONS / 2` collection pairs.
 - Avoid changing warmup, measurement, fork counts, or `jmh.includes` as part of unrelated edits.

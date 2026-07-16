@@ -1,59 +1,39 @@
 # AI Context Map
 
-Use this map to jump to the right files for common Codex tasks.
+Use this map to locate the smallest relevant area before making a change.
 
-## Build And Dependencies
+## Build And Execution
 
-- Files: `settings.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`, `gradle.properties`, `.github/workflows/ci.yml`.
-- Boundaries: one Gradle root project named `pods4k-benchmarks`; no included subprojects in `settings.gradle.kts`.
-- Inspect: `README.md` before changing JMH config.
-- Pitfalls: `jmh.includes` controls what `./gradlew jmh` runs; changing it can turn a targeted run into a multi-hour run.
+- Configuration: `settings.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`, `gradle.properties`, and
+  `.github/workflows/ci.yml`.
+- The repository is one Gradle project. `jmh.includes` controls what `./gradlew jmh` executes; broad filters can run for
+  hours.
+- User-facing run instructions belong in `README.md`; detailed agent workflow belongs in `benchmark-workflow.md`.
 
-## Shared Utilities
+## Shared Data Infrastructure
 
-- Files: `src/main/kotlin/com/danrusu/pods4kBenchmarks/utils/`.
-- Tests: `src/test/kotlin/com/danrusu/pods4kBenchmarks/utils/`.
-- Boundaries: utility source is manual, checked-in Kotlin. It is used by benchmark setup and should stay small/testable.
-- Pitfalls: random data helpers affect benchmark comparability; preserve validation messages when tests assert exact text.
-- Character data: `AlphanumericCharacters` is the single source for generated chars and the filter median derived from them.
-- RNG setup: use `RngFactory` with a constant master seed and give each independent data source its own created stream.
+- General utilities: `src/main/kotlin/com/danrusu/pods4kBenchmarks/utils/`.
+- Immutable-array setup: `src/main/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/`.
+- Tests mirror both areas under `src/test/kotlin/com/danrusu/pods4kBenchmarks/`.
+- Key types: `RngFactory`, `DistributionFactory`, `GeneratorRngs`, `CollectionType`, `DataType`,
+  `BenchmarkGeneratorRngs`, and the three `*BenchmarkData` builders.
+- Preserve purpose-specific RNG streams and runtime element-type checks; both protect comparability across parameter
+  combinations.
 
-## Benchmark Setup Model
+## JMH Benchmarks
 
-- Files: `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/`.
-- Key types: `CollectionType`, `DataType`, `FieldGenerator`, `ObjectGenerator`, and `FlatDataFilter`.
-- Boundaries: benchmark-only source set; not production library code.
-- Tests/benchmarks to inspect: benchmark classes under `flatCollectionBenchmarks`, `objectCollectionBenchmarks`, and `nestedCollectionBenchmarks`.
-- Pitfalls: collection and data-type dispatch happens during trial setup and in benchmark helpers; keep their branches aligned.
+- Root: `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/`.
+- Flat: `flatCollectionBenchmarks/`; base state in `setup/FlatCollectionBenchmark.kt`.
+- Object: `objectCollectionBenchmarks/`; generic base state in `setup/ObjectCollectionBenchmark.kt`.
+- Nested: `nestedCollectionBenchmarks/`; base state in `setup/NestedCollectionBenchmark.kt`.
+- Shared benchmark-only filtering: `setup/FlatDataFilter.kt`.
+- Pairwise flat operations use `transformEachPairOfCollections` and
+  `@OperationsPerInvocation(NUM_COLLECTIONS / 2)`.
 
-## Flat Collection Benchmarks
+## Artifacts And Documentation
 
-- Files: `src/jmh/kotlin/.../immutableArrays/flatCollectionBenchmarks/`.
-- Base: `flatCollectionBenchmarks/setup/FlatCollectionBenchmark.kt`.
-- Benchmarks: operations such as `Any`, `Filter`, `Drop`, `Take`, `Plus`, `GroupBy`, `Sorted`, `ForEach`, `ForLoop`.
-- Pitfalls: pairwise operations use `transformEachPairOfCollections` and need `@OperationsPerInvocation(NUM_COLLECTIONS / 2)`.
-
-## Object Collection Benchmarks
-
-- Files: `src/jmh/kotlin/.../immutableArrays/objectCollectionBenchmarks/`.
-- Base: `objectCollectionBenchmarks/setup/ObjectCollectionBenchmark.kt`.
-- Setup files: `CompoundElement`, `CompoundElementOfNullableValues`.
-- Pitfalls: avoid boxing/erasing immutable array variants in ways that make results no longer match normal public API usage.
-
-## Nested Collection Benchmarks
-
-- Files: `src/jmh/kotlin/.../immutableArrays/nestedCollectionBenchmarks/`.
-- Base: `nestedCollectionBenchmarks/setup/NestedCollectionBenchmark.kt`.
-- Setup files: `CollectionOwner` models the domain object that owns one nested collection.
-- Pitfalls: top-level and nested collection size distributions are separate; preserve this distinction and the intentional owner-object indirection.
-
-## Generated And Local Artifacts
-
-- Manual source: `src/main`, `src/test`, `src/jmh`.
-- Generated/build output: `build/`, `.gradle/`, `.kotlin/`, JMH generated classes/results.
-- Pitfalls: do not edit generated output or benchmark result CSVs as source.
-
-## Documentation
-
-- Files: `README.md`, `AGENTS.md`, `docs/ai/*.md`.
-- Pitfalls: keep AI guidance concise and command-focused; do not duplicate benchmark implementations.
+- Manual source: `src/main`, `src/test`, and `src/jmh`.
+- Generated/local output: `build/`, `.gradle/`, `.kotlin/`, generated JMH classes, and result CSVs; never edit these as
+  source.
+- Documentation: `README.md`, `AGENTS.md`, and `docs/ai/*.md`. Keep guidance focused on stable boundaries and commands
+  rather than copying implementation details.
