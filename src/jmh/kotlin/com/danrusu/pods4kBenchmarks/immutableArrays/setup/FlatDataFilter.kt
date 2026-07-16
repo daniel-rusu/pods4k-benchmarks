@@ -11,10 +11,7 @@ import kotlin.random.Random
 private const val MAX_VALUE_GENERATION_ATTEMPTS = 100
 
 /**
- * Filters data such that all values less than the median will be accepted and all other values will be rejected.
- *
- * This strategy is chosen to minimize filtering overhead so that the condition becomes as cheap as possible in order
- * to minimize benchmarking overhead.
+ * Cheap predicates near each generator's midpoint, plus factories that control how often those predicates pass.
  */
 @Suppress("NOTHING_TO_INLINE") // to avoid any overhead on benchmarks
 object FlatDataFilter {
@@ -49,11 +46,7 @@ object FlatDataFilter {
 
     inline fun shouldAccept(value: Double): Boolean = value < MEDIAN_DOUBLE
 
-    /**
-     * Creates a [FieldGeneratorFactory] that produces values which will be accepted with a ratio of [acceptRatio].
-     *
-     * acceptRatio = (# of accepted values) / (# of total values)
-     */
+    /** Creates a [FieldGeneratorFactory] that produces values which pass the predicate [acceptRatio] of the time */
     fun createFieldGeneratorFactory(
         acceptRatio: Double,
         sourceFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
@@ -69,11 +62,7 @@ object FlatDataFilter {
         )
     }
 
-    /**
-     * Creates an [ObjectGeneratorFactory] that produces strings which will be accepted with a ratio of [acceptRatio].
-     *
-     * acceptRatio = (# of accepted values) / (# of total values)
-     */
+    /** Creates an [ObjectGeneratorFactory] that produces strings which pass the predicate [acceptRatio] of the time */
     fun createStringGeneratorFactory(
         acceptRatio: Double,
         sourceFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(
@@ -131,18 +120,8 @@ object FlatDataFilter {
 }
 
 /**
- * Creates values that will be accepted [acceptRatio] proportion of the time.
- *
- * Data Generation Strategy:
- * 1. Randomly determine whether the new value should be accepted
- * 2. Repeatedly ask the source generator for values until a value is found that will be accepted / rejected based on
- * the previous step.
- *
- * Default source generators usually produce acceptable values quickly, but custom source generators may never produce
- * values on one side of the predicate. The retry limit fails benchmark setup loudly instead of spinning forever.
- *
- * An [acceptRatio] of 0.0 is safe because every supported data type can produce values that fail its
- * acceptance predicate.
+ * Chooses the desired predicate result using [acceptRatio], then samples values until one matches. The retry limit
+ * reports incompatible custom generators instead of allowing benchmark setup to spin forever.
  */
 private class FilterAcceptanceSampler(
     private val acceptRatio: Double,
@@ -163,7 +142,7 @@ private class FilterAcceptanceSampler(
 
         throw IllegalStateException(
             "Unable to generate a value with accepted=$shouldBeAccepted after " +
-                "$MAX_VALUE_GENERATION_ATTEMPTS attempts. Check that the source generator can produce matching values."
+                    "$MAX_VALUE_GENERATION_ATTEMPTS attempts. Check that the source generator can produce matching values."
         )
     }
 }
