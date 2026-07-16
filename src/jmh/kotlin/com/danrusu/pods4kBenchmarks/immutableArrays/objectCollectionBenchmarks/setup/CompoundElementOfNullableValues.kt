@@ -1,6 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
-/** Represents classes that have multiple types of nullable fields */
+/** Nullable counterpart to [CompoundElement] for null-related benchmarks. */
 class CompoundElementOfNullableValues(
     val nullableReference: Any?,
     val nullableBoolean: Boolean?,

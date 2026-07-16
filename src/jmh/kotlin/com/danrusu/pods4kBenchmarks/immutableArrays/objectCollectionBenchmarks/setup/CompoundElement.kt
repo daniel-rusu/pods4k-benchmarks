@@ -1,8 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
-/**
- * Represents classes that have multiple types of fields.
- */
+/** Benchmark fixture with one field from each supported data-type family. */
 class CompoundElement(
     val referenceValue: Any,
     val booleanValue: Boolean,
