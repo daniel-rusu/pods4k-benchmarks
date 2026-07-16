@@ -103,6 +103,7 @@ class NestedCollectionBenchmarkDataTest {
             DataType.LONG -> listData<Long>().normalize()
             DataType.DOUBLE -> listData<Double>().normalize()
         }
+
         CollectionType.PERSISTENT_LIST -> when (dataType) {
             DataType.REFERENCE -> persistentListData<String>().normalize()
             DataType.BOOLEAN -> persistentListData<Boolean>().normalize()
@@ -114,31 +115,40 @@ class NestedCollectionBenchmarkDataTest {
             DataType.LONG -> persistentListData<Long>().normalize()
             DataType.DOUBLE -> persistentListData<Double>().normalize()
         }
+
         CollectionType.ARRAY -> when (dataType) {
             DataType.REFERENCE -> referenceArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.BOOLEAN -> booleanArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.BYTE -> byteArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.CHAR -> charArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.SHORT -> shortArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.INT -> intArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.FLOAT -> floatArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.LONG -> longArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
+
             DataType.DOUBLE -> doubleArrayData.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
@@ -148,34 +158,42 @@ class NestedCollectionBenchmarkDataTest {
             DataType.REFERENCE -> immutableReferenceArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.BOOLEAN -> immutableBooleanArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.BYTE -> immutableByteArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.CHAR -> immutableCharArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.SHORT -> immutableShortArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.INT -> immutableIntArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.FLOAT -> immutableFloatArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.LONG -> immutableLongArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
+
             DataType.DOUBLE -> immutableDoubleArrayData.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
         }
     }
 
-    private fun <T> Array<out List<CollectionOwner<out List<T>>>>.normalize(): List<List<List<T>>> {
+    private fun <T> Array<out List<CollectionOwner<List<T>>>>.normalize(): List<List<List<T>>> {
         return map { collection -> collection.map { it.nestedCollection.toList() } }
     }
 }

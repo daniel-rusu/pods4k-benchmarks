@@ -6,6 +6,10 @@ plugins {
     `jvm-test-suite`
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 group = "com.danrusu"
 version = "1.0-SNAPSHOT"
 

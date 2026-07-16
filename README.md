@@ -17,7 +17,7 @@ The project uses the [Java Microbenchmark Harness (JMH)](https://github.com/open
 
 ## Running Benchmarks
 
-1. Clone the repository and use a JDK matching your production environment
+1. Clone the repository and ensure you have JDK 21 installed
 2. Set `jmh.includes` in [build.gradle.kts](build.gradle.kts) to the smallest class or package you want to measure:
 
    ```kotlin
