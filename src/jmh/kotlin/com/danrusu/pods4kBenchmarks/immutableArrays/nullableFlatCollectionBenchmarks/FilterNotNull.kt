@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks
+package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks
 
 import com.danrusu.pods4k.immutableArrays.filterNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup.NullableFlatCollectionBenchmarkData
