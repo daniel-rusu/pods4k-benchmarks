@@ -30,7 +30,7 @@ private const val NUM_COLLECTIONS = 1000
 @OperationsPerInvocation(NUM_COLLECTIONS / 2)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Fork(2)
 open class PlusCollectionBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun plusCollection(bh: Blackhole) {

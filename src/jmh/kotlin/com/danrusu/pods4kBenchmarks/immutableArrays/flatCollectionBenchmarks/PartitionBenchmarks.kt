@@ -33,7 +33,7 @@ private const val ACCEPT_RATIO = 0.5
 @OperationsPerInvocation(NUM_COLLECTIONS)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Fork(2)
 open class PartitionBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     fieldGeneratorFactory = FlatDataFilter.createFieldGeneratorFactory(acceptRatio = ACCEPT_RATIO),

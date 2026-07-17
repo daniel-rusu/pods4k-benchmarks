@@ -28,9 +28,9 @@ private const val NUM_COLLECTIONS = 1000
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @OperationsPerInvocation(NUM_COLLECTIONS)
-@Warmup(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Fork(2)
 open class GroupByBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun groupBy(bh: Blackhole) {

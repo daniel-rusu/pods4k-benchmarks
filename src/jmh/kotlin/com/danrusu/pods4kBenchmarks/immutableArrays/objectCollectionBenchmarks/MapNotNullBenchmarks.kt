@@ -27,7 +27,7 @@ private const val NULL_RATIO = 0.5
 @OperationsPerInvocation(NUM_COLLECTIONS)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Fork(2)
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
     objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(

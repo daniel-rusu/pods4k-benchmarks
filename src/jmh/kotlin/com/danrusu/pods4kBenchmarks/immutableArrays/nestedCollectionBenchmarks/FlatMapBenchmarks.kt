@@ -31,7 +31,7 @@ private const val NUM_COLLECTIONS = 250
 @OperationsPerInvocation(NUM_COLLECTIONS)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Fork(2)
 open class FlatMapBenchmarks : NestedCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
     @Benchmark
     fun flatMap(bh: Blackhole) {

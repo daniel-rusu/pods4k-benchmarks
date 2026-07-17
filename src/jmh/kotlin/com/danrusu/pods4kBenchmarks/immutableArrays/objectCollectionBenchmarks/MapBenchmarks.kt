@@ -24,7 +24,7 @@ private const val NUM_COLLECTIONS = 1000
 @OperationsPerInvocation(NUM_COLLECTIONS)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Fork(2)
 open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>(
     numCollections = NUM_COLLECTIONS,
     objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { fields, references ->
