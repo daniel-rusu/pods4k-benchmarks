@@ -94,10 +94,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
                 }
             }
 
-            return NullableFlatCollectionBenchmarkData(
-                elementClass = elementClass,
-                collectionData = data,
-            )
+            return NullableFlatCollectionBenchmarkData(elementClass, data)
         }
 
         private fun createElementGenerator(

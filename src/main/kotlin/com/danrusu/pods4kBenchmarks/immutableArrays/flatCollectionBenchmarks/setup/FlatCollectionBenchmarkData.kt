@@ -136,12 +136,13 @@ class FlatCollectionBenchmarkData private constructor(
             val fields = fieldGeneratorFactory.create(generatorRngs)
             val references = referenceGeneratorFactory.create(generatorRngs)
 
-            return when (collectionType) {
+            val data = when (collectionType) {
                 LIST -> createLists(numCollections, dataType, sizeDistribution, fields, references)
                 PERSISTENT_LIST -> createPersistentLists(numCollections, dataType, sizeDistribution, fields, references)
                 ARRAY -> createArrays(numCollections, dataType, sizeDistribution, fields, references)
                 IMMUTABLE_ARRAY -> createImmutableArrays(numCollections, dataType, sizeDistribution, fields, references)
             }
+            return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }
 
         private fun createLists(
@@ -150,12 +151,11 @@ class FlatCollectionBenchmarkData private constructor(
             sizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): FlatCollectionBenchmarkData {
+        ): Array<ArrayList<*>> {
             val generateElement = createElementGenerator(dataType, fields, references)
-            val data: Array<ArrayList<*>> = Array(numCollections) {
+            return Array(numCollections) {
                 createList(sizeDistribution.nextValue()) { generateElement() }
             }
-            return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }
 
         private fun createPersistentLists(
@@ -164,12 +164,11 @@ class FlatCollectionBenchmarkData private constructor(
             sizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): FlatCollectionBenchmarkData {
+        ): Array<PersistentList<*>> {
             val generateElement = createElementGenerator(dataType, fields, references)
-            val data: Array<PersistentList<*>> = Array(numCollections) {
+            return Array(numCollections) {
                 createPersistentList(sizeDistribution.nextValue()) { generateElement() }
             }
-            return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }
 
         private fun createElementGenerator(
@@ -194,45 +193,42 @@ class FlatCollectionBenchmarkData private constructor(
             sizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): FlatCollectionBenchmarkData {
-            val data: Array<*> = when (dataType) {
-                DataType.REFERENCE -> Array(numCollections) {
-                    Array(sizeDistribution.nextValue()) { references.next() }
-                }
-
-                DataType.BOOLEAN -> Array(numCollections) {
-                    BooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
-                }
-
-                DataType.BYTE -> Array(numCollections) {
-                    ByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
-                }
-
-                DataType.CHAR -> Array(numCollections) {
-                    CharArray(sizeDistribution.nextValue()) { fields.nextChar() }
-                }
-
-                DataType.SHORT -> Array(numCollections) {
-                    ShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
-                }
-
-                DataType.INT -> Array(numCollections) {
-                    IntArray(sizeDistribution.nextValue()) { fields.nextInt() }
-                }
-
-                DataType.FLOAT -> Array(numCollections) {
-                    FloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
-                }
-
-                DataType.LONG -> Array(numCollections) {
-                    LongArray(sizeDistribution.nextValue()) { fields.nextLong() }
-                }
-
-                DataType.DOUBLE -> Array(numCollections) {
-                    DoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
-                }
+        ): Array<*> = when (dataType) {
+            DataType.REFERENCE -> Array(numCollections) {
+                Array(sizeDistribution.nextValue()) { references.next() }
             }
-            return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+
+            DataType.BOOLEAN -> Array(numCollections) {
+                BooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
+            }
+
+            DataType.BYTE -> Array(numCollections) {
+                ByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
+            }
+
+            DataType.CHAR -> Array(numCollections) {
+                CharArray(sizeDistribution.nextValue()) { fields.nextChar() }
+            }
+
+            DataType.SHORT -> Array(numCollections) {
+                ShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
+            }
+
+            DataType.INT -> Array(numCollections) {
+                IntArray(sizeDistribution.nextValue()) { fields.nextInt() }
+            }
+
+            DataType.FLOAT -> Array(numCollections) {
+                FloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
+            }
+
+            DataType.LONG -> Array(numCollections) {
+                LongArray(sizeDistribution.nextValue()) { fields.nextLong() }
+            }
+
+            DataType.DOUBLE -> Array(numCollections) {
+                DoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
+            }
         }
 
         private fun createImmutableArrays(
@@ -241,45 +237,42 @@ class FlatCollectionBenchmarkData private constructor(
             sizeDistribution: Distribution,
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
-        ): FlatCollectionBenchmarkData {
-            val data: Array<*> = when (dataType) {
-                DataType.REFERENCE -> Array(numCollections) {
-                    ImmutableArray(sizeDistribution.nextValue()) { references.next() }
-                }
-
-                DataType.BOOLEAN -> Array(numCollections) {
-                    ImmutableBooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
-                }
-
-                DataType.BYTE -> Array(numCollections) {
-                    ImmutableByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
-                }
-
-                DataType.CHAR -> Array(numCollections) {
-                    ImmutableCharArray(sizeDistribution.nextValue()) { fields.nextChar() }
-                }
-
-                DataType.SHORT -> Array(numCollections) {
-                    ImmutableShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
-                }
-
-                DataType.INT -> Array(numCollections) {
-                    ImmutableIntArray(sizeDistribution.nextValue()) { fields.nextInt() }
-                }
-
-                DataType.FLOAT -> Array(numCollections) {
-                    ImmutableFloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
-                }
-
-                DataType.LONG -> Array(numCollections) {
-                    ImmutableLongArray(sizeDistribution.nextValue()) { fields.nextLong() }
-                }
-
-                DataType.DOUBLE -> Array(numCollections) {
-                    ImmutableDoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
-                }
+        ): Array<*> = when (dataType) {
+            DataType.REFERENCE -> Array(numCollections) {
+                ImmutableArray(sizeDistribution.nextValue()) { references.next() }
             }
-            return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+
+            DataType.BOOLEAN -> Array(numCollections) {
+                ImmutableBooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
+            }
+
+            DataType.BYTE -> Array(numCollections) {
+                ImmutableByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
+            }
+
+            DataType.CHAR -> Array(numCollections) {
+                ImmutableCharArray(sizeDistribution.nextValue()) { fields.nextChar() }
+            }
+
+            DataType.SHORT -> Array(numCollections) {
+                ImmutableShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
+            }
+
+            DataType.INT -> Array(numCollections) {
+                ImmutableIntArray(sizeDistribution.nextValue()) { fields.nextInt() }
+            }
+
+            DataType.FLOAT -> Array(numCollections) {
+                ImmutableFloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
+            }
+
+            DataType.LONG -> Array(numCollections) {
+                ImmutableLongArray(sizeDistribution.nextValue()) { fields.nextLong() }
+            }
+
+            DataType.DOUBLE -> Array(numCollections) {
+                ImmutableDoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
+            }
         }
     }
 }
