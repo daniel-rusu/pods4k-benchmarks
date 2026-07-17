@@ -24,10 +24,9 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
    only the selected representation.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
 
-Flat and nested data holders retain one `Array<*>` for the active parameter combination. Their typed accessors validate
-the element class before casting, preventing a benchmark from silently reading an unused or mismatched data field.
-Object data is generic in its element type and uses the outer array's runtime component type to guard representation
-casts.
+All benchmark-data holders retain one `Array<*>` for the active parameter combination and use the outer array's runtime
+component type to guard representation casts. Flat, nullable-flat, and nested data holders additionally validate the
+element class before casting, preventing a benchmark from silently reading data with a mismatched element type.
 
 ## Core Types
 
@@ -36,8 +35,9 @@ casts.
 - `RngFactory` and `BenchmarkGeneratorRngs`: deterministic, purpose-specific random streams.
 - `DistributionFactory`: flat and nested collection-size models.
 - `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable element generation.
-- `FlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and `NestedCollectionBenchmarkData`: typed trial-data
-  builders.
+- `FlatCollectionBenchmarkData`, `NullableFlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and
+  `NestedCollectionBenchmarkData`: typed trial-data builders. The nullable flat builder stores boxed nullable elements
+  and is used by `FilterNotNull`.
 - `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`: JMH state and dispatch
   helpers.
 - `FlatDataFilter`: benchmark-only factories that generate a controlled predicate acceptance ratio.

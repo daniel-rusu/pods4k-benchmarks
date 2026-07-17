@@ -16,7 +16,8 @@ Use this map to locate the smallest relevant area before making a change.
 - Immutable-array setup: `src/main/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/`.
 - Tests mirror both areas under `src/test/kotlin/com/danrusu/pods4kBenchmarks/`.
 - Key types: `RngFactory`, `DistributionFactory`, `GeneratorRngs`, `CollectionType`, `DataType`,
-  `BenchmarkGeneratorRngs`, and the three `*BenchmarkData` builders.
+  `BenchmarkGeneratorRngs`, and the four `*BenchmarkData` builders, including
+  `NullableFlatCollectionBenchmarkData` for boxed nullable elements.
 - Preserve purpose-specific RNG streams and runtime element-type checks; both protect comparability across parameter
   combinations.
 
