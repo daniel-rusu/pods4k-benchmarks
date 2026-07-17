@@ -67,18 +67,10 @@ class ObjectCollectionBenchmarkData<T> private constructor(
                     createPersistentList(sizeDistribution.nextValue()) { objectGenerator.next() }
                 }
 
-                ARRAY -> {
-                    val arrays = arrayOfNulls<Array<*>>(numCollections)
-                    repeat(numCollections) { index ->
-                        arrays[index] = ArrayCreator.createArray(
-                            objectGenerator.objectClass,
-                            sizeDistribution.nextValue(),
-                        ) {
-                            objectGenerator.next()
-                        }
+                ARRAY -> ArrayCreator.createArray(Array::class.java, numCollections) {
+                    ArrayCreator.createArray(objectGenerator.objectClass, sizeDistribution.nextValue()) {
+                        objectGenerator.next()
                     }
-                    @Suppress("UNCHECKED_CAST")
-                    arrays as Array<Array<T>>
                 }
 
                 IMMUTABLE_ARRAY -> Array(numCollections) {
