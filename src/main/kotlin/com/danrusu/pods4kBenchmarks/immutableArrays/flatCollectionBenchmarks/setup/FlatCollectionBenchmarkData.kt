@@ -151,42 +151,9 @@ class FlatCollectionBenchmarkData private constructor(
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
         ): FlatCollectionBenchmarkData {
-            val data: Array<*> = when (dataType) {
-                DataType.REFERENCE -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { references.next() }
-                }
-
-                DataType.BOOLEAN -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextBoolean() }
-                }
-
-                DataType.BYTE -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextByte() }
-                }
-
-                DataType.CHAR -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextChar() }
-                }
-
-                DataType.SHORT -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextShort() }
-                }
-
-                DataType.INT -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextInt() }
-                }
-
-                DataType.FLOAT -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextFloat() }
-                }
-
-                DataType.LONG -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextLong() }
-                }
-
-                DataType.DOUBLE -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { fields.nextDouble() }
-                }
+            val generateElement = createElementGenerator(dataType, fields, references)
+            val data: Array<ArrayList<*>> = Array(numCollections) {
+                createList(sizeDistribution.nextValue()) { generateElement() }
             }
             return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }
@@ -198,44 +165,27 @@ class FlatCollectionBenchmarkData private constructor(
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
         ): FlatCollectionBenchmarkData {
-            val data: Array<*> = when (dataType) {
-                DataType.REFERENCE -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { references.next() }
-                }
-
-                DataType.BOOLEAN -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextBoolean() }
-                }
-
-                DataType.BYTE -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextByte() }
-                }
-
-                DataType.CHAR -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextChar() }
-                }
-
-                DataType.SHORT -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextShort() }
-                }
-
-                DataType.INT -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextInt() }
-                }
-
-                DataType.FLOAT -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextFloat() }
-                }
-
-                DataType.LONG -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextLong() }
-                }
-
-                DataType.DOUBLE -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { fields.nextDouble() }
-                }
+            val generateElement = createElementGenerator(dataType, fields, references)
+            val data: Array<PersistentList<*>> = Array(numCollections) {
+                createPersistentList(sizeDistribution.nextValue()) { generateElement() }
             }
             return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+        }
+
+        private fun createElementGenerator(
+            dataType: DataType,
+            fields: FieldGenerator,
+            references: ObjectGenerator<String>,
+        ): () -> Any = when (dataType) {
+            DataType.REFERENCE -> references::next
+            DataType.BOOLEAN -> fields::nextBoolean
+            DataType.BYTE -> fields::nextByte
+            DataType.CHAR -> fields::nextChar
+            DataType.SHORT -> fields::nextShort
+            DataType.INT -> fields::nextInt
+            DataType.FLOAT -> fields::nextFloat
+            DataType.LONG -> fields::nextLong
+            DataType.DOUBLE -> fields::nextDouble
         }
 
         private fun createArrays(
