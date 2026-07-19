@@ -152,9 +152,8 @@ class FlatCollectionBenchmarkData private constructor(
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
         ): Array<ArrayList<*>> {
-            val generateElement = createElementGenerator(dataType, fields, references)
             return Array(numCollections) {
-                createList(sizeDistribution.nextValue()) { generateElement() }
+                createList(sizeDistribution.nextValue(), dataType, fields, references)
             }
         }
 
@@ -165,26 +164,9 @@ class FlatCollectionBenchmarkData private constructor(
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
         ): Array<PersistentList<*>> {
-            val generateElement = createElementGenerator(dataType, fields, references)
             return Array(numCollections) {
-                createPersistentList(sizeDistribution.nextValue()) { generateElement() }
+                createPersistentList(sizeDistribution.nextValue(), dataType, fields, references)
             }
-        }
-
-        private fun createElementGenerator(
-            dataType: DataType,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): () -> Any = when (dataType) {
-            DataType.REFERENCE -> references::next
-            DataType.BOOLEAN -> fields::nextBoolean
-            DataType.BYTE -> fields::nextByte
-            DataType.CHAR -> fields::nextChar
-            DataType.SHORT -> fields::nextShort
-            DataType.INT -> fields::nextInt
-            DataType.FLOAT -> fields::nextFloat
-            DataType.LONG -> fields::nextLong
-            DataType.DOUBLE -> fields::nextDouble
         }
 
         private fun createArrays(

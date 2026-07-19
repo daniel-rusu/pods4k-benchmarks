@@ -183,11 +183,10 @@ class NestedCollectionBenchmarkData private constructor(
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
         ): Array<ArrayList<CollectionOwner<ArrayList<*>>>> {
-            val generateElement = createElementGenerator(dataType, fields, references)
             return Array(numCollections) {
                 createList(topLevelSizeDistribution.nextValue()) {
                     CollectionOwner(
-                        createList(nestedSizeDistribution.nextValue()) { generateElement() }
+                        createList(nestedSizeDistribution.nextValue(), dataType, fields, references)
                     )
                 }
             }
@@ -201,30 +200,13 @@ class NestedCollectionBenchmarkData private constructor(
             fields: FieldGenerator,
             references: ObjectGenerator<String>,
         ): Array<PersistentList<CollectionOwner<PersistentList<*>>>> {
-            val generateElement = createElementGenerator(dataType, fields, references)
             return Array(numCollections) {
                 createPersistentList(topLevelSizeDistribution.nextValue()) {
                     CollectionOwner(
-                        createPersistentList(nestedSizeDistribution.nextValue()) { generateElement() }
+                        createPersistentList(nestedSizeDistribution.nextValue(), dataType, fields, references)
                     )
                 }
             }
-        }
-
-        private fun createElementGenerator(
-            dataType: DataType,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): () -> Any = when (dataType) {
-            DataType.REFERENCE -> references::next
-            DataType.BOOLEAN -> fields::nextBoolean
-            DataType.BYTE -> fields::nextByte
-            DataType.CHAR -> fields::nextChar
-            DataType.SHORT -> fields::nextShort
-            DataType.INT -> fields::nextInt
-            DataType.FLOAT -> fields::nextFloat
-            DataType.LONG -> fields::nextLong
-            DataType.DOUBLE -> fields::nextDouble
         }
 
         private fun createArrays(
