@@ -66,7 +66,10 @@ class ObjectCollectionBenchmarkData<T> private constructor(
                     CollectionFactory.createPersistentList(sizeDistribution.nextValue()) { objectGenerator.next() }
                 }
 
-                ARRAY -> ArrayCreator.createArray(Array::class.java, numCollections) {
+                ARRAY -> ArrayCreator.createNestedArrays(
+                    nestedElementClass = objectGenerator.objectClass,
+                    size = numCollections,
+                ) {
                     ArrayCreator.createArray(objectGenerator.objectClass, sizeDistribution.nextValue()) {
                         objectGenerator.next()
                     }

@@ -94,4 +94,20 @@ class ArrayCreatorTest {
                 .isNull()
         }
     }
+
+    @Test
+    fun `create nested array with the element array as its runtime component type`() {
+        val nestedArray: Array<Array<String>> =
+            ArrayCreator.createNestedArrays(String::class.java, size = 2) { outerIndex ->
+                ArrayCreator.createArray(String::class.java, size = outerIndex + 1) { innerIndex ->
+                    "$outerIndex-$innerIndex"
+                }
+            }
+
+        expectThat(nestedArray::class.java.componentType)
+            .isEqualTo(Array<String>::class.java)
+
+        expectThat(nestedArray.map { it.toList() })
+            .isEqualTo(listOf(listOf("0-0"), listOf("1-0", "1-1")))
+    }
 }

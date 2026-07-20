@@ -82,15 +82,20 @@ class NullableFlatCollectionBenchmarkData private constructor(
                     CollectionFactory.createPersistentList(sizeDistribution.nextValue()) { generateElement() }
                 }
 
-                CollectionType.ARRAY -> Array(numCollections) {
-                    @Suppress("UNCHECKED_CAST") // cast as Class<Any> because generateElement returns Any?
-                    ArrayCreator.createArray(elementClass as Class<Any>, sizeDistribution.nextValue()) {
-                        generateElement()
+                CollectionType.ARRAY -> {
+                    @Suppress("UNCHECKED_CAST")
+                    ArrayCreator.createNestedArrays(
+                        nestedElementClass = elementClass as Class<Any>,
+                        size = numCollections,
+                    ) {
+                        ArrayCreator.createArray(elementClass, sizeDistribution.nextValue()) {
+                            generateElement()
+                        }
                     }
                 }
 
                 CollectionType.IMMUTABLE_ARRAY -> Array(numCollections) {
-                    ImmutableArray.Companion(sizeDistribution.nextValue()) { generateElement() }
+                    ImmutableArray(sizeDistribution.nextValue()) { generateElement() }
                 }
             }
 
