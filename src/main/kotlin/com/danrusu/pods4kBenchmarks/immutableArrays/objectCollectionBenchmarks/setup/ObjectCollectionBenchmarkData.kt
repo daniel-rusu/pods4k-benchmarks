@@ -59,24 +59,27 @@ class ObjectCollectionBenchmarkData<T> private constructor(
 
             val data: Array<*> = when (collectionType) {
                 LIST -> Array(numCollections) {
-                    CollectionFactory.createList(sizeDistribution.nextValue()) { objectGenerator.next() }
+                    CollectionFactory.createList(sizeDistribution.nextValue()) {
+                        objectGenerator.next()
+                    }
                 }
 
                 PERSISTENT_LIST -> Array(numCollections) {
-                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) { objectGenerator.next() }
+                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) {
+                        objectGenerator.next()
+                    }
                 }
 
-                ARRAY -> ArrayCreator.createNestedArrays(
-                    nestedElementClass = objectGenerator.objectClass,
-                    size = numCollections,
-                ) {
+                ARRAY -> ArrayCreator.createNestedArrays(objectGenerator.objectClass, numCollections) {
                     ArrayCreator.createArray(objectGenerator.objectClass, sizeDistribution.nextValue()) {
                         objectGenerator.next()
                     }
                 }
 
                 IMMUTABLE_ARRAY -> Array(numCollections) {
-                    ImmutableArray(sizeDistribution.nextValue()) { objectGenerator.next() }
+                    ImmutableArray(sizeDistribution.nextValue()) {
+                        objectGenerator.next()
+                    }
                 }
             }
             return ObjectCollectionBenchmarkData(data)

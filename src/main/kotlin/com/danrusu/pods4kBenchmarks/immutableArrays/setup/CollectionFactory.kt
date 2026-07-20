@@ -9,6 +9,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
+import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
@@ -61,6 +62,23 @@ object CollectionFactory {
         return builder.build()
     }
 
+    fun <R> createArray(
+        size: Int,
+        dataType: DataType,
+        fields: FieldGenerator,
+        references: ObjectGenerator<R>
+    ): Any = when (dataType) {
+        DataType.REFERENCE -> ArrayCreator.createArray(references.objectClass, size) { references.next() }
+        DataType.BOOLEAN -> BooleanArray(size) { fields.nextBoolean() }
+        DataType.BYTE -> ByteArray(size) { fields.nextByte() }
+        DataType.CHAR -> CharArray(size) { fields.nextChar() }
+        DataType.SHORT -> ShortArray(size) { fields.nextShort() }
+        DataType.INT -> IntArray(size) { fields.nextInt() }
+        DataType.FLOAT -> FloatArray(size) { fields.nextFloat() }
+        DataType.LONG -> LongArray(size) { fields.nextLong() }
+        DataType.DOUBLE -> DoubleArray(size) { fields.nextDouble() }
+    }
+
     fun <R> createImmutableArray(
         size: Int,
         dataType: DataType,
@@ -78,11 +96,15 @@ object CollectionFactory {
         DataType.DOUBLE -> ImmutableDoubleArray(size) { fields.nextDouble() }
     }
 
-    fun getCollectionClass(collectionType: CollectionType, dataType: DataType): Class<*>? = when (collectionType) {
+    fun getCollectionClass(
+        collectionType: CollectionType,
+        dataType: DataType,
+        referenceElementClass: Class<*>
+    ): Class<*>? = when (collectionType) {
         CollectionType.LIST -> ArrayList::class.java
         CollectionType.PERSISTENT_LIST -> PersistentList::class.java
         CollectionType.ARRAY -> when (dataType) {
-            DataType.REFERENCE -> Array::class.java
+            DataType.REFERENCE -> referenceElementClass.arrayType()
             DataType.BOOLEAN -> BooleanArray::class.java
             DataType.BYTE -> ByteArray::class.java
             DataType.CHAR -> CharArray::class.java

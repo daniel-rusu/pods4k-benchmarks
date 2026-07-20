@@ -19,12 +19,9 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
-import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
@@ -137,6 +134,12 @@ class FlatCollectionBenchmarkData private constructor(
             val references = referenceGeneratorFactory.create(generatorRngs)
 
             @Suppress("UNCHECKED_CAST")
+            val collectionClass = CollectionFactory.getCollectionClass(
+                collectionType = collectionType,
+                dataType = dataType,
+                referenceElementClass = references.objectClass,
+            ) as Class<Any>
+
             val data = when (collectionType) {
                 LIST -> Array(numCollections) {
                     CollectionFactory.createList(sizeDistribution.nextValue(), dataType, fields, references)
@@ -146,60 +149,16 @@ class FlatCollectionBenchmarkData private constructor(
                     CollectionFactory.createPersistentList(sizeDistribution.nextValue(), dataType, fields, references)
                 }
 
-                ARRAY -> createArrays(numCollections, dataType, sizeDistribution, fields, references)
+                // Can't use createNestedArrays because that assumes generic nested arrays, but we use primitive arrays
+                ARRAY -> ArrayCreator.createArray(collectionClass, numCollections) {
+                    CollectionFactory.createArray(sizeDistribution.nextValue(), dataType, fields, references)
+                }
 
-                IMMUTABLE_ARRAY -> ArrayCreator.createArray(
-                    componentClass = CollectionFactory.getCollectionClass(collectionType, dataType) as Class<Any>,
-                    size = numCollections,
-                ) {
+                IMMUTABLE_ARRAY -> ArrayCreator.createArray(collectionClass, numCollections) {
                     CollectionFactory.createImmutableArray(sizeDistribution.nextValue(), dataType, fields, references)
                 }
             }
             return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
-        }
-
-        private fun createArrays(
-            numCollections: Int,
-            dataType: DataType,
-            sizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<*> = when (dataType) {
-            DataType.REFERENCE -> Array(numCollections) {
-                Array(sizeDistribution.nextValue()) { references.next() }
-            }
-
-            DataType.BOOLEAN -> Array(numCollections) {
-                BooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
-            }
-
-            DataType.BYTE -> Array(numCollections) {
-                ByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
-            }
-
-            DataType.CHAR -> Array(numCollections) {
-                CharArray(sizeDistribution.nextValue()) { fields.nextChar() }
-            }
-
-            DataType.SHORT -> Array(numCollections) {
-                ShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
-            }
-
-            DataType.INT -> Array(numCollections) {
-                IntArray(sizeDistribution.nextValue()) { fields.nextInt() }
-            }
-
-            DataType.FLOAT -> Array(numCollections) {
-                FloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
-            }
-
-            DataType.LONG -> Array(numCollections) {
-                LongArray(sizeDistribution.nextValue()) { fields.nextLong() }
-            }
-
-            DataType.DOUBLE -> Array(numCollections) {
-                DoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
-            }
         }
     }
 }

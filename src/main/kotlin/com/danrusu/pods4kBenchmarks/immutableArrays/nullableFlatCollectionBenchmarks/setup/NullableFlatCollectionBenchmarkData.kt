@@ -73,29 +73,30 @@ class NullableFlatCollectionBenchmarkData private constructor(
             val elementClass = dataType.resolveElementClass(references.objectClass)
             val generateElement = createElementGenerator(dataType, fields, references)
 
+            @Suppress("UNCHECKED_CAST")
             val data: Array<*> = when (collectionType) {
                 CollectionType.LIST -> Array(numCollections) {
-                    CollectionFactory.createList(sizeDistribution.nextValue()) { generateElement() }
+                    CollectionFactory.createList(sizeDistribution.nextValue()) {
+                        generateElement()
+                    }
                 }
 
                 CollectionType.PERSISTENT_LIST -> Array(numCollections) {
-                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) { generateElement() }
+                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) {
+                        generateElement()
+                    }
                 }
 
-                CollectionType.ARRAY -> {
-                    @Suppress("UNCHECKED_CAST")
-                    ArrayCreator.createNestedArrays(
-                        nestedElementClass = elementClass as Class<Any>,
-                        size = numCollections,
-                    ) {
-                        ArrayCreator.createArray(elementClass, sizeDistribution.nextValue()) {
-                            generateElement()
-                        }
+                CollectionType.ARRAY -> ArrayCreator.createNestedArrays(elementClass as Class<Any>, numCollections) {
+                    ArrayCreator.createArray(elementClass, sizeDistribution.nextValue()) {
+                        generateElement()
                     }
                 }
 
                 CollectionType.IMMUTABLE_ARRAY -> Array(numCollections) {
-                    ImmutableArray(sizeDistribution.nextValue()) { generateElement() }
+                    ImmutableArray(sizeDistribution.nextValue()) {
+                        generateElement()
+                    }
                 }
             }
 
