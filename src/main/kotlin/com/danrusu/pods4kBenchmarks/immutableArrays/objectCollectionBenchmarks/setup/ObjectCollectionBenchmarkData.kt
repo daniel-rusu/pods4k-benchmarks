@@ -2,8 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -60,11 +59,11 @@ class ObjectCollectionBenchmarkData<T> private constructor(
 
             val data: Array<*> = when (collectionType) {
                 LIST -> Array(numCollections) {
-                    createList(sizeDistribution.nextValue()) { objectGenerator.next() }
+                    CollectionFactory.createList(sizeDistribution.nextValue()) { objectGenerator.next() }
                 }
 
                 PERSISTENT_LIST -> Array(numCollections) {
-                    createPersistentList(sizeDistribution.nextValue()) { objectGenerator.next() }
+                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) { objectGenerator.next() }
                 }
 
                 ARRAY -> ArrayCreator.createArray(Array::class.java, numCollections) {

@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup
 
+import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
@@ -7,14 +8,36 @@ import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.nullable
+import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 
 private const val NULL_RATIO = 0.5
 
 class NullableFlatCollectionBenchmarkDataTest {
+    @Test
+    fun `all collection types are mapped to appropriate classes`() {
+        with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
+            expectThat(listData<Boolean>()[0])
+                .isA<ArrayList<Boolean?>>()
+        }
+        with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
+            expectThat(persistentListData<Boolean>()[0])
+                .isA<PersistentList<Boolean?>>()
+        }
+        with(createData(CollectionType.ARRAY, DataType.BOOLEAN)) {
+            expectThat(arrayData<Boolean>()[0])
+                .isA<Array<Boolean?>>()
+        }
+        with(createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)) {
+            expectThat(immutableArrayData<Boolean>()[0])
+                .isA<ImmutableArray<Boolean?>>()
+        }
+    }
+
     @Test
     fun `all collection types contain identical nullable data`() {
         DataType.entries.forEach { dataType ->

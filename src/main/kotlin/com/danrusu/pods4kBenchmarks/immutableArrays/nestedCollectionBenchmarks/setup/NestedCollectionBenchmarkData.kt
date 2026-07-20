@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
@@ -136,23 +137,21 @@ class NestedCollectionBenchmarkData private constructor(
             val references = nestedReferenceGeneratorFactory.create(generatorRngs)
 
             val data = when (collectionType) {
-                LIST -> createLists(
-                    numCollections,
-                    dataType,
-                    topLevelSizeDistribution,
-                    nestedSizeDistribution,
-                    fields,
-                    references,
-                )
+                LIST -> Array(numCollections) {
+                    createList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
+                            createList(nestedSizeDistribution.nextValue(), dataType, fields, references)
+                        )
+                    }
+                }
 
-                PERSISTENT_LIST -> createPersistentLists(
-                    numCollections,
-                    dataType,
-                    topLevelSizeDistribution,
-                    nestedSizeDistribution,
-                    fields,
-                    references,
-                )
+                PERSISTENT_LIST -> Array(numCollections) {
+                    createPersistentList(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
+                            createPersistentList(nestedSizeDistribution.nextValue(), dataType, fields, references)
+                        )
+                    }
+                }
 
                 ARRAY -> createArrays(
                     numCollections,
@@ -163,50 +162,21 @@ class NestedCollectionBenchmarkData private constructor(
                     references,
                 )
 
-                IMMUTABLE_ARRAY -> createImmutableArrays(
-                    numCollections,
-                    dataType,
-                    topLevelSizeDistribution,
-                    nestedSizeDistribution,
-                    fields,
-                    references,
-                )
+                IMMUTABLE_ARRAY -> Array(numCollections) {
+                    ImmutableArray(topLevelSizeDistribution.nextValue()) {
+                        CollectionOwner(
+                            CollectionFactory.createImmutableArray(
+                                nestedSizeDistribution.nextValue(),
+                                dataType,
+                                fields,
+                                references,
+                            )
+                        )
+                    }
+                }
             }
+
             return NestedCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
-        }
-
-        private fun createLists(
-            numCollections: Int,
-            dataType: DataType,
-            topLevelSizeDistribution: Distribution,
-            nestedSizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<ArrayList<CollectionOwner<ArrayList<*>>>> {
-            return Array(numCollections) {
-                createList(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(
-                        createList(nestedSizeDistribution.nextValue(), dataType, fields, references)
-                    )
-                }
-            }
-        }
-
-        private fun createPersistentLists(
-            numCollections: Int,
-            dataType: DataType,
-            topLevelSizeDistribution: Distribution,
-            nestedSizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<PersistentList<CollectionOwner<PersistentList<*>>>> {
-            return Array(numCollections) {
-                createPersistentList(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(
-                        createPersistentList(nestedSizeDistribution.nextValue(), dataType, fields, references)
-                    )
-                }
-            }
         }
 
         private fun createArrays(
@@ -268,71 +238,6 @@ class NestedCollectionBenchmarkData private constructor(
             DataType.DOUBLE -> Array(numCollections) {
                 Array(topLevelSizeDistribution.nextValue()) {
                     CollectionOwner(DoubleArray(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
-                }
-            }
-        }
-
-        private fun createImmutableArrays(
-            numCollections: Int,
-            dataType: DataType,
-            topLevelSizeDistribution: Distribution,
-            nestedSizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<*> = when (dataType) {
-            DataType.REFERENCE -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableArray(nestedSizeDistribution.nextValue()) { references.next() })
-                }
-            }
-
-            DataType.BOOLEAN -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(
-                        ImmutableBooleanArray(nestedSizeDistribution.nextValue()) { fields.nextBoolean() }
-                    )
-                }
-            }
-
-            DataType.BYTE -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableByteArray(nestedSizeDistribution.nextValue()) { fields.nextByte() })
-                }
-            }
-
-            DataType.CHAR -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableCharArray(nestedSizeDistribution.nextValue()) { fields.nextChar() })
-                }
-            }
-
-            DataType.SHORT -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableShortArray(nestedSizeDistribution.nextValue()) { fields.nextShort() })
-                }
-            }
-
-            DataType.INT -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableIntArray(nestedSizeDistribution.nextValue()) { fields.nextInt() })
-                }
-            }
-
-            DataType.FLOAT -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableFloatArray(nestedSizeDistribution.nextValue()) { fields.nextFloat() })
-                }
-            }
-
-            DataType.LONG -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableLongArray(nestedSizeDistribution.nextValue()) { fields.nextLong() })
-                }
-            }
-
-            DataType.DOUBLE -> Array(numCollections) {
-                ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                    CollectionOwner(ImmutableDoubleArray(nestedSizeDistribution.nextValue()) { fields.nextDouble() })
                 }
             }
         }

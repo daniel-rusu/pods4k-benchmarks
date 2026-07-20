@@ -10,8 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -19,6 +18,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
+import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
@@ -136,37 +136,26 @@ class FlatCollectionBenchmarkData private constructor(
             val fields = fieldGeneratorFactory.create(generatorRngs)
             val references = referenceGeneratorFactory.create(generatorRngs)
 
+            @Suppress("UNCHECKED_CAST")
             val data = when (collectionType) {
-                LIST -> createLists(numCollections, dataType, sizeDistribution, fields, references)
-                PERSISTENT_LIST -> createPersistentLists(numCollections, dataType, sizeDistribution, fields, references)
+                LIST -> Array(numCollections) {
+                    CollectionFactory.createList(sizeDistribution.nextValue(), dataType, fields, references)
+                }
+
+                PERSISTENT_LIST -> Array(numCollections) {
+                    CollectionFactory.createPersistentList(sizeDistribution.nextValue(), dataType, fields, references)
+                }
+
                 ARRAY -> createArrays(numCollections, dataType, sizeDistribution, fields, references)
-                IMMUTABLE_ARRAY -> createImmutableArrays(numCollections, dataType, sizeDistribution, fields, references)
+
+                IMMUTABLE_ARRAY -> ArrayCreator.createArray(
+                    componentClass = CollectionFactory.getCollectionClass(collectionType, dataType) as Class<Any>,
+                    size = numCollections,
+                ) {
+                    CollectionFactory.createImmutableArray(sizeDistribution.nextValue(), dataType, fields, references)
+                }
             }
             return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
-        }
-
-        private fun createLists(
-            numCollections: Int,
-            dataType: DataType,
-            sizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<ArrayList<*>> {
-            return Array(numCollections) {
-                createList(sizeDistribution.nextValue(), dataType, fields, references)
-            }
-        }
-
-        private fun createPersistentLists(
-            numCollections: Int,
-            dataType: DataType,
-            sizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<PersistentList<*>> {
-            return Array(numCollections) {
-                createPersistentList(sizeDistribution.nextValue(), dataType, fields, references)
-            }
         }
 
         private fun createArrays(
@@ -210,50 +199,6 @@ class FlatCollectionBenchmarkData private constructor(
 
             DataType.DOUBLE -> Array(numCollections) {
                 DoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
-            }
-        }
-
-        private fun createImmutableArrays(
-            numCollections: Int,
-            dataType: DataType,
-            sizeDistribution: Distribution,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String>,
-        ): Array<*> = when (dataType) {
-            DataType.REFERENCE -> Array(numCollections) {
-                ImmutableArray(sizeDistribution.nextValue()) { references.next() }
-            }
-
-            DataType.BOOLEAN -> Array(numCollections) {
-                ImmutableBooleanArray(sizeDistribution.nextValue()) { fields.nextBoolean() }
-            }
-
-            DataType.BYTE -> Array(numCollections) {
-                ImmutableByteArray(sizeDistribution.nextValue()) { fields.nextByte() }
-            }
-
-            DataType.CHAR -> Array(numCollections) {
-                ImmutableCharArray(sizeDistribution.nextValue()) { fields.nextChar() }
-            }
-
-            DataType.SHORT -> Array(numCollections) {
-                ImmutableShortArray(sizeDistribution.nextValue()) { fields.nextShort() }
-            }
-
-            DataType.INT -> Array(numCollections) {
-                ImmutableIntArray(sizeDistribution.nextValue()) { fields.nextInt() }
-            }
-
-            DataType.FLOAT -> Array(numCollections) {
-                ImmutableFloatArray(sizeDistribution.nextValue()) { fields.nextFloat() }
-            }
-
-            DataType.LONG -> Array(numCollections) {
-                ImmutableLongArray(sizeDistribution.nextValue()) { fields.nextLong() }
-            }
-
-            DataType.DOUBLE -> Array(numCollections) {
-                ImmutableDoubleArray(sizeDistribution.nextValue()) { fields.nextDouble() }
             }
         }
     }

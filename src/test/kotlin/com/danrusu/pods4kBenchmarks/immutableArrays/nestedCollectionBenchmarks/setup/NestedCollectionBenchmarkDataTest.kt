@@ -1,17 +1,61 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup
 
+import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
 import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 
 class NestedCollectionBenchmarkDataTest {
+    @Test
+    fun `all collection types are mapped to appropriate classes`() {
+        with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
+            val topLevelCollection = listData<Boolean>()[0]
+            expectThat(topLevelCollection)
+                .isA<ArrayList<CollectionOwner<ArrayList<Boolean>>>>()
+
+            val nestedCollection = topLevelCollection[0].nestedCollection
+            expectThat(nestedCollection)
+                .isA<ArrayList<Boolean>>()
+        }
+        with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
+            val topLevelCollection = persistentListData<Boolean>()[0]
+            expectThat(topLevelCollection)
+                .isA<PersistentList<CollectionOwner<PersistentList<Boolean>>>>()
+
+            val nestedCollection = topLevelCollection[0].nestedCollection
+            expectThat(nestedCollection)
+                .isA<PersistentList<Boolean>>()
+        }
+        with(createData(CollectionType.ARRAY, DataType.BOOLEAN)) {
+            val topLevelCollection = booleanArrayData[0]
+            expectThat(topLevelCollection)
+                .isA<Array<CollectionOwner<BooleanArray>>>()
+
+            val nestedCollection = topLevelCollection[0].nestedCollection
+            expectThat(nestedCollection)
+                .isA<BooleanArray>()
+        }
+        with(createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)) {
+            val topLevelCollection = immutableBooleanArrayData[0]
+            expectThat(topLevelCollection)
+                .isA<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>()
+
+            val nestedCollection = topLevelCollection[0].nestedCollection
+            expectThat(nestedCollection)
+                .isA<ImmutableBooleanArray>()
+        }
+    }
+
     @Test
     fun `all collection types contain identical data`() {
         DataType.entries.forEach { dataType ->
