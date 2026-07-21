@@ -4,10 +4,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
@@ -57,29 +54,23 @@ class ObjectCollectionBenchmarkData<T> private constructor(
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
 
-            val data: Array<*> = when (collectionType) {
-                LIST -> Array(numCollections) {
-                    CollectionFactory.createList(sizeDistribution.nextValue()) {
-                        objectGenerator.next()
-                    }
-                }
-
-                PERSISTENT_LIST -> Array(numCollections) {
-                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) {
-                        objectGenerator.next()
-                    }
-                }
-
-                ARRAY -> ArrayCreator.createNestedArrays(objectGenerator.objectClass, numCollections) {
-                    ArrayCreator.createArray(objectGenerator.objectClass, sizeDistribution.nextValue()) {
-                        objectGenerator.next()
-                    }
-                }
-
-                IMMUTABLE_ARRAY -> Array(numCollections) {
-                    ImmutableArray(sizeDistribution.nextValue()) {
-                        objectGenerator.next()
-                    }
+            // Array<Collection<T>>
+            // where Collection is ArrayList, PersistentList, Array, or ImmutableArray
+            @Suppress("UNCHECKED_CAST")
+            val data = ArrayCreator.createArray(
+                componentClass = CollectionFactory.getCollectionClass(
+                    collectionType,
+                    DataType.REFERENCE,
+                    objectGenerator.objectClass
+                ) as Class<Any>,
+                size = numCollections,
+            ) {
+                CollectionFactory.createCollection(
+                    size = sizeDistribution.nextValue(),
+                    collectionType = collectionType,
+                    elementClass = objectGenerator.objectClass
+                ) {
+                    objectGenerator.next()
                 }
             }
             return ObjectCollectionBenchmarkData(data)

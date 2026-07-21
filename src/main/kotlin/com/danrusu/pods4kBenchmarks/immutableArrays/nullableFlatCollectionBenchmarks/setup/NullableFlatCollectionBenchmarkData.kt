@@ -9,9 +9,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
@@ -55,6 +53,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
 
     companion object {
         /** Creates deterministic nullable data for one flat benchmark parameter combination. */
+        @Suppress("UNCHECKED_CAST")
         fun create(
             collectionType: CollectionType,
             dataType: DataType,
@@ -70,53 +69,38 @@ class NullableFlatCollectionBenchmarkData private constructor(
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val fields = fieldGeneratorFactory.create(generatorRngs)
             val references = referenceGeneratorFactory.create(generatorRngs)
-            val elementClass = dataType.resolveElementClass(references.objectClass)
-            val generateElement = createElementGenerator(dataType, fields, references)
+            val elementClass = dataType.resolveElementClass(references.objectClass) as Class<Any>
 
-            @Suppress("UNCHECKED_CAST")
-            val data: Array<*> = when (collectionType) {
-                CollectionType.LIST -> Array(numCollections) {
-                    CollectionFactory.createList(sizeDistribution.nextValue()) {
-                        generateElement()
-                    }
-                }
-
-                CollectionType.PERSISTENT_LIST -> Array(numCollections) {
-                    CollectionFactory.createPersistentList(sizeDistribution.nextValue()) {
-                        generateElement()
-                    }
-                }
-
-                CollectionType.ARRAY -> ArrayCreator.createNestedArrays(elementClass as Class<Any>, numCollections) {
-                    ArrayCreator.createArray(elementClass, sizeDistribution.nextValue()) {
-                        generateElement()
-                    }
-                }
-
-                CollectionType.IMMUTABLE_ARRAY -> Array(numCollections) {
-                    ImmutableArray(sizeDistribution.nextValue()) {
-                        generateElement()
+            // Array<Collection<DataType?>>
+            // where Collection is ArrayList, PersistentList, Array, or ImmutableArray
+            val data = ArrayCreator.createArray(
+                componentClass = CollectionFactory.getCollectionClass(
+                    collectionType,
+                    DataType.REFERENCE, // All collections will store references because the primitive values are boxed
+                    elementClass
+                ) as Class<Any>,
+                size = numCollections,
+            ) {
+                CollectionFactory.createCollection(
+                    size = sizeDistribution.nextValue(),
+                    collectionType = collectionType,
+                    elementClass = elementClass,
+                ) {
+                    when (dataType) {
+                        DataType.REFERENCE -> references.next()
+                        DataType.BOOLEAN -> fields.nextNullableBoolean()
+                        DataType.BYTE -> fields.nextNullableByte()
+                        DataType.CHAR -> fields.nextNullableChar()
+                        DataType.SHORT -> fields.nextNullableShort()
+                        DataType.INT -> fields.nextNullableInt()
+                        DataType.FLOAT -> fields.nextNullableFloat()
+                        DataType.LONG -> fields.nextNullableLong()
+                        DataType.DOUBLE -> fields.nextNullableDouble()
                     }
                 }
             }
 
             return NullableFlatCollectionBenchmarkData(elementClass, data)
-        }
-
-        private fun createElementGenerator(
-            dataType: DataType,
-            fields: FieldGenerator,
-            references: ObjectGenerator<String?>,
-        ): () -> Any? = when (dataType) {
-            DataType.REFERENCE -> references::next
-            DataType.BOOLEAN -> fields::nextNullableBoolean
-            DataType.BYTE -> fields::nextNullableByte
-            DataType.CHAR -> fields::nextNullableChar
-            DataType.SHORT -> fields::nextNullableShort
-            DataType.INT -> fields::nextNullableInt
-            DataType.FLOAT -> fields::nextNullableFloat
-            DataType.LONG -> fields::nextNullableLong
-            DataType.DOUBLE -> fields::nextNullableDouble
         }
     }
 }

@@ -12,10 +12,6 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
@@ -140,23 +136,16 @@ class FlatCollectionBenchmarkData private constructor(
                 referenceElementClass = references.objectClass,
             ) as Class<Any>
 
-            val data = when (collectionType) {
-                LIST -> Array(numCollections) {
-                    CollectionFactory.createList(sizeDistribution.nextValue(), dataType, fields, references)
-                }
-
-                PERSISTENT_LIST -> Array(numCollections) {
-                    CollectionFactory.createPersistentList(sizeDistribution.nextValue(), dataType, fields, references)
-                }
-
-                // Can't use createNestedArrays because that assumes generic nested arrays, but we use primitive arrays
-                ARRAY -> ArrayCreator.createArray(collectionClass, numCollections) {
-                    CollectionFactory.createArray(sizeDistribution.nextValue(), dataType, fields, references)
-                }
-
-                IMMUTABLE_ARRAY -> ArrayCreator.createArray(collectionClass, numCollections) {
-                    CollectionFactory.createImmutableArray(sizeDistribution.nextValue(), dataType, fields, references)
-                }
+            // Array<Collection>
+            // where Collection is ArrayList<DataType>, PersistentList<DataType>, Array<String>, BooleanArray, ...
+            val data = ArrayCreator.createArray(collectionClass, numCollections) {
+                CollectionFactory.createCollection(
+                    size = sizeDistribution.nextValue(),
+                    collectionType = collectionType,
+                    dataType = dataType,
+                    fields = fields,
+                    references = references
+                )
             }
             return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
         }

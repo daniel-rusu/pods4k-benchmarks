@@ -11,15 +11,10 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createList
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory.createPersistentList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
+import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
@@ -133,47 +128,32 @@ class NestedCollectionBenchmarkData private constructor(
             val fields = nestedFieldGeneratorFactory.create(generatorRngs)
             val references = nestedReferenceGeneratorFactory.create(generatorRngs)
 
-            val data = when (collectionType) {
-                LIST -> Array(numCollections) {
-                    createList(topLevelSizeDistribution.nextValue()) {
-                        CollectionOwner(
-                            createList(nestedSizeDistribution.nextValue(), dataType, fields, references)
+            // data = Array<TopLevelCollection<CollectionOwner<NestedCollection<DataType>>
+            // where TopLevelCollection is ArrayList, PersistentList, Array, or ImmutableArray
+            // and NestedCollection is ArrayList, PersistentList, Array, ImmutableArray, or primitive array variants such as BooleanArray, ImmutableBooleanArray, etc.
+            @Suppress("UNCHECKED_CAST")
+            val data = ArrayCreator.createArray(
+                componentClass = CollectionFactory.getCollectionClass(
+                    collectionType = collectionType,
+                    dataType = DataType.REFERENCE,
+                    referenceElementClass = CollectionOwner::class.java
+                ) as Class<Any>,
+                size = numCollections,
+            ) {
+                CollectionFactory.createCollection(
+                    size = topLevelSizeDistribution.nextValue(),
+                    collectionType = collectionType,
+                    elementClass = CollectionOwner::class.java,
+                ) {
+                    CollectionOwner(
+                        CollectionFactory.createCollection(
+                            nestedSizeDistribution.nextValue(),
+                            collectionType,
+                            dataType,
+                            fields,
+                            references
                         )
-                    }
-                }
-
-                PERSISTENT_LIST -> Array(numCollections) {
-                    createPersistentList(topLevelSizeDistribution.nextValue()) {
-                        CollectionOwner(
-                            createPersistentList(nestedSizeDistribution.nextValue(), dataType, fields, references)
-                        )
-                    }
-                }
-
-                ARRAY -> Array(numCollections) {
-                    Array(topLevelSizeDistribution.nextValue()) {
-                        CollectionOwner(
-                            CollectionFactory.createArray(
-                                nestedSizeDistribution.nextValue(),
-                                dataType,
-                                fields,
-                                references
-                            )
-                        )
-                    }
-                }
-
-                IMMUTABLE_ARRAY -> Array(numCollections) {
-                    ImmutableArray(topLevelSizeDistribution.nextValue()) {
-                        CollectionOwner(
-                            CollectionFactory.createImmutableArray(
-                                nestedSizeDistribution.nextValue(),
-                                dataType,
-                                fields,
-                                references,
-                            )
-                        )
-                    }
+                    )
                 }
             }
 

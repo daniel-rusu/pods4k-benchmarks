@@ -16,6 +16,31 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
 object CollectionFactory {
+    fun <T> createCollection(
+        size: Int,
+        collectionType: CollectionType,
+        dataType: DataType,
+        fields: FieldGenerator,
+        references: ObjectGenerator<T>,
+    ): Any = when (collectionType) {
+        CollectionType.LIST -> createList(size, dataType, fields, references)
+        CollectionType.PERSISTENT_LIST -> createPersistentList(size, dataType, fields, references)
+        CollectionType.ARRAY -> createArray(size, dataType, fields, references)
+        CollectionType.IMMUTABLE_ARRAY -> createImmutableArray(size, dataType, fields, references)
+    }
+
+    fun <T> createCollection(
+        size: Int,
+        collectionType: CollectionType,
+        elementClass: Class<T & Any>,
+        initializer: () -> T,
+    ): Any = when (collectionType) {
+        CollectionType.LIST -> createList(size) { initializer() }
+        CollectionType.PERSISTENT_LIST -> createPersistentList(size) { initializer() }
+        CollectionType.ARRAY -> ArrayCreator.createArray(elementClass, size) { initializer() }
+        CollectionType.IMMUTABLE_ARRAY -> ImmutableArray(size) { initializer() }
+    }
+
     fun <T> createList(
         size: Int,
         dataType: DataType,
