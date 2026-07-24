@@ -15,7 +15,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
-import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
@@ -105,8 +104,6 @@ class NestedCollectionBenchmarkData private constructor(
             nestedFieldGeneratorFactory: FieldGeneratorFactory,
             nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>,
         ): NestedCollectionBenchmarkData {
-            require(numCollections > 0) { "numCollections must be positive" }
-
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
@@ -114,41 +111,32 @@ class NestedCollectionBenchmarkData private constructor(
             val fields = nestedFieldGeneratorFactory.create(generatorRngs)
             val references = nestedReferenceGeneratorFactory.create(generatorRngs)
 
-            // data = Array<TopLevelCollection<CollectionOwner<NestedCollection<DataType>>
-            // where TopLevelCollection is ArrayList, PersistentList, Array, or ImmutableArray
-            // and NestedCollection is ArrayList, PersistentList, Array, ImmutableArray, or primitive array variants such as BooleanArray, ImmutableBooleanArray, etc.
-            @Suppress("UNCHECKED_CAST")
-            val data = ArrayCreator.createArray(
-                componentClass = CollectionFactory.getCollectionClass(
-                    collectionType = collectionType,
-                    dataType = DataType.REFERENCE,
-                    referenceElementClass = CollectionOwner::class.java
-                ) as Class<Any>,
-                size = numCollections,
-            ) {
-                CollectionFactory.createCollection(
-                    size = topLevelSizeDistribution.nextValue(),
-                    collectionType = collectionType,
-                    elementClass = CollectionOwner::class.java,
-                ) {
-                    CollectionOwner(
-                        CollectionFactory.createCollection(
-                            nestedSizeDistribution.nextValue(),
-                            collectionType,
-                            dataType,
-                            fields,
-                            references
-                        )
-                    )
-                }
-            }
+            val topLevelCollectionClass = CollectionFactory.getCollectionClass(
+                collectionType = collectionType,
+                dataType = DataType.REFERENCE, // top level collection stores a reference to CollectionOwner
+                referenceElementClass = CollectionOwner::class.java,
+            )
 
             return NestedCollectionBenchmarkData(
-                batch = CollectionBatch(
+                batch = CollectionBatch.create(
                     collectionType = collectionType,
                     logicalElementClass = dataType.resolveElementClass(references.objectClass),
-                    collections = data,
-                ),
+                    collectionClass = topLevelCollectionClass,
+                    numCollections = numCollections,
+                    sizeDistribution = topLevelSizeDistribution,
+                ) { topLevelSize ->
+                    CollectionFactory.createCollection(topLevelSize, collectionType, CollectionOwner::class.java) {
+                        CollectionOwner(
+                            CollectionFactory.createCollection(
+                                size = nestedSizeDistribution.nextValue(),
+                                collectionType = collectionType,
+                                dataType = dataType,
+                                fields = fields,
+                                references = references,
+                            )
+                        )
+                    }
+                },
             )
         }
     }

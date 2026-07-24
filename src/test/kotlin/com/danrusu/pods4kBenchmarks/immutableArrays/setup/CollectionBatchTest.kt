@@ -1,5 +1,8 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
+import com.danrusu.pods4kBenchmarks.utils.Distribution
+import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.percent
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
@@ -10,28 +13,21 @@ class CollectionBatchTest {
     @Test
     fun `returns collections using the requested representation and element type`() {
         val collections = arrayOf(arrayListOf(1, 2), arrayListOf(3))
-        val batch = CollectionBatch(
-            collectionType = CollectionType.LIST,
-            logicalElementClass = Int::class.javaObjectType,
-            collections = collections,
-        )
+        val batch = createBatch(collections)
 
-        expectThat(
+        val result =
             batch.getCollections<ArrayList<Int>>(
                 expectedCollectionType = CollectionType.LIST,
                 expectedLogicalElementClass = Int::class.javaObjectType,
             )
-        )
-            .isEqualTo(collections)
+
+        expectThat(result.asList()).isEqualTo(collections.asList())
+        expectThat(result.javaClass.componentType).isEqualTo(ArrayList::class.java)
     }
 
     @Test
     fun `rejects the wrong collection representation with a descriptive error`() {
-        val batch = CollectionBatch(
-            collectionType = CollectionType.LIST,
-            logicalElementClass = Int::class.javaObjectType,
-            collections = arrayOf(arrayListOf(1)),
-        )
+        val batch = createBatch(arrayOf(arrayListOf(1)))
 
         expectThrows<IllegalStateException> {
             batch.getCollections<ArrayList<Int>>(
@@ -43,11 +39,7 @@ class CollectionBatchTest {
 
     @Test
     fun `rejects the wrong element type with a descriptive error`() {
-        val batch = CollectionBatch(
-            collectionType = CollectionType.LIST,
-            logicalElementClass = Int::class.javaObjectType,
-            collections = arrayOf(arrayListOf(1)),
-        )
+        val batch = createBatch(arrayOf(arrayListOf(1)))
 
         expectThrows<IllegalStateException> {
             batch.getCollections<ArrayList<Long>>(
@@ -56,6 +48,41 @@ class CollectionBatchTest {
             )
         }.message.isEqualTo(
             "Requested logical element class java.lang.Long, but the batch contains java.lang.Integer"
+        )
+    }
+
+    @Test
+    fun `requires a positive number of collections`() {
+        expectThrows<IllegalArgumentException> {
+            CollectionBatch.create(
+                collectionType = CollectionType.LIST,
+                logicalElementClass = Int::class.javaObjectType,
+                collectionClass = ArrayList::class.java,
+                numCollections = 0,
+                sizeDistribution = fixedSizeDistribution(),
+            ) {
+                arrayListOf<Int>()
+            }
+        }.message.isEqualTo("numCollections must be positive")
+    }
+
+    private fun createBatch(collections: Array<ArrayList<Int>>): CollectionBatch {
+        var index = 0
+        return CollectionBatch.create(
+            collectionType = CollectionType.LIST,
+            logicalElementClass = Int::class.javaObjectType,
+            collectionClass = ArrayList::class.java,
+            numCollections = collections.size,
+            sizeDistribution = fixedSizeDistribution(),
+        ) {
+            collections[index++]
+        }
+    }
+
+    private fun fixedSizeDistribution(): Distribution {
+        return Distribution(
+            RngFactory(),
+            100.percent inRange 1..1,
         )
     }
 }

@@ -71,18 +71,6 @@ class ObjectCollectionBenchmarkDataTest {
         }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
-    @Test
-    fun `requires a positive number of collections`() {
-        expectThrows<IllegalArgumentException> {
-            ObjectCollectionBenchmarkData.create(
-                collectionType = CollectionType.LIST,
-                numCollections = 0,
-                sizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
-                objectGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
-            )
-        }.message.isEqualTo("numCollections must be positive")
-    }
-
     private fun createData(collectionType: CollectionType): ObjectCollectionBenchmarkData<String> {
         return ObjectCollectionBenchmarkData.create(
             collectionType = collectionType,

@@ -15,7 +15,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
-import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
@@ -103,38 +102,26 @@ class FlatCollectionBenchmarkData private constructor(
             fieldGeneratorFactory: FieldGeneratorFactory,
             referenceGeneratorFactory: ObjectGeneratorFactory<String>,
         ): FlatCollectionBenchmarkData {
-            require(numCollections > 0) { "numCollections must be positive" }
-
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val fields = fieldGeneratorFactory.create(generatorRngs)
             val references = referenceGeneratorFactory.create(generatorRngs)
-
-            @Suppress("UNCHECKED_CAST")
             val collectionClass = CollectionFactory.getCollectionClass(
                 collectionType = collectionType,
                 dataType = dataType,
                 referenceElementClass = references.objectClass,
-            ) as Class<Any>
-
-            // Array<Collection>
-            // where Collection is ArrayList<DataType>, PersistentList<DataType>, Array<String>, BooleanArray, ...
-            val data = ArrayCreator.createArray(collectionClass, numCollections) {
-                CollectionFactory.createCollection(
-                    size = sizeDistribution.nextValue(),
-                    collectionType = collectionType,
-                    dataType = dataType,
-                    fields = fields,
-                    references = references
-                )
-            }
+            )
             return FlatCollectionBenchmarkData(
-                batch = CollectionBatch(
+                batch = CollectionBatch.create(
                     collectionType = collectionType,
                     logicalElementClass = dataType.resolveElementClass(references.objectClass),
-                    collections = data,
-                ),
+                    collectionClass = collectionClass,
+                    numCollections = numCollections,
+                    sizeDistribution = sizeDistribution,
+                ) { size ->
+                    CollectionFactory.createCollection(size, collectionType, dataType, fields, references)
+                },
             )
         }
     }

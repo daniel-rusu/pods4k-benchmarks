@@ -6,7 +6,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
@@ -42,39 +41,29 @@ class ObjectCollectionBenchmarkData<T> private constructor(
             sizeDistributionFactory: DistributionFactory,
             objectGeneratorFactory: ObjectGeneratorFactory<T>,
         ): ObjectCollectionBenchmarkData<T> {
-            require(numCollections > 0) { "numCollections must be positive" }
-
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
             val elementClass = objectGenerator.objectClass
+            val collectionClass = CollectionFactory.getCollectionClass(
+                collectionType,
+                DataType.REFERENCE,
+                elementClass,
+            )
 
-            // Array<Collection<T>>
-            // where Collection is ArrayList, PersistentList, Array, or ImmutableArray
-            @Suppress("UNCHECKED_CAST")
-            val data = ArrayCreator.createArray(
-                componentClass = CollectionFactory.getCollectionClass(
-                    collectionType,
-                    DataType.REFERENCE,
-                    elementClass
-                ) as Class<Any>,
-                size = numCollections,
-            ) {
-                CollectionFactory.createCollection(
-                    size = sizeDistribution.nextValue(),
-                    collectionType = collectionType,
-                    elementClass = elementClass
-                ) {
-                    objectGenerator.next()
-                }
-            }
             return ObjectCollectionBenchmarkData(
-                batch = CollectionBatch(
-                    collectionType = collectionType,
-                    logicalElementClass = elementClass,
-                    collections = data,
-                ),
+                batch = CollectionBatch.create(
+                    collectionType,
+                    elementClass,
+                    collectionClass,
+                    numCollections,
+                    sizeDistribution
+                ) { size ->
+                    CollectionFactory.createCollection(size, collectionType, elementClass) {
+                        objectGenerator.next()
+                    }
+                },
                 elementClass = elementClass,
             )
         }

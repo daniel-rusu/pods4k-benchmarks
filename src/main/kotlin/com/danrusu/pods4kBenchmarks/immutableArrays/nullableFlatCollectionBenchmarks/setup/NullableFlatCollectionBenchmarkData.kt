@@ -7,7 +7,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
-import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
@@ -50,50 +49,40 @@ class NullableFlatCollectionBenchmarkData private constructor(
             fieldGeneratorFactory: FieldGeneratorFactory,
             referenceGeneratorFactory: ObjectGeneratorFactory<String?>,
         ): NullableFlatCollectionBenchmarkData {
-            require(numCollections > 0) { "numCollections must be positive" }
-
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val fields = fieldGeneratorFactory.create(generatorRngs)
             val references = referenceGeneratorFactory.create(generatorRngs)
-            val logicalElementClass = dataType.resolveElementClass(references.objectClass) as Class<Any>
-
-            // Array<Collection<DataType?>>
-            // where Collection is ArrayList, PersistentList, Array, or ImmutableArray
-            val data = ArrayCreator.createArray(
-                componentClass = CollectionFactory.getCollectionClass(
-                    collectionType,
-                    DataType.REFERENCE, // All collections will store references because the primitive values are boxed
-                    logicalElementClass
-                ) as Class<Any>,
-                size = numCollections,
-            ) {
-                CollectionFactory.createCollection(
-                    size = sizeDistribution.nextValue(),
-                    collectionType = collectionType,
-                    elementClass = logicalElementClass,
-                ) {
-                    when (dataType) {
-                        DataType.REFERENCE -> references.next()
-                        DataType.BOOLEAN -> fields.nextNullableBoolean()
-                        DataType.BYTE -> fields.nextNullableByte()
-                        DataType.CHAR -> fields.nextNullableChar()
-                        DataType.SHORT -> fields.nextNullableShort()
-                        DataType.INT -> fields.nextNullableInt()
-                        DataType.FLOAT -> fields.nextNullableFloat()
-                        DataType.LONG -> fields.nextNullableLong()
-                        DataType.DOUBLE -> fields.nextNullableDouble()
-                    }
-                }
-            }
+            val elementClass = dataType.resolveElementClass(references.objectClass) as Class<Any>
+            val collectionClass = CollectionFactory.getCollectionClass(
+                collectionType,
+                DataType.REFERENCE, // All collections will store references because the primitive values are boxed
+                elementClass,
+            )
 
             return NullableFlatCollectionBenchmarkData(
-                batch = CollectionBatch(
-                    collectionType = collectionType,
-                    logicalElementClass = logicalElementClass,
-                    collections = data,
-                ),
+                batch = CollectionBatch.create(
+                    collectionType,
+                    elementClass,
+                    collectionClass,
+                    numCollections,
+                    sizeDistribution
+                ) { size ->
+                    CollectionFactory.createCollection(size, collectionType, elementClass) {
+                        when (dataType) {
+                            DataType.REFERENCE -> references.next()
+                            DataType.BOOLEAN -> fields.nextNullableBoolean()
+                            DataType.BYTE -> fields.nextNullableByte()
+                            DataType.CHAR -> fields.nextNullableChar()
+                            DataType.SHORT -> fields.nextNullableShort()
+                            DataType.INT -> fields.nextNullableInt()
+                            DataType.FLOAT -> fields.nextNullableFloat()
+                            DataType.LONG -> fields.nextNullableLong()
+                            DataType.DOUBLE -> fields.nextNullableDouble()
+                        }
+                    }
+                },
             )
         }
     }

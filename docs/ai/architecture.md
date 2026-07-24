@@ -20,23 +20,25 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
 1. A JMH base state receives a fixed `numCollections` plus generator and distribution factories.
 2. `@Param` supplies a `CollectionType` and, where relevant, a `DataType`.
 3. `@Setup(Level.Trial)` calls the matching `*BenchmarkData.create` factory.
-4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/filter streams, and materializes
-   only the selected representation.
+4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/filter streams, and passes its
+   single-collection construction logic to `CollectionBatch`, which materializes only the selected representation.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
 
 All benchmark-data holders delegate erased storage to a `CollectionBatch`, which retains the active `CollectionType`,
 logical element runtime class, and one `Array<*>` for the active parameter combination. The logical element is the value
 operated on by a benchmark; in nested data it is the innermost value beneath `CollectionOwner` and its collection. The
-batch validates the requested representation and logical element class through one checked accessor before casting,
-while the outer array's runtime component type provides a final representation guard. Each benchmark-data holder owns
-the statically typed representation-specific accessors exposed to its benchmarks.
+batch owns outer-array allocation and validates the requested representation and logical element class through one
+checked accessor before casting. The outer array's runtime component type validates stored collections and provides a
+final representation guard. Each benchmark-data holder owns the statically typed representation-specific accessors
+exposed to its benchmarks.
 
 ## Core Types
 
 - `CollectionType`: `LIST`, `PERSISTENT_LIST`, `ARRAY`, and `IMMUTABLE_ARRAY`.
 - `DataType`: `REFERENCE` plus the eight Kotlin primitive families.
 - `RngFactory` and `BenchmarkGeneratorRngs`: deterministic, purpose-specific random streams.
-- `CollectionBatch`: shared erased storage and runtime validation for one materialized trial-data representation.
+- `CollectionBatch`: shared outer-array materialization, erased storage, and runtime validation for one trial-data
+  representation.
 - `DistributionFactory`: flat and nested collection-size models.
 - `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable element generation.
 - `FlatCollectionBenchmarkData`, `NullableFlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and

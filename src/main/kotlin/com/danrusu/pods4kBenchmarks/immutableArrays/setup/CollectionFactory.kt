@@ -125,7 +125,7 @@ object CollectionFactory {
         collectionType: CollectionType,
         dataType: DataType,
         referenceElementClass: Class<*>
-    ): Class<*>? = when (collectionType) {
+    ): Class<*> = when (collectionType) {
         CollectionType.LIST -> ArrayList::class.java
         CollectionType.PERSISTENT_LIST -> PersistentList::class.java
         CollectionType.ARRAY -> when (dataType) {

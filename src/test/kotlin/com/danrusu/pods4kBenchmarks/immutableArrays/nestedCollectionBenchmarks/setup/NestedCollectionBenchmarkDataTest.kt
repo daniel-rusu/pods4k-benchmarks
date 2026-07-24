@@ -107,21 +107,6 @@ class NestedCollectionBenchmarkDataTest {
         }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
-    @Test
-    fun `requires a positive number of collections`() {
-        expectThrows<IllegalArgumentException> {
-            NestedCollectionBenchmarkData.create(
-                collectionType = CollectionType.LIST,
-                dataType = DataType.INT,
-                numCollections = 0,
-                topLevelSizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-                nestedCollectionSizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
-                nestedFieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-                nestedReferenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
-            )
-        }.message.isEqualTo("numCollections must be positive")
-    }
-
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
