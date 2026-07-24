@@ -2,7 +2,12 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import kotlin.jvm.javaObjectType
 
-/** Resolves the runtime element class represented by this benchmark data type. */
+/**
+ * Resolves the logical benchmark element class represented by this data type.
+ *
+ * Primitive data types resolve to their boxed classes because this class is a runtime validation token rather than a
+ * description of the physical primitive-array representation.
+ */
 internal fun DataType.resolveElementClass(referenceClass: Class<*>): Class<*> = when (this) {
     DataType.REFERENCE -> referenceClass
     DataType.BOOLEAN -> Boolean::class.javaObjectType
