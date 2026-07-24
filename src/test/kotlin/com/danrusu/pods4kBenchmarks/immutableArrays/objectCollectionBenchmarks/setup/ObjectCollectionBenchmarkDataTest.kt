@@ -7,10 +7,11 @@ import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.message
 
 class ObjectCollectionBenchmarkDataTest {
     @Test
@@ -53,33 +54,33 @@ class ObjectCollectionBenchmarkDataTest {
         val arrayData = createData(CollectionType.ARRAY)
         val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY)
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             listData.persistentListData
-        }
+        }.message.isEqualTo("Requested PERSISTENT_LIST data, but the batch contains LIST data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             persistentListData.listData
-        }
+        }.message.isEqualTo("Requested LIST data, but the batch contains PERSISTENT_LIST data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             arrayData.immutableArrayData
-        }
+        }.message.isEqualTo("Requested IMMUTABLE_ARRAY data, but the batch contains ARRAY data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             immutableArrayData.arrayData
-        }
+        }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
     @Test
     fun `requires a positive number of collections`() {
-        assertThrows<IllegalArgumentException> {
+        expectThrows<IllegalArgumentException> {
             ObjectCollectionBenchmarkData.create(
                 collectionType = CollectionType.LIST,
                 numCollections = 0,
                 sizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
                 objectGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
             )
-        }
+        }.message.isEqualTo("numCollections must be positive")
     }
 
     private fun createData(collectionType: CollectionType): ObjectCollectionBenchmarkData<String> {

@@ -10,10 +10,11 @@ import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.message
 
 class NestedCollectionBenchmarkDataTest {
     @Test
@@ -75,9 +76,11 @@ class NestedCollectionBenchmarkDataTest {
     fun `rejects access using the wrong element type`() {
         val data = createData(CollectionType.LIST, DataType.BOOLEAN)
 
-        assertThrows<IllegalStateException> {
+        expectThrows<IllegalStateException> {
             data.listData<Int>()
-        }
+        }.message.isEqualTo(
+            "Requested logical element class java.lang.Integer, but the batch contains java.lang.Boolean"
+        )
     }
 
     @Test
@@ -87,26 +90,26 @@ class NestedCollectionBenchmarkDataTest {
         val arrayData = createData(CollectionType.ARRAY, DataType.BOOLEAN)
         val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             listData.persistentListData<Boolean>()
-        }
+        }.message.isEqualTo("Requested PERSISTENT_LIST data, but the batch contains LIST data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             persistentListData.listData<Boolean>()
-        }
+        }.message.isEqualTo("Requested LIST data, but the batch contains PERSISTENT_LIST data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             arrayData.immutableBooleanArrayData
-        }
+        }.message.isEqualTo("Requested IMMUTABLE_ARRAY data, but the batch contains ARRAY data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             immutableArrayData.booleanArrayData
-        }
+        }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
     @Test
     fun `requires a positive number of collections`() {
-        assertThrows<IllegalArgumentException> {
+        expectThrows<IllegalArgumentException> {
             NestedCollectionBenchmarkData.create(
                 collectionType = CollectionType.LIST,
                 dataType = DataType.INT,
@@ -116,7 +119,7 @@ class NestedCollectionBenchmarkDataTest {
                 nestedFieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
                 nestedReferenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
             )
-        }
+        }.message.isEqualTo("numCollections must be positive")
     }
 
     private fun createData(

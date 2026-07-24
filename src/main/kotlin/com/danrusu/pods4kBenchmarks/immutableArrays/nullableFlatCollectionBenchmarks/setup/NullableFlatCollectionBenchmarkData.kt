@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBench
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
@@ -14,41 +15,28 @@ import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
- * Materialized nullable collections for one [com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType]/[com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType] trial.
+ * Materialized nullable collections for one [CollectionType]/[DataType] trial.
  *
- * Nullable primitive values use their boxed representations, so every data type can share the same four typed
- * accessors. Only the active collection representation is retained. Accessors validate the non-null class underlying
- * the nullable element type, while the outer array's runtime component type guards the collection representation cast.
+ * Nullable primitive values use boxed representations, so all data types share the same four reference-collection
+ * accessors. Each accessor's type parameter is the non-null type underlying the returned nullable elements.
  */
 class NullableFlatCollectionBenchmarkData private constructor(
-    @PublishedApi internal val elementClass: Class<*>,
-    @PublishedApi internal val collectionData: Array<*>,
+    @PublishedApi internal val batch: CollectionBatch,
 ) {
     inline fun <reified T : Any> listData(): Array<ArrayList<T?>> {
-        return typedCollectionData<T, ArrayList<T?>>()
+        return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 
     inline fun <reified T : Any> persistentListData(): Array<PersistentList<T?>> {
-        return typedCollectionData<T, PersistentList<T?>>()
+        return batch.getCollections(CollectionType.PERSISTENT_LIST, T::class.javaObjectType)
     }
 
     inline fun <reified T : Any> arrayData(): Array<Array<T?>> {
-        return typedCollectionData<T, Array<T?>>()
+        return batch.getCollections(CollectionType.ARRAY, T::class.javaObjectType)
     }
 
     inline fun <reified T : Any> immutableArrayData(): Array<ImmutableArray<T?>> {
-        return typedCollectionData<T, ImmutableArray<T?>>()
-    }
-
-    @PublishedApi
-    internal inline fun <reified T : Any, reified C : Any> typedCollectionData(): Array<C> {
-        val requestedElementClass = T::class.javaObjectType
-        check(elementClass === requestedElementClass) {
-            "Requested ${requestedElementClass.name} elements, but the data contains ${elementClass.name} elements"
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return collectionData as Array<C>
+        return batch.getCollections(CollectionType.IMMUTABLE_ARRAY, T::class.javaObjectType)
     }
 
     companion object {
@@ -69,7 +57,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val fields = fieldGeneratorFactory.create(generatorRngs)
             val references = referenceGeneratorFactory.create(generatorRngs)
-            val elementClass = dataType.resolveElementClass(references.objectClass) as Class<Any>
+            val logicalElementClass = dataType.resolveElementClass(references.objectClass) as Class<Any>
 
             // Array<Collection<DataType?>>
             // where Collection is ArrayList, PersistentList, Array, or ImmutableArray
@@ -77,14 +65,14 @@ class NullableFlatCollectionBenchmarkData private constructor(
                 componentClass = CollectionFactory.getCollectionClass(
                     collectionType,
                     DataType.REFERENCE, // All collections will store references because the primitive values are boxed
-                    elementClass
+                    logicalElementClass
                 ) as Class<Any>,
                 size = numCollections,
             ) {
                 CollectionFactory.createCollection(
                     size = sizeDistribution.nextValue(),
                     collectionType = collectionType,
-                    elementClass = elementClass,
+                    elementClass = logicalElementClass,
                 ) {
                     when (dataType) {
                         DataType.REFERENCE -> references.next()
@@ -100,7 +88,13 @@ class NullableFlatCollectionBenchmarkData private constructor(
                 }
             }
 
-            return NullableFlatCollectionBenchmarkData(elementClass, data)
+            return NullableFlatCollectionBenchmarkData(
+                batch = CollectionBatch(
+                    collectionType = collectionType,
+                    logicalElementClass = logicalElementClass,
+                    collections = data,
+                ),
+            )
         }
     }
 }

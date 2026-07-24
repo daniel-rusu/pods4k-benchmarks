@@ -24,15 +24,19 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
    only the selected representation.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
 
-All benchmark-data holders retain one `Array<*>` for the active parameter combination and use the outer array's runtime
-component type to guard representation casts. Flat, nullable-flat, and nested data holders additionally validate the
-element class before casting, preventing a benchmark from silently reading data with a mismatched element type.
+All benchmark-data holders delegate erased storage to a `CollectionBatch`, which retains the active `CollectionType`,
+logical element runtime class, and one `Array<*>` for the active parameter combination. The logical element is the value
+operated on by a benchmark; in nested data it is the innermost value beneath `CollectionOwner` and its collection. The
+batch validates the requested representation and logical element class through one checked accessor before casting,
+while the outer array's runtime component type provides a final representation guard. Each benchmark-data holder owns
+the statically typed representation-specific accessors exposed to its benchmarks.
 
 ## Core Types
 
 - `CollectionType`: `LIST`, `PERSISTENT_LIST`, `ARRAY`, and `IMMUTABLE_ARRAY`.
 - `DataType`: `REFERENCE` plus the eight Kotlin primitive families.
 - `RngFactory` and `BenchmarkGeneratorRngs`: deterministic, purpose-specific random streams.
+- `CollectionBatch`: shared erased storage and runtime validation for one materialized trial-data representation.
 - `DistributionFactory`: flat and nested collection-size models.
 - `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable element generation.
 - `FlatCollectionBenchmarkData`, `NullableFlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and

@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
@@ -24,89 +25,74 @@ import kotlinx.collections.immutable.PersistentList
 /**
  * Materialized parent and nested collections for one [CollectionType]/[DataType] trial.
  *
- * Storing only the active representation avoids unused empty fields and prevents benchmarks from accidentally operating
- * on unrelated empty arrays.
- *
- * Typed accessors validate the nested [elementClass], while the outer array's runtime component type prevents an
- * Array<ArrayList> from being treated as an Array<PersistentList> etc.
+ * Every parent collection contains [CollectionOwner] values, and each owner contains a nested collection. The parent and
+ * nested collections use the same [CollectionType]. Accessor type parameters identify the innermost [DataType] values,
+ * not the intermediate owner or collection types.
  */
 class NestedCollectionBenchmarkData private constructor(
-    @PublishedApi internal val elementClass: Class<*>,
-    @PublishedApi internal val collectionData: Array<*>,
+    @PublishedApi internal val batch: CollectionBatch,
 ) {
     inline fun <reified T : Any> listData(): Array<ArrayList<CollectionOwner<ArrayList<T>>>> {
-        return typedCollectionData<T, ArrayList<CollectionOwner<ArrayList<T>>>>()
+        return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 
     inline fun <reified T : Any> persistentListData(): Array<PersistentList<CollectionOwner<PersistentList<T>>>> {
-        return typedCollectionData<T, PersistentList<CollectionOwner<PersistentList<T>>>>()
+        return batch.getCollections(CollectionType.PERSISTENT_LIST, T::class.javaObjectType)
     }
 
     val referenceArrayData: Array<Array<CollectionOwner<Array<String>>>>
-        get() = typedCollectionData<String, Array<CollectionOwner<Array<String>>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, String::class.java)
 
     val booleanArrayData: Array<Array<CollectionOwner<BooleanArray>>>
-        get() = typedCollectionData<Boolean, Array<CollectionOwner<BooleanArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Boolean::class.javaObjectType)
 
     val byteArrayData: Array<Array<CollectionOwner<ByteArray>>>
-        get() = typedCollectionData<Byte, Array<CollectionOwner<ByteArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Byte::class.javaObjectType)
 
     val charArrayData: Array<Array<CollectionOwner<CharArray>>>
-        get() = typedCollectionData<Char, Array<CollectionOwner<CharArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Char::class.javaObjectType)
 
     val shortArrayData: Array<Array<CollectionOwner<ShortArray>>>
-        get() = typedCollectionData<Short, Array<CollectionOwner<ShortArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Short::class.javaObjectType)
 
     val intArrayData: Array<Array<CollectionOwner<IntArray>>>
-        get() = typedCollectionData<Int, Array<CollectionOwner<IntArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Int::class.javaObjectType)
 
     val floatArrayData: Array<Array<CollectionOwner<FloatArray>>>
-        get() = typedCollectionData<Float, Array<CollectionOwner<FloatArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Float::class.javaObjectType)
 
     val longArrayData: Array<Array<CollectionOwner<LongArray>>>
-        get() = typedCollectionData<Long, Array<CollectionOwner<LongArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Long::class.javaObjectType)
 
     val doubleArrayData: Array<Array<CollectionOwner<DoubleArray>>>
-        get() = typedCollectionData<Double, Array<CollectionOwner<DoubleArray>>>()
+        get() = batch.getCollections(CollectionType.ARRAY, Double::class.javaObjectType)
 
     val immutableReferenceArrayData: Array<ImmutableArray<CollectionOwner<ImmutableArray<String>>>>
-        get() = typedCollectionData<String, ImmutableArray<CollectionOwner<ImmutableArray<String>>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, String::class.java)
 
     val immutableBooleanArrayData: Array<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>
-        get() = typedCollectionData<Boolean, ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Boolean::class.javaObjectType)
 
     val immutableByteArrayData: Array<ImmutableArray<CollectionOwner<ImmutableByteArray>>>
-        get() = typedCollectionData<Byte, ImmutableArray<CollectionOwner<ImmutableByteArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Byte::class.javaObjectType)
 
     val immutableCharArrayData: Array<ImmutableArray<CollectionOwner<ImmutableCharArray>>>
-        get() = typedCollectionData<Char, ImmutableArray<CollectionOwner<ImmutableCharArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Char::class.javaObjectType)
 
     val immutableShortArrayData: Array<ImmutableArray<CollectionOwner<ImmutableShortArray>>>
-        get() = typedCollectionData<Short, ImmutableArray<CollectionOwner<ImmutableShortArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Short::class.javaObjectType)
 
     val immutableIntArrayData: Array<ImmutableArray<CollectionOwner<ImmutableIntArray>>>
-        get() = typedCollectionData<Int, ImmutableArray<CollectionOwner<ImmutableIntArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Int::class.javaObjectType)
 
     val immutableFloatArrayData: Array<ImmutableArray<CollectionOwner<ImmutableFloatArray>>>
-        get() = typedCollectionData<Float, ImmutableArray<CollectionOwner<ImmutableFloatArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Float::class.javaObjectType)
 
     val immutableLongArrayData: Array<ImmutableArray<CollectionOwner<ImmutableLongArray>>>
-        get() = typedCollectionData<Long, ImmutableArray<CollectionOwner<ImmutableLongArray>>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Long::class.javaObjectType)
 
     val immutableDoubleArrayData: Array<ImmutableArray<CollectionOwner<ImmutableDoubleArray>>>
-        get() = typedCollectionData<Double, ImmutableArray<CollectionOwner<ImmutableDoubleArray>>>()
-
-    /** Validates nested element type [T] and casts the array to the appropriate top-level collection type [C]. */
-    @PublishedApi
-    internal inline fun <reified T : Any, reified C : Any> typedCollectionData(): Array<C> {
-        val requestedElementClass = T::class.javaObjectType
-        check(elementClass === requestedElementClass) {
-            "Requested ${requestedElementClass.name} elements, but the data contains ${elementClass.name} elements"
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return collectionData as Array<C>
-    }
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Double::class.javaObjectType)
 
     companion object {
         /** Creates deterministic data for one nested benchmark parameter combination. */
@@ -157,7 +143,13 @@ class NestedCollectionBenchmarkData private constructor(
                 }
             }
 
-            return NestedCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+            return NestedCollectionBenchmarkData(
+                batch = CollectionBatch(
+                    collectionType = collectionType,
+                    logicalElementClass = dataType.resolveElementClass(references.objectClass),
+                    collections = data,
+                ),
+            )
         }
     }
 }

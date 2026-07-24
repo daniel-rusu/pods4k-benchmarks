@@ -9,20 +9,21 @@ import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.message
 
 class FlatCollectionBenchmarkDataTest {
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
-            expectThat(listData<Boolean>()[0])
+            expectThat(lists<Boolean>()[0])
                 .isA<ArrayList<Boolean>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
-            expectThat(persistentListData<Boolean>()[0])
+            expectThat(persistentLists<Boolean>()[0])
                 .isA<PersistentList<Boolean>>()
         }
         with(createData(CollectionType.ARRAY, DataType.BOOLEAN)) {
@@ -54,9 +55,11 @@ class FlatCollectionBenchmarkDataTest {
     fun `rejects access using the wrong element type`() {
         val data = createData(CollectionType.LIST, DataType.BOOLEAN)
 
-        assertThrows<IllegalStateException> {
-            data.listData<Int>()
-        }
+        expectThrows<IllegalStateException> {
+            data.lists<Int>()
+        }.message.isEqualTo(
+            "Requested logical element class java.lang.Integer, but the batch contains java.lang.Boolean"
+        )
     }
 
     @Test
@@ -66,26 +69,26 @@ class FlatCollectionBenchmarkDataTest {
         val arrayData = createData(CollectionType.ARRAY, DataType.BOOLEAN)
         val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)
 
-        assertThrows<ClassCastException> {
-            listData.persistentListData<Boolean>()
-        }
+        expectThrows<IllegalStateException> {
+            listData.persistentLists<Boolean>()
+        }.message.isEqualTo("Requested PERSISTENT_LIST data, but the batch contains LIST data")
 
-        assertThrows<ClassCastException> {
-            persistentListData.listData<Boolean>()
-        }
+        expectThrows<IllegalStateException> {
+            persistentListData.lists<Boolean>()
+        }.message.isEqualTo("Requested LIST data, but the batch contains PERSISTENT_LIST data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             arrayData.immutableBooleanArrays
-        }
+        }.message.isEqualTo("Requested IMMUTABLE_ARRAY data, but the batch contains ARRAY data")
 
-        assertThrows<ClassCastException> {
+        expectThrows<IllegalStateException> {
             immutableArrayData.booleanArrays
-        }
+        }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
     @Test
     fun `requires a positive number of collections`() {
-        assertThrows<IllegalArgumentException> {
+        expectThrows<IllegalArgumentException> {
             FlatCollectionBenchmarkData.create(
                 collectionType = CollectionType.LIST,
                 dataType = DataType.INT,
@@ -94,7 +97,7 @@ class FlatCollectionBenchmarkDataTest {
                 fieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
                 referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
             )
-        }
+        }.message.isEqualTo("numCollections must be positive")
     }
 
     private fun createData(
@@ -114,27 +117,27 @@ class FlatCollectionBenchmarkDataTest {
         dataType: DataType,
     ): List<List<Any>> = when (collectionType) {
         CollectionType.LIST -> when (dataType) {
-            DataType.REFERENCE -> listData<String>().map { it.toList() }
-            DataType.BOOLEAN -> listData<Boolean>().map { it.toList() }
-            DataType.BYTE -> listData<Byte>().map { it.toList() }
-            DataType.CHAR -> listData<Char>().map { it.toList() }
-            DataType.SHORT -> listData<Short>().map { it.toList() }
-            DataType.INT -> listData<Int>().map { it.toList() }
-            DataType.FLOAT -> listData<Float>().map { it.toList() }
-            DataType.LONG -> listData<Long>().map { it.toList() }
-            DataType.DOUBLE -> listData<Double>().map { it.toList() }
+            DataType.REFERENCE -> lists<String>().map { it.toList() }
+            DataType.BOOLEAN -> lists<Boolean>().map { it.toList() }
+            DataType.BYTE -> lists<Byte>().map { it.toList() }
+            DataType.CHAR -> lists<Char>().map { it.toList() }
+            DataType.SHORT -> lists<Short>().map { it.toList() }
+            DataType.INT -> lists<Int>().map { it.toList() }
+            DataType.FLOAT -> lists<Float>().map { it.toList() }
+            DataType.LONG -> lists<Long>().map { it.toList() }
+            DataType.DOUBLE -> lists<Double>().map { it.toList() }
         }
 
         CollectionType.PERSISTENT_LIST -> when (dataType) {
-            DataType.REFERENCE -> persistentListData<String>().map { it.toList() }
-            DataType.BOOLEAN -> persistentListData<Boolean>().map { it.toList() }
-            DataType.BYTE -> persistentListData<Byte>().map { it.toList() }
-            DataType.CHAR -> persistentListData<Char>().map { it.toList() }
-            DataType.SHORT -> persistentListData<Short>().map { it.toList() }
-            DataType.INT -> persistentListData<Int>().map { it.toList() }
-            DataType.FLOAT -> persistentListData<Float>().map { it.toList() }
-            DataType.LONG -> persistentListData<Long>().map { it.toList() }
-            DataType.DOUBLE -> persistentListData<Double>().map { it.toList() }
+            DataType.REFERENCE -> persistentLists<String>().map { it.toList() }
+            DataType.BOOLEAN -> persistentLists<Boolean>().map { it.toList() }
+            DataType.BYTE -> persistentLists<Byte>().map { it.toList() }
+            DataType.CHAR -> persistentLists<Char>().map { it.toList() }
+            DataType.SHORT -> persistentLists<Short>().map { it.toList() }
+            DataType.INT -> persistentLists<Int>().map { it.toList() }
+            DataType.FLOAT -> persistentLists<Float>().map { it.toList() }
+            DataType.LONG -> persistentLists<Long>().map { it.toList() }
+            DataType.DOUBLE -> persistentLists<Double>().map { it.toList() }
         }
 
         CollectionType.ARRAY -> when (dataType) {

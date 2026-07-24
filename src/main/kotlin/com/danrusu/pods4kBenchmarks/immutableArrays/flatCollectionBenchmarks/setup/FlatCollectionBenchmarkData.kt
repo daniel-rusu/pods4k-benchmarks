@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
@@ -24,92 +25,73 @@ import kotlinx.collections.immutable.PersistentList
 /**
  * Materialized collections for one [CollectionType]/[DataType] trial.
  *
- * Storing only the active representation avoids unused empty fields and prevents benchmarks from accidentally operating
- * on unrelated empty arrays.
- *
- * Typed accessors validate the nested [elementClass], while the outer array's runtime component type prevents an
- * Array<ArrayList> from being treated as an Array<PersistentList> etc.
+ * Provides statically typed access to lists, persistent lists, JVM arrays, and immutable arrays. JVM and immutable array
+ * accessors preserve primitive-specialized representations for primitive [DataType] values.
  */
 class FlatCollectionBenchmarkData private constructor(
-    @PublishedApi internal val elementClass: Class<*>,
-    @PublishedApi internal val collectionData: Array<*>,
+    @PublishedApi internal val batch: CollectionBatch,
 ) {
-    inline fun <reified T : Any> listData(): Array<ArrayList<T>> {
-        return typedCollectionData<T, ArrayList<T>>()
+    inline fun <reified T : Any> lists(): Array<ArrayList<T>> {
+        return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 
-    inline fun <reified T : Any> persistentListData(): Array<PersistentList<T>> {
-        return typedCollectionData<T, PersistentList<T>>()
+    inline fun <reified T : Any> persistentLists(): Array<PersistentList<T>> {
+        return batch.getCollections(CollectionType.PERSISTENT_LIST, T::class.javaObjectType)
     }
 
     val referenceArrays: Array<Array<String>>
-        get() = typedCollectionData<String, Array<String>>()
+        get() = batch.getCollections(CollectionType.ARRAY, String::class.java)
 
     val booleanArrays: Array<BooleanArray>
-        get() = typedCollectionData<Boolean, BooleanArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Boolean::class.javaObjectType)
 
     val byteArrays: Array<ByteArray>
-        get() = typedCollectionData<Byte, ByteArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Byte::class.javaObjectType)
 
     val charArrays: Array<CharArray>
-        get() = typedCollectionData<Char, CharArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Char::class.javaObjectType)
 
     val shortArrays: Array<ShortArray>
-        get() = typedCollectionData<Short, ShortArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Short::class.javaObjectType)
 
     val intArrays: Array<IntArray>
-        get() = typedCollectionData<Int, IntArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Int::class.javaObjectType)
 
     val floatArrays: Array<FloatArray>
-        get() = typedCollectionData<Float, FloatArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Float::class.javaObjectType)
 
     val longArrays: Array<LongArray>
-        get() = typedCollectionData<Long, LongArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Long::class.javaObjectType)
 
     val doubleArrays: Array<DoubleArray>
-        get() = typedCollectionData<Double, DoubleArray>()
+        get() = batch.getCollections(CollectionType.ARRAY, Double::class.javaObjectType)
 
     val immutableReferenceArrays: Array<ImmutableArray<String>>
-        get() = typedCollectionData<String, ImmutableArray<String>>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, String::class.java)
 
     val immutableBooleanArrays: Array<ImmutableBooleanArray>
-        get() = typedCollectionData<Boolean, ImmutableBooleanArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Boolean::class.javaObjectType)
 
     val immutableByteArrays: Array<ImmutableByteArray>
-        get() = typedCollectionData<Byte, ImmutableByteArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Byte::class.javaObjectType)
 
     val immutableCharArrays: Array<ImmutableCharArray>
-        get() = typedCollectionData<Char, ImmutableCharArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Char::class.javaObjectType)
 
     val immutableShortArrays: Array<ImmutableShortArray>
-        get() = typedCollectionData<Short, ImmutableShortArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Short::class.javaObjectType)
 
     val immutableIntArrays: Array<ImmutableIntArray>
-        get() = typedCollectionData<Int, ImmutableIntArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Int::class.javaObjectType)
 
     val immutableFloatArrays: Array<ImmutableFloatArray>
-        get() = typedCollectionData<Float, ImmutableFloatArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Float::class.javaObjectType)
 
     val immutableLongArrays: Array<ImmutableLongArray>
-        get() = typedCollectionData<Long, ImmutableLongArray>()
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Long::class.javaObjectType)
 
     val immutableDoubleArrays: Array<ImmutableDoubleArray>
-        get() = typedCollectionData<Double, ImmutableDoubleArray>()
-
-    /**
-     * Validates element type [T] and casts to collection type [C]. Every accessor uses this path so the overhead is
-     * consistent across benchmarks, including for primitive arrays whose runtime type already encodes the element type.
-     */
-    @PublishedApi
-    internal inline fun <reified T : Any, reified C : Any> typedCollectionData(): Array<C> {
-        val requestedElementClass = T::class.javaObjectType
-        check(elementClass === requestedElementClass) {
-            "Requested ${requestedElementClass.name} elements, but the data contains ${elementClass.name} elements"
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return collectionData as Array<C>
-    }
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Double::class.javaObjectType)
 
     companion object {
         /** Creates deterministic data for one flat benchmark parameter combination. */
@@ -147,7 +129,13 @@ class FlatCollectionBenchmarkData private constructor(
                     references = references
                 )
             }
-            return FlatCollectionBenchmarkData(dataType.resolveElementClass(references.objectClass), data)
+            return FlatCollectionBenchmarkData(
+                batch = CollectionBatch(
+                    collectionType = collectionType,
+                    logicalElementClass = dataType.resolveElementClass(references.objectClass),
+                    collections = data,
+                ),
+            )
         }
     }
 }

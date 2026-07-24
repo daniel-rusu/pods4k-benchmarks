@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
@@ -14,30 +15,24 @@ import kotlinx.collections.immutable.PersistentList
 /**
  * Materialized collections for one object benchmark trial.
  *
- * Storing only the active representation avoids unused empty fields and prevents benchmarks from accidentally operating
- * on unrelated empty arrays.
- *
- * Accessors cast the array to the selected collection representation. Arrays store the component type, preventing an
- * Array<ArrayList> from being treated as an Array<PersistentList> etc.
+ * Provides statically typed access to collections of the generated object type [T] across the four benchmark collection
+ * representations.
  */
 class ObjectCollectionBenchmarkData<T> private constructor(
-    private val collectionData: Array<*>,
+    @PublishedApi internal val batch: CollectionBatch,
+    private val elementClass: Class<T & Any>,
 ) {
-    @Suppress("UNCHECKED_CAST")
     val listData: Array<ArrayList<T>>
-        get() = collectionData as Array<ArrayList<T>>
+        get() = batch.getCollections(CollectionType.LIST, elementClass)
 
-    @Suppress("UNCHECKED_CAST")
     val persistentListData: Array<PersistentList<T>>
-        get() = collectionData as Array<PersistentList<T>>
+        get() = batch.getCollections(CollectionType.PERSISTENT_LIST, elementClass)
 
-    @Suppress("UNCHECKED_CAST")
     val arrayData: Array<Array<T>>
-        get() = collectionData as Array<Array<T>>
+        get() = batch.getCollections(CollectionType.ARRAY, elementClass)
 
-    @Suppress("UNCHECKED_CAST")
     val immutableArrayData: Array<ImmutableArray<T>>
-        get() = collectionData as Array<ImmutableArray<T>>
+        get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, elementClass)
 
     companion object {
         /** Creates deterministic data for one object benchmark parameter combination. */
@@ -53,6 +48,7 @@ class ObjectCollectionBenchmarkData<T> private constructor(
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
+            val elementClass = objectGenerator.objectClass
 
             // Array<Collection<T>>
             // where Collection is ArrayList, PersistentList, Array, or ImmutableArray
@@ -61,19 +57,26 @@ class ObjectCollectionBenchmarkData<T> private constructor(
                 componentClass = CollectionFactory.getCollectionClass(
                     collectionType,
                     DataType.REFERENCE,
-                    objectGenerator.objectClass
+                    elementClass
                 ) as Class<Any>,
                 size = numCollections,
             ) {
                 CollectionFactory.createCollection(
                     size = sizeDistribution.nextValue(),
                     collectionType = collectionType,
-                    elementClass = objectGenerator.objectClass
+                    elementClass = elementClass
                 ) {
                     objectGenerator.next()
                 }
             }
-            return ObjectCollectionBenchmarkData(data)
+            return ObjectCollectionBenchmarkData(
+                batch = CollectionBatch(
+                    collectionType = collectionType,
+                    logicalElementClass = elementClass,
+                    collections = data,
+                ),
+                elementClass = elementClass,
+            )
         }
     }
 }
