@@ -14,6 +14,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isGreaterThan
 import strikt.assertions.message
 
 private const val NULL_RATIO = 0.5
@@ -41,16 +42,37 @@ class NullableFlatCollectionBenchmarkDataTest {
 
     @Test
     fun `all collection types contain identical nullable data`() {
-        DataType.entries.forEach { dataType ->
+        for (dataType in DataType.entries) {
             val expected = createData(CollectionType.LIST, dataType).normalized(CollectionType.LIST, dataType)
 
-            CollectionType.entries.forEach { collectionType ->
+            for (collectionType in CollectionType.entries) {
                 val actual = createData(collectionType, dataType).normalized(collectionType, dataType)
 
                 expectThat(actual)
                     .describedAs("$collectionType with nullable $dataType elements")
                     .isEqualTo(expected)
             }
+        }
+    }
+
+    @Test
+    fun `all data types have nulls in identical locations`() {
+        val expectedNullability = createData(CollectionType.LIST, DataType.REFERENCE)
+            .normalized<String>(CollectionType.LIST)
+            .map { collection -> collection.map { it == null } }
+
+        expectThat(expectedNullability.flatten().count { it })
+            .describedAs("number of null elements in the reference data")
+            .isGreaterThan(0)
+
+        for (dataType in DataType.entries) {
+            val actualNullability = createData(CollectionType.LIST, dataType)
+                .normalized(CollectionType.LIST, dataType)
+                .map { collection -> collection.map { it == null } }
+
+            expectThat(actualNullability)
+                .describedAs("null locations for $dataType elements")
+                .isEqualTo(expectedNullability)
         }
     }
 
