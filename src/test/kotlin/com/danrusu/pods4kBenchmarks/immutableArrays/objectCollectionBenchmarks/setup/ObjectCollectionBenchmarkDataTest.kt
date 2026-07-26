@@ -17,8 +17,11 @@ class ObjectCollectionBenchmarkDataTest {
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST)) {
+            // A List[] component type prevents benchmark loops from needing a per-collection cast to List.
+            expectThat(listData.javaClass.componentType)
+                .isEqualTo(List::class.java)
             expectThat(listData[0])
-                .isA<ArrayList<String>>()
+                .isA<List<String>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST)) {
             expectThat(persistentListData[0])

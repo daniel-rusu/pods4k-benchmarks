@@ -31,7 +31,7 @@ import kotlinx.collections.immutable.PersistentList
 class NestedCollectionBenchmarkData private constructor(
     @PublishedApi internal val batch: CollectionBatch,
 ) {
-    inline fun <reified T : Any> listData(): Array<ArrayList<CollectionOwner<ArrayList<T>>>> {
+    inline fun <reified T : Any> listData(): Array<List<CollectionOwner<List<T>>>> {
         return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 

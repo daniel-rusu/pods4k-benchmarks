@@ -19,8 +19,12 @@ class FlatCollectionBenchmarkDataTest {
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
-            expectThat(lists<Boolean>()[0])
-                .isA<ArrayList<Boolean>>()
+            val lists = lists<Boolean>()
+            // A List[] component type prevents benchmark loops from needing a per-collection cast to List.
+            expectThat(lists.javaClass.componentType)
+                .isEqualTo(List::class.java)
+            expectThat(lists[0])
+                .isA<List<Boolean>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
             expectThat(persistentLists<Boolean>()[0])

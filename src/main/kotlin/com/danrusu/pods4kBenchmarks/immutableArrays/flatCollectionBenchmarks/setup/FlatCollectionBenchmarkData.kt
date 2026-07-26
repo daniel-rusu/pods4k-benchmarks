@@ -30,7 +30,7 @@ import kotlinx.collections.immutable.PersistentList
 class FlatCollectionBenchmarkData private constructor(
     @PublishedApi internal val batch: CollectionBatch,
 ) {
-    inline fun <reified T : Any> lists(): Array<ArrayList<T>> {
+    inline fun <reified T : Any> lists(): Array<List<T>> {
         return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 

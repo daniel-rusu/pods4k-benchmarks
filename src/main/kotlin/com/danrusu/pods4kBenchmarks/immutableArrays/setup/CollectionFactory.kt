@@ -46,7 +46,7 @@ object CollectionFactory {
         dataType: DataType,
         fields: FieldGenerator,
         references: ObjectGenerator<T>
-    ): ArrayList<*> = when (dataType) {
+    ): List<*> = when (dataType) {
         DataType.REFERENCE -> createList(size) { references.next() }
         DataType.BOOLEAN -> createList(size) { fields.nextBoolean() }
         DataType.BYTE -> createList(size) { fields.nextByte() }
@@ -58,7 +58,7 @@ object CollectionFactory {
         DataType.DOUBLE -> createList(size) { fields.nextDouble() }
     }
 
-    inline fun <T> createList(size: Int, crossinline initializer: () -> T): ArrayList<T> {
+    inline fun <T> createList(size: Int, crossinline initializer: () -> T): List<T> {
         val result = ArrayList<T>(size)
         repeat(size) { result.add(initializer()) }
         return result
@@ -126,7 +126,7 @@ object CollectionFactory {
         dataType: DataType,
         referenceElementClass: Class<*>
     ): Class<*> = when (collectionType) {
-        CollectionType.LIST -> ArrayList::class.java
+        CollectionType.LIST -> List::class.java
         CollectionType.PERSISTENT_LIST -> PersistentList::class.java
         CollectionType.ARRAY -> when (dataType) {
             DataType.REFERENCE -> referenceElementClass.arrayType()

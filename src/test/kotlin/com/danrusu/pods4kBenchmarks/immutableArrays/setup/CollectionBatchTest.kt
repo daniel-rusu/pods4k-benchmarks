@@ -12,25 +12,25 @@ import strikt.assertions.message
 class CollectionBatchTest {
     @Test
     fun `returns collections using the requested representation and element type`() {
-        val collections = arrayOf(arrayListOf(1, 2), arrayListOf(3))
+        val collections: Array<List<Int>> = arrayOf(listOf(1, 2), listOf(3))
         val batch = createBatch(collections)
 
         val result =
-            batch.getCollections<ArrayList<Int>>(
+            batch.getCollections<List<Int>>(
                 expectedCollectionType = CollectionType.LIST,
                 expectedLogicalElementClass = Int::class.javaObjectType,
             )
 
         expectThat(result.asList()).isEqualTo(collections.asList())
-        expectThat(result.javaClass.componentType).isEqualTo(ArrayList::class.java)
+        expectThat(result.javaClass.componentType).isEqualTo(List::class.java)
     }
 
     @Test
     fun `rejects the wrong collection representation with a descriptive error`() {
-        val batch = createBatch(arrayOf(arrayListOf(1)))
+        val batch = createBatch(arrayOf(listOf(1)))
 
         expectThrows<IllegalStateException> {
-            batch.getCollections<ArrayList<Int>>(
+            batch.getCollections<List<Int>>(
                 expectedCollectionType = CollectionType.PERSISTENT_LIST,
                 expectedLogicalElementClass = Int::class.javaObjectType,
             )
@@ -39,10 +39,10 @@ class CollectionBatchTest {
 
     @Test
     fun `rejects the wrong element type with a descriptive error`() {
-        val batch = createBatch(arrayOf(arrayListOf(1)))
+        val batch = createBatch(arrayOf(listOf(1)))
 
         expectThrows<IllegalStateException> {
-            batch.getCollections<ArrayList<Long>>(
+            batch.getCollections<List<Long>>(
                 expectedCollectionType = CollectionType.LIST,
                 expectedLogicalElementClass = Long::class.javaObjectType,
             )
@@ -57,21 +57,21 @@ class CollectionBatchTest {
             CollectionBatch.create(
                 collectionType = CollectionType.LIST,
                 logicalElementClass = Int::class.javaObjectType,
-                collectionClass = ArrayList::class.java,
+                collectionClass = List::class.java,
                 numCollections = 0,
                 sizeDistribution = fixedSizeDistribution(),
             ) {
-                arrayListOf<Int>()
+                emptyList<Int>()
             }
         }.message.isEqualTo("numCollections must be positive")
     }
 
-    private fun createBatch(collections: Array<ArrayList<Int>>): CollectionBatch {
+    private fun createBatch(collections: Array<List<Int>>): CollectionBatch {
         var index = 0
         return CollectionBatch.create(
             collectionType = CollectionType.LIST,
             logicalElementClass = Int::class.javaObjectType,
-            collectionClass = ArrayList::class.java,
+            collectionClass = List::class.java,
             numCollections = collections.size,
             sizeDistribution = fixedSizeDistribution(),
         ) {

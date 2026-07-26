@@ -21,7 +21,7 @@ class ObjectCollectionBenchmarkData<T> private constructor(
     @PublishedApi internal val batch: CollectionBatch,
     private val elementClass: Class<T & Any>,
 ) {
-    val listData: Array<ArrayList<T>>
+    val listData: Array<List<T>>
         get() = batch.getCollections(CollectionType.LIST, elementClass)
 
     val persistentListData: Array<PersistentList<T>>

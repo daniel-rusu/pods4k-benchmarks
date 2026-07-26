@@ -20,13 +20,18 @@ class NestedCollectionBenchmarkDataTest {
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
-            val topLevelCollection = listData<Boolean>()[0]
+            val lists = listData<Boolean>()
+            // A List[] component type prevents benchmark loops from needing a per-collection cast to List.
+            expectThat(lists.javaClass.componentType)
+                .isEqualTo(List::class.java)
+
+            val topLevelCollection = lists[0]
             expectThat(topLevelCollection)
-                .isA<ArrayList<CollectionOwner<ArrayList<Boolean>>>>()
+                .isA<List<CollectionOwner<List<Boolean>>>>()
 
             val nestedCollection = topLevelCollection[0].nestedCollection
             expectThat(nestedCollection)
-                .isA<ArrayList<Boolean>>()
+                .isA<List<Boolean>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
             val topLevelCollection = persistentListData<Boolean>()[0]

@@ -22,7 +22,7 @@ import kotlinx.collections.immutable.PersistentList
 class NullableFlatCollectionBenchmarkData private constructor(
     @PublishedApi internal val batch: CollectionBatch,
 ) {
-    inline fun <reified T : Any> listData(): Array<ArrayList<T?>> {
+    inline fun <reified T : Any> listData(): Array<List<T?>> {
         return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 
