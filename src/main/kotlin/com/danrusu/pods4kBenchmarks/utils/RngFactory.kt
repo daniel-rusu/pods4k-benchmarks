@@ -1,6 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils
 
-import java.util.*
+import java.util.SplittableRandom
 import kotlin.random.Random
 
 /**

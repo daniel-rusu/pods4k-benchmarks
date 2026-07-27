@@ -24,7 +24,7 @@ class StringGenerator(
 ) : ObjectGenerator<String> {
     init {
         require(minLength >= 0) { "minLength ($minLength) cannot be negative" }
-        require(minLength <= maxLength) { "minLength ($minLength) cannot be larger than maxLength($maxLength)" }
+        require(minLength <= maxLength) { "minLength ($minLength) cannot be larger than maxLength ($maxLength)" }
     }
 
     override val objectClass: Class<String> = String::class.java
@@ -60,15 +60,15 @@ abstract class ObjectGeneratorFactory<T> {
          * Creates a factory for objects initialized from field and reference generators.
          */
         inline fun <reified T : Any, R> of(
-            fieldsFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-            referenceFactory: ObjectGeneratorFactory<R>,
-            noinline initializer: (fields: FieldGenerator, references: ObjectGenerator<R>) -> T,
+            fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+            referenceGeneratorFactory: ObjectGeneratorFactory<R>,
+            noinline initializer: (fieldGenerator: FieldGenerator, referenceGenerator: ObjectGenerator<R>) -> T,
         ): ObjectGeneratorFactory<T> = object : ObjectGeneratorFactory<T>() {
             override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T> = object : ObjectGenerator<T> {
                 override val objectClass: Class<T> = T::class.java
 
-                private val fieldGenerator = fieldsFactory.create(generatorRngs)
-                private val referenceGenerator = referenceFactory.create(generatorRngs)
+                private val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+                private val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
 
                 override fun next(): T = initializer(fieldGenerator, referenceGenerator)
             }
@@ -76,11 +76,11 @@ abstract class ObjectGeneratorFactory<T> {
 
         /** Creates a factory for the common case where [String] is used for reference fields. */
         inline fun <reified T : Any> of(
-            fieldsFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-            noinline initializer: (fields: FieldGenerator, references: ObjectGenerator<String>) -> T,
+            fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+            noinline initializer: (fieldGenerator: FieldGenerator, referenceGenerator: ObjectGenerator<String>) -> T,
         ): ObjectGeneratorFactory<T> = of(
-            fieldsFactory = fieldsFactory,
-            referenceFactory = randomStrings(),
+            fieldGeneratorFactory = fieldGeneratorFactory,
+            referenceGeneratorFactory = randomStrings(),
             initializer = initializer,
         )
 
