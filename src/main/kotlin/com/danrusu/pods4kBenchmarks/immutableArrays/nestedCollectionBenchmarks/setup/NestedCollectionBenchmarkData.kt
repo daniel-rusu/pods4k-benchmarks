@@ -31,66 +31,66 @@ import kotlinx.collections.immutable.PersistentList
 class NestedCollectionBenchmarkData private constructor(
     @PublishedApi internal val batch: CollectionBatch,
 ) {
-    inline fun <reified T : Any> listData(): Array<List<CollectionOwner<List<T>>>> {
+    inline fun <reified T : Any> lists(): Array<List<CollectionOwner<List<T>>>> {
         return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 
-    inline fun <reified T : Any> persistentListData(): Array<PersistentList<CollectionOwner<PersistentList<T>>>> {
+    inline fun <reified T : Any> persistentLists(): Array<PersistentList<CollectionOwner<PersistentList<T>>>> {
         return batch.getCollections(CollectionType.PERSISTENT_LIST, T::class.javaObjectType)
     }
 
-    val referenceArrayData: Array<Array<CollectionOwner<Array<String>>>>
+    val referenceArrays: Array<Array<CollectionOwner<Array<String>>>>
         get() = batch.getCollections(CollectionType.ARRAY, String::class.java)
 
-    val booleanArrayData: Array<Array<CollectionOwner<BooleanArray>>>
+    val booleanArrays: Array<Array<CollectionOwner<BooleanArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Boolean::class.javaObjectType)
 
-    val byteArrayData: Array<Array<CollectionOwner<ByteArray>>>
+    val byteArrays: Array<Array<CollectionOwner<ByteArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Byte::class.javaObjectType)
 
-    val charArrayData: Array<Array<CollectionOwner<CharArray>>>
+    val charArrays: Array<Array<CollectionOwner<CharArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Char::class.javaObjectType)
 
-    val shortArrayData: Array<Array<CollectionOwner<ShortArray>>>
+    val shortArrays: Array<Array<CollectionOwner<ShortArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Short::class.javaObjectType)
 
-    val intArrayData: Array<Array<CollectionOwner<IntArray>>>
+    val intArrays: Array<Array<CollectionOwner<IntArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Int::class.javaObjectType)
 
-    val floatArrayData: Array<Array<CollectionOwner<FloatArray>>>
+    val floatArrays: Array<Array<CollectionOwner<FloatArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Float::class.javaObjectType)
 
-    val longArrayData: Array<Array<CollectionOwner<LongArray>>>
+    val longArrays: Array<Array<CollectionOwner<LongArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Long::class.javaObjectType)
 
-    val doubleArrayData: Array<Array<CollectionOwner<DoubleArray>>>
+    val doubleArrays: Array<Array<CollectionOwner<DoubleArray>>>
         get() = batch.getCollections(CollectionType.ARRAY, Double::class.javaObjectType)
 
-    val immutableReferenceArrayData: Array<ImmutableArray<CollectionOwner<ImmutableArray<String>>>>
+    val immutableReferenceArrays: Array<ImmutableArray<CollectionOwner<ImmutableArray<String>>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, String::class.java)
 
-    val immutableBooleanArrayData: Array<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>
+    val immutableBooleanArrays: Array<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Boolean::class.javaObjectType)
 
-    val immutableByteArrayData: Array<ImmutableArray<CollectionOwner<ImmutableByteArray>>>
+    val immutableByteArrays: Array<ImmutableArray<CollectionOwner<ImmutableByteArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Byte::class.javaObjectType)
 
-    val immutableCharArrayData: Array<ImmutableArray<CollectionOwner<ImmutableCharArray>>>
+    val immutableCharArrays: Array<ImmutableArray<CollectionOwner<ImmutableCharArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Char::class.javaObjectType)
 
-    val immutableShortArrayData: Array<ImmutableArray<CollectionOwner<ImmutableShortArray>>>
+    val immutableShortArrays: Array<ImmutableArray<CollectionOwner<ImmutableShortArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Short::class.javaObjectType)
 
-    val immutableIntArrayData: Array<ImmutableArray<CollectionOwner<ImmutableIntArray>>>
+    val immutableIntArrays: Array<ImmutableArray<CollectionOwner<ImmutableIntArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Int::class.javaObjectType)
 
-    val immutableFloatArrayData: Array<ImmutableArray<CollectionOwner<ImmutableFloatArray>>>
+    val immutableFloatArrays: Array<ImmutableArray<CollectionOwner<ImmutableFloatArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Float::class.javaObjectType)
 
-    val immutableLongArrayData: Array<ImmutableArray<CollectionOwner<ImmutableLongArray>>>
+    val immutableLongArrays: Array<ImmutableArray<CollectionOwner<ImmutableLongArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Long::class.javaObjectType)
 
-    val immutableDoubleArrayData: Array<ImmutableArray<CollectionOwner<ImmutableDoubleArray>>>
+    val immutableDoubleArrays: Array<ImmutableArray<CollectionOwner<ImmutableDoubleArray>>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Double::class.javaObjectType)
 
     companion object {
@@ -108,19 +108,19 @@ class NestedCollectionBenchmarkData private constructor(
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
             val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
-            val fields = nestedFieldGeneratorFactory.create(generatorRngs)
-            val references = nestedReferenceGeneratorFactory.create(generatorRngs)
+            val nestedFieldGenerator = nestedFieldGeneratorFactory.create(generatorRngs)
+            val nestedReferenceGenerator = nestedReferenceGeneratorFactory.create(generatorRngs)
 
             val topLevelCollectionClass = CollectionFactory.getCollectionClass(
                 collectionType = collectionType,
-                dataType = DataType.REFERENCE, // top level collection stores a reference to CollectionOwner
+                dataType = DataType.REFERENCE,
                 referenceElementClass = CollectionOwner::class.java,
             )
 
             return NestedCollectionBenchmarkData(
                 batch = CollectionBatch.create(
                     collectionType = collectionType,
-                    logicalElementClass = dataType.resolveElementClass(references.objectClass),
+                    logicalElementClass = dataType.resolveElementClass(nestedReferenceGenerator.objectClass),
                     collectionClass = topLevelCollectionClass,
                     numCollections = numCollections,
                     sizeDistribution = topLevelSizeDistribution,
@@ -131,8 +131,8 @@ class NestedCollectionBenchmarkData private constructor(
                                 size = nestedSizeDistribution.nextValue(),
                                 collectionType = collectionType,
                                 dataType = dataType,
-                                fields = fields,
-                                references = references,
+                                fieldGenerator = nestedFieldGenerator,
+                                referenceGenerator = nestedReferenceGenerator,
                             )
                         )
                     }

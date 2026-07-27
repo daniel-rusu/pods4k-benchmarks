@@ -36,18 +36,18 @@ import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.infra.Blackhole
 
 /**
- * Represents a benchmark that measures the performance of operating on nested collections, such as a list of orders
- * with each order containing a list of products. Note that the term collection is used loosely to represent a [List],
- * [Array], or [ImmutableArray] rather than the actual [Collection] interface.
+ * Base state for operations on nested collections, such as orders that each contain products.
+ *
+ * Here, "collection" includes [List], [PersistentList], [Array], and [ImmutableArray] representations rather than only
+ * implementations of the Kotlin [Collection] interface.
  */
 @State(Scope.Benchmark)
 abstract class NestedCollectionBenchmark(
-    /**
-     * The number of collections to benchmark against in order to avoid repeatedly operating on the same collection.
-     */
+    /** Number of distinct top-level collections processed by each benchmark invocation. */
     private val numCollections: Int,
     /** Controls the sizes of the parent collections that will be generated. */
-    private val topLevelSizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
+    private val topLevelSizeDistributionFactory: DistributionFactory =
+        DistributionFactory.ListSizeDistribution,
     /** Controls the sizes of the nested collections that will be generated. */
     private val nestedCollectionSizeDistributionFactory: DistributionFactory =
         DistributionFactory.NestedListSizeDistribution,
@@ -56,11 +56,11 @@ abstract class NestedCollectionBenchmark(
     /** Creates reference generators for nested collection elements. */
     private val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
 ) {
-    /** Repeat the benchmarks for each collection type. */
+    /** Repeats each benchmark for every collection representation. */
     @Param
     protected lateinit var collectionType: CollectionType
 
-    /** Repeat the benchmarks for each of the eight base data types plus a String reference type. */
+    /** Repeats each benchmark for a string reference type and all eight primitive families. */
     @Param
     protected lateinit var dataType: DataType
 
@@ -68,7 +68,7 @@ abstract class NestedCollectionBenchmark(
     internal lateinit var data: NestedCollectionBenchmarkData
 
     @Setup(Level.Trial)
-    fun setupCollections() {
+    fun setupBenchmarkData() {
         data = NestedCollectionBenchmarkData.create(
             collectionType = collectionType,
             dataType = dataType,
@@ -130,81 +130,54 @@ abstract class NestedCollectionBenchmark(
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> data.listData<String>().forEach { bh.consume(transformNestedLists(it)) }
-                BOOLEAN -> data.listData<Boolean>().forEach { bh.consume(transformNestedBooleanLists(it)) }
-                BYTE -> data.listData<Byte>().forEach { bh.consume(transformNestedByteLists(it)) }
-                CHAR -> data.listData<Char>().forEach { bh.consume(transformNestedCharLists(it)) }
-                SHORT -> data.listData<Short>().forEach { bh.consume(transformNestedShortLists(it)) }
-                INT -> data.listData<Int>().forEach { bh.consume(transformNestedIntLists(it)) }
-                FLOAT -> data.listData<Float>().forEach { bh.consume(transformNestedFloatLists(it)) }
-                LONG -> data.listData<Long>().forEach { bh.consume(transformNestedLongLists(it)) }
-                DOUBLE -> data.listData<Double>().forEach { bh.consume(transformNestedDoubleLists(it)) }
+                REFERENCE -> data.lists<String>().forEach { bh.consume(transformNestedLists(it)) }
+                BOOLEAN -> data.lists<Boolean>().forEach { bh.consume(transformNestedBooleanLists(it)) }
+                BYTE -> data.lists<Byte>().forEach { bh.consume(transformNestedByteLists(it)) }
+                CHAR -> data.lists<Char>().forEach { bh.consume(transformNestedCharLists(it)) }
+                SHORT -> data.lists<Short>().forEach { bh.consume(transformNestedShortLists(it)) }
+                INT -> data.lists<Int>().forEach { bh.consume(transformNestedIntLists(it)) }
+                FLOAT -> data.lists<Float>().forEach { bh.consume(transformNestedFloatLists(it)) }
+                LONG -> data.lists<Long>().forEach { bh.consume(transformNestedLongLists(it)) }
+                DOUBLE -> data.lists<Double>().forEach { bh.consume(transformNestedDoubleLists(it)) }
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> data.persistentListData<String>().forEach {
-                    bh.consume(transformNestedPersistentLists(it))
-                }
+                REFERENCE -> data.persistentLists<String>().forEach { bh.consume(transformNestedPersistentLists(it)) }
+                BOOLEAN -> data.persistentLists<Boolean>()
+                    .forEach { bh.consume(transformNestedPersistentBooleanLists(it)) }
 
-                BOOLEAN -> data.persistentListData<Boolean>().forEach {
-                    bh.consume(transformNestedPersistentBooleanLists(it))
-                }
-
-                BYTE -> data.persistentListData<Byte>().forEach {
-                    bh.consume(transformNestedPersistentByteLists(it))
-                }
-
-                CHAR -> data.persistentListData<Char>().forEach {
-                    bh.consume(transformNestedPersistentCharLists(it))
-                }
-
-                SHORT -> data.persistentListData<Short>().forEach {
-                    bh.consume(transformNestedPersistentShortLists(it))
-                }
-
-                INT -> data.persistentListData<Int>().forEach {
-                    bh.consume(transformNestedPersistentIntLists(it))
-                }
-
-                FLOAT -> data.persistentListData<Float>().forEach {
-                    bh.consume(transformNestedPersistentFloatLists(it))
-                }
-
-                LONG -> data.persistentListData<Long>().forEach {
-                    bh.consume(transformNestedPersistentLongLists(it))
-                }
-
-                DOUBLE -> data.persistentListData<Double>().forEach {
-                    bh.consume(transformNestedPersistentDoubleLists(it))
-                }
+                BYTE -> data.persistentLists<Byte>().forEach { bh.consume(transformNestedPersistentByteLists(it)) }
+                CHAR -> data.persistentLists<Char>().forEach { bh.consume(transformNestedPersistentCharLists(it)) }
+                SHORT -> data.persistentLists<Short>().forEach { bh.consume(transformNestedPersistentShortLists(it)) }
+                INT -> data.persistentLists<Int>().forEach { bh.consume(transformNestedPersistentIntLists(it)) }
+                FLOAT -> data.persistentLists<Float>().forEach { bh.consume(transformNestedPersistentFloatLists(it)) }
+                LONG -> data.persistentLists<Long>().forEach { bh.consume(transformNestedPersistentLongLists(it)) }
+                DOUBLE -> data.persistentLists<Double>()
+                    .forEach { bh.consume(transformNestedPersistentDoubleLists(it)) }
             }
 
             ARRAY -> when (dataType) {
-                REFERENCE -> data.referenceArrayData.forEach { bh.consume(transformNestedArrays(it)) }
-                BOOLEAN -> data.booleanArrayData.forEach { bh.consume(transformNestedBooleanArrays(it)) }
-                BYTE -> data.byteArrayData.forEach { bh.consume(transformNestedByteArrays(it)) }
-                CHAR -> data.charArrayData.forEach { bh.consume(transformNestedCharArrays(it)) }
-                SHORT -> data.shortArrayData.forEach { bh.consume(transformNestedShortArrays(it)) }
-                INT -> data.intArrayData.forEach { bh.consume(transformNestedIntArrays(it)) }
-                FLOAT -> data.floatArrayData.forEach { bh.consume(transformNestedFloatArrays(it)) }
-                LONG -> data.longArrayData.forEach { bh.consume(transformNestedLongArrays(it)) }
-                DOUBLE -> data.doubleArrayData.forEach { bh.consume(transformNestedDoubleArrays(it)) }
+                REFERENCE -> data.referenceArrays.forEach { bh.consume(transformNestedArrays(it)) }
+                BOOLEAN -> data.booleanArrays.forEach { bh.consume(transformNestedBooleanArrays(it)) }
+                BYTE -> data.byteArrays.forEach { bh.consume(transformNestedByteArrays(it)) }
+                CHAR -> data.charArrays.forEach { bh.consume(transformNestedCharArrays(it)) }
+                SHORT -> data.shortArrays.forEach { bh.consume(transformNestedShortArrays(it)) }
+                INT -> data.intArrays.forEach { bh.consume(transformNestedIntArrays(it)) }
+                FLOAT -> data.floatArrays.forEach { bh.consume(transformNestedFloatArrays(it)) }
+                LONG -> data.longArrays.forEach { bh.consume(transformNestedLongArrays(it)) }
+                DOUBLE -> data.doubleArrays.forEach { bh.consume(transformNestedDoubleArrays(it)) }
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> data.immutableReferenceArrayData.forEach {
-                    bh.consume(transformNestedImmutableArrays(it))
-                }
-                BOOLEAN -> data.immutableBooleanArrayData.forEach {
-                    bh.consume(transformNestedImmutableBooleanArrays(it))
-                }
-                BYTE -> data.immutableByteArrayData.forEach { bh.consume(transformNestedImmutableByteArrays(it)) }
-                CHAR -> data.immutableCharArrayData.forEach { bh.consume(transformNestedImmutableCharArrays(it)) }
-                SHORT -> data.immutableShortArrayData.forEach { bh.consume(transformNestedImmutableShortArrays(it)) }
-                INT -> data.immutableIntArrayData.forEach { bh.consume(transformNestedImmutableIntArrays(it)) }
-                FLOAT -> data.immutableFloatArrayData.forEach { bh.consume(transformNestedImmutableFloatArrays(it)) }
-                LONG -> data.immutableLongArrayData.forEach { bh.consume(transformNestedImmutableLongArrays(it)) }
-                DOUBLE -> data.immutableDoubleArrayData.forEach { bh.consume(transformNestedImmutableDoubleArrays(it)) }
+                REFERENCE -> data.immutableReferenceArrays.forEach { bh.consume(transformNestedImmutableArrays(it)) }
+                BOOLEAN -> data.immutableBooleanArrays.forEach { bh.consume(transformNestedImmutableBooleanArrays(it)) }
+                BYTE -> data.immutableByteArrays.forEach { bh.consume(transformNestedImmutableByteArrays(it)) }
+                CHAR -> data.immutableCharArrays.forEach { bh.consume(transformNestedImmutableCharArrays(it)) }
+                SHORT -> data.immutableShortArrays.forEach { bh.consume(transformNestedImmutableShortArrays(it)) }
+                INT -> data.immutableIntArrays.forEach { bh.consume(transformNestedImmutableIntArrays(it)) }
+                FLOAT -> data.immutableFloatArrays.forEach { bh.consume(transformNestedImmutableFloatArrays(it)) }
+                LONG -> data.immutableLongArrays.forEach { bh.consume(transformNestedImmutableLongArrays(it)) }
+                DOUBLE -> data.immutableDoubleArrays.forEach { bh.consume(transformNestedImmutableDoubleArrays(it)) }
             }
         }
     }

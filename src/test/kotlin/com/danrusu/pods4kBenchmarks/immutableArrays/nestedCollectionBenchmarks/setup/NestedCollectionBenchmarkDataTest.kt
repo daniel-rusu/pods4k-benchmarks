@@ -20,7 +20,7 @@ class NestedCollectionBenchmarkDataTest {
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
-            val lists = listData<Boolean>()
+            val lists = lists<Boolean>()
             // A List[] component type prevents benchmark loops from needing a per-collection cast to List.
             expectThat(lists.javaClass.componentType)
                 .isEqualTo(List::class.java)
@@ -34,7 +34,7 @@ class NestedCollectionBenchmarkDataTest {
                 .isA<List<Boolean>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
-            val topLevelCollection = persistentListData<Boolean>()[0]
+            val topLevelCollection = persistentLists<Boolean>()[0]
             expectThat(topLevelCollection)
                 .isA<PersistentList<CollectionOwner<PersistentList<Boolean>>>>()
 
@@ -43,7 +43,7 @@ class NestedCollectionBenchmarkDataTest {
                 .isA<PersistentList<Boolean>>()
         }
         with(createData(CollectionType.ARRAY, DataType.BOOLEAN)) {
-            val topLevelCollection = booleanArrayData[0]
+            val topLevelCollection = booleanArrays[0]
             expectThat(topLevelCollection)
                 .isA<Array<CollectionOwner<BooleanArray>>>()
 
@@ -52,7 +52,7 @@ class NestedCollectionBenchmarkDataTest {
                 .isA<BooleanArray>()
         }
         with(createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)) {
-            val topLevelCollection = immutableBooleanArrayData[0]
+            val topLevelCollection = immutableBooleanArrays[0]
             expectThat(topLevelCollection)
                 .isA<ImmutableArray<CollectionOwner<ImmutableBooleanArray>>>()
 
@@ -63,7 +63,7 @@ class NestedCollectionBenchmarkDataTest {
     }
 
     @Test
-    fun `all collection types contain identical data`() {
+    fun `all collection representations contain identical data`() {
         DataType.entries.forEach { dataType ->
             val expected = createData(CollectionType.LIST, dataType).normalized(CollectionType.LIST, dataType)
 
@@ -82,7 +82,7 @@ class NestedCollectionBenchmarkDataTest {
         val data = createData(CollectionType.LIST, DataType.BOOLEAN)
 
         expectThrows<IllegalStateException> {
-            data.listData<Int>()
+            data.lists<Int>()
         }.message.isEqualTo(
             "Requested logical element class java.lang.Integer, but the batch contains java.lang.Boolean"
         )
@@ -96,19 +96,19 @@ class NestedCollectionBenchmarkDataTest {
         val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)
 
         expectThrows<IllegalStateException> {
-            listData.persistentListData<Boolean>()
+            listData.persistentLists<Boolean>()
         }.message.isEqualTo("Requested PERSISTENT_LIST data, but the batch contains LIST data")
 
         expectThrows<IllegalStateException> {
-            persistentListData.listData<Boolean>()
+            persistentListData.lists<Boolean>()
         }.message.isEqualTo("Requested LIST data, but the batch contains PERSISTENT_LIST data")
 
         expectThrows<IllegalStateException> {
-            arrayData.immutableBooleanArrayData
+            arrayData.immutableBooleanArrays
         }.message.isEqualTo("Requested IMMUTABLE_ARRAY data, but the batch contains ARRAY data")
 
         expectThrows<IllegalStateException> {
-            immutableArrayData.booleanArrayData
+            immutableArrayData.booleanArrays
         }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
@@ -130,101 +130,101 @@ class NestedCollectionBenchmarkDataTest {
         dataType: DataType,
     ): List<List<List<Any>>> = when (collectionType) {
         CollectionType.LIST -> when (dataType) {
-            DataType.REFERENCE -> listData<String>().normalize()
-            DataType.BOOLEAN -> listData<Boolean>().normalize()
-            DataType.BYTE -> listData<Byte>().normalize()
-            DataType.CHAR -> listData<Char>().normalize()
-            DataType.SHORT -> listData<Short>().normalize()
-            DataType.INT -> listData<Int>().normalize()
-            DataType.FLOAT -> listData<Float>().normalize()
-            DataType.LONG -> listData<Long>().normalize()
-            DataType.DOUBLE -> listData<Double>().normalize()
+            DataType.REFERENCE -> lists<String>().normalize()
+            DataType.BOOLEAN -> lists<Boolean>().normalize()
+            DataType.BYTE -> lists<Byte>().normalize()
+            DataType.CHAR -> lists<Char>().normalize()
+            DataType.SHORT -> lists<Short>().normalize()
+            DataType.INT -> lists<Int>().normalize()
+            DataType.FLOAT -> lists<Float>().normalize()
+            DataType.LONG -> lists<Long>().normalize()
+            DataType.DOUBLE -> lists<Double>().normalize()
         }
 
         CollectionType.PERSISTENT_LIST -> when (dataType) {
-            DataType.REFERENCE -> persistentListData<String>().normalize()
-            DataType.BOOLEAN -> persistentListData<Boolean>().normalize()
-            DataType.BYTE -> persistentListData<Byte>().normalize()
-            DataType.CHAR -> persistentListData<Char>().normalize()
-            DataType.SHORT -> persistentListData<Short>().normalize()
-            DataType.INT -> persistentListData<Int>().normalize()
-            DataType.FLOAT -> persistentListData<Float>().normalize()
-            DataType.LONG -> persistentListData<Long>().normalize()
-            DataType.DOUBLE -> persistentListData<Double>().normalize()
+            DataType.REFERENCE -> persistentLists<String>().normalize()
+            DataType.BOOLEAN -> persistentLists<Boolean>().normalize()
+            DataType.BYTE -> persistentLists<Byte>().normalize()
+            DataType.CHAR -> persistentLists<Char>().normalize()
+            DataType.SHORT -> persistentLists<Short>().normalize()
+            DataType.INT -> persistentLists<Int>().normalize()
+            DataType.FLOAT -> persistentLists<Float>().normalize()
+            DataType.LONG -> persistentLists<Long>().normalize()
+            DataType.DOUBLE -> persistentLists<Double>().normalize()
         }
 
         CollectionType.ARRAY -> when (dataType) {
-            DataType.REFERENCE -> referenceArrayData.map { collection ->
+            DataType.REFERENCE -> referenceArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.BOOLEAN -> booleanArrayData.map { collection ->
+            DataType.BOOLEAN -> booleanArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.BYTE -> byteArrayData.map { collection ->
+            DataType.BYTE -> byteArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.CHAR -> charArrayData.map { collection ->
+            DataType.CHAR -> charArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.SHORT -> shortArrayData.map { collection ->
+            DataType.SHORT -> shortArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.INT -> intArrayData.map { collection ->
+            DataType.INT -> intArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.FLOAT -> floatArrayData.map { collection ->
+            DataType.FLOAT -> floatArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.LONG -> longArrayData.map { collection ->
+            DataType.LONG -> longArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
 
-            DataType.DOUBLE -> doubleArrayData.map { collection ->
+            DataType.DOUBLE -> doubleArrays.map { collection ->
                 collection.map { it.nestedCollection.toList() }
             }
         }
 
         CollectionType.IMMUTABLE_ARRAY -> when (dataType) {
-            DataType.REFERENCE -> immutableReferenceArrayData.map { collection ->
+            DataType.REFERENCE -> immutableReferenceArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.BOOLEAN -> immutableBooleanArrayData.map { collection ->
+            DataType.BOOLEAN -> immutableBooleanArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.BYTE -> immutableByteArrayData.map { collection ->
+            DataType.BYTE -> immutableByteArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.CHAR -> immutableCharArrayData.map { collection ->
+            DataType.CHAR -> immutableCharArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.SHORT -> immutableShortArrayData.map { collection ->
+            DataType.SHORT -> immutableShortArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.INT -> immutableIntArrayData.map { collection ->
+            DataType.INT -> immutableIntArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.FLOAT -> immutableFloatArrayData.map { collection ->
+            DataType.FLOAT -> immutableFloatArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.LONG -> immutableLongArrayData.map { collection ->
+            DataType.LONG -> immutableLongArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
 
-            DataType.DOUBLE -> immutableDoubleArrayData.map { collection ->
+            DataType.DOUBLE -> immutableDoubleArrays.map { collection ->
                 collection.toList().map { it.nestedCollection.toList() }
             }
         }
