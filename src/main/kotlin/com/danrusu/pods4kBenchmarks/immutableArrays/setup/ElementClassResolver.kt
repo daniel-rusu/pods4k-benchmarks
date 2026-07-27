@@ -1,7 +1,5 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
-import kotlin.jvm.javaObjectType
-
 /**
  * Resolves the logical benchmark element class represented by this data type.
  *

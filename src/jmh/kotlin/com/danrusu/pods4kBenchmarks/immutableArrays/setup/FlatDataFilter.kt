@@ -13,7 +13,7 @@ private const val MAX_VALUE_GENERATION_ATTEMPTS = 100
 /**
  * Cheap predicates near each generator's midpoint, plus factories that control how often those predicates pass.
  */
-@Suppress("NOTHING_TO_INLINE") // to avoid any overhead on benchmarks
+@Suppress("NOTHING_TO_INLINE") // Predicates stay inline to avoid adding call overhead to measured operations.
 object FlatDataFilter {
     private const val MIN_STRING_LENGTH = 3
     private const val MAX_STRING_LENGTH = 10

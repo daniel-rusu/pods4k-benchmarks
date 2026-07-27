@@ -27,17 +27,17 @@ private const val NUM_COLLECTIONS = 1000
 @Fork(2)
 open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>(
     numCollections = NUM_COLLECTIONS,
-    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { fields, references ->
+    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { fieldGenerator, referenceGenerator ->
         CompoundElement(
-            referenceValue = references.next(),
-            booleanValue = fields.nextBoolean(),
-            byteValue = fields.nextByte(),
-            charValue = fields.nextChar(),
-            shortValue = fields.nextShort(),
-            intValue = fields.nextInt(),
-            floatValue = fields.nextFloat(),
-            longValue = fields.nextLong(),
-            doubleValue = fields.nextDouble(),
+            referenceValue = referenceGenerator.next(),
+            booleanValue = fieldGenerator.nextBoolean(),
+            byteValue = fieldGenerator.nextByte(),
+            charValue = fieldGenerator.nextChar(),
+            shortValue = fieldGenerator.nextShort(),
+            intValue = fieldGenerator.nextInt(),
+            floatValue = fieldGenerator.nextFloat(),
+            longValue = fieldGenerator.nextLong(),
+            doubleValue = fieldGenerator.nextDouble(),
         )
     },
 ) {

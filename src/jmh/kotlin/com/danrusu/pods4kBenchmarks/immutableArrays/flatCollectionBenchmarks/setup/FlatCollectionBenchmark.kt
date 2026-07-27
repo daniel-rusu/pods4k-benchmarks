@@ -66,7 +66,7 @@ abstract class FlatCollectionBenchmark(
     internal lateinit var data: FlatCollectionBenchmarkData
 
     @Setup(Level.Trial)
-    fun setupCollections() {
+    fun setupBenchmarkData() {
         data = FlatCollectionBenchmarkData.create(
             collectionType = collectionType,
             dataType = dataType,
@@ -78,9 +78,8 @@ abstract class FlatCollectionBenchmark(
     }
 
     /**
-     * Applies the appropriate transform to every collection and consumes each result.  The selected transform is based
-     * on the active [collectionType] & [dataType].
-     **/
+     * Applies the transform selected by [collectionType] and [dataType] to every collection and consumes each result.
+     */
     protected inline fun transformEachCollection(
         bh: Blackhole,
         transformList: (List<String>) -> Any?,
@@ -172,8 +171,8 @@ abstract class FlatCollectionBenchmark(
     }
 
     /**
-     * Applies the appropriate transform to adjacent pairs of collections and consumes each result.  The selected
-     * transform is based on the active [collectionType] & [dataType].
+     * Applies the transform selected by [collectionType] and [dataType] to adjacent collection pairs and consumes each
+     * result.
      *
      * One invocation performs [numCollections] / 2 operations, which must match [OperationsPerInvocation].
      */

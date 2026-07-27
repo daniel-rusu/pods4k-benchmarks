@@ -3,7 +3,7 @@ package com.danrusu.pods4kBenchmarks.utils
 import kotlin.random.nextInt
 
 /**
- * Represents a probability distribution defined by 1 or more buckets. Each bucket defines the probability of that
+ * Represents a probability distribution defined by one or more buckets. Each bucket defines the probability of that
  * bucket being chosen along with the range of values that this bucket can generate.
  *
  * For example:
@@ -16,8 +16,8 @@ import kotlin.random.nextInt
  */
 class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
     private val random = rngFactory.createRng()
-    private val accumulatedPercentages: IntArray
-    private val boundaries = Array(buckets.size) { buckets[it].values }
+    private val cumulativePercentages: IntArray
+    private val valueRanges = Array(buckets.size) { buckets[it].values }
 
     /**
      * The weighted mean of all bucket ranges. It need not be a value the distribution can generate when ranges have
@@ -28,7 +28,7 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
     init {
         var accumulatedPercentage = 0
         var weightedAverage = 0.0
-        accumulatedPercentages = IntArray(buckets.size)
+        cumulativePercentages = IntArray(buckets.size)
 
         for (index in buckets.indices) {
             val (percentage, values) = buckets[index]
@@ -36,7 +36,7 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
 
             weightedAverage += percentage * values.computeAverageValue() / 100
             accumulatedPercentage += percentage
-            accumulatedPercentages[index] = accumulatedPercentage
+            cumulativePercentages[index] = accumulatedPercentage
         }
         require(accumulatedPercentage == 100) {
             "The percentages must add up to 100 (found $accumulatedPercentage)"
@@ -46,11 +46,10 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
     }
 
     fun nextValue(): Int {
-        val selector = random.nextInt(100)
+        val bucketSelection = random.nextInt(100)
         // The configured distributions have few buckets, so a linear scan is cheaper than a binary search.
-        val index = accumulatedPercentages.indexOfFirst { selector < it }
-        val values = boundaries[index]
-        return random.nextInt(values)
+        val bucketIndex = cumulativePercentages.indexOfFirst { bucketSelection < it }
+        return random.nextInt(valueRanges[bucketIndex])
     }
 
     data class Bucket(val percentage: Int, val values: IntRange) {
@@ -78,7 +77,7 @@ interface DistributionFactory {
     /** Creates a distribution with an independent random stream from [rngFactory]. */
     fun create(rngFactory: RngFactory): Distribution
 
-    /** Size distribution for top-level flat collections. */
+    /** Size distribution for top-level collections. */
     object ListSizeDistribution : DistributionFactory {
         override fun create(rngFactory: RngFactory): Distribution = Distribution(
             rngFactory,
