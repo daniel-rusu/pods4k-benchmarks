@@ -105,22 +105,28 @@ class FlatCollectionBenchmarkData private constructor(
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-            val fields = fieldGeneratorFactory.create(generatorRngs)
-            val references = referenceGeneratorFactory.create(generatorRngs)
-            val collectionClass = CollectionFactory.getCollectionClass(
+            val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+            val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
+            val collectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
                 dataType = dataType,
-                referenceElementClass = references.objectClass,
+                referenceElementClass = referenceGenerator.objectClass,
             )
             return FlatCollectionBenchmarkData(
                 batch = CollectionBatch.create(
                     collectionType = collectionType,
-                    logicalElementClass = dataType.resolveElementClass(references.objectClass),
+                    logicalElementClass = dataType.resolveElementClass(referenceGenerator.objectClass),
                     collectionClass = collectionClass,
                     numCollections = numCollections,
                     sizeDistribution = sizeDistribution,
                 ) { size ->
-                    CollectionFactory.createCollection(size, collectionType, dataType, fields, references)
+                    CollectionFactory.createCollection(
+                        size = size,
+                        collectionType = collectionType,
+                        dataType = dataType,
+                        fieldGenerator = fieldGenerator,
+                        referenceGenerator = referenceGenerator,
+                    )
                 },
             )
         }

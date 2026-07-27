@@ -46,7 +46,7 @@ class ObjectCollectionBenchmarkData<T> private constructor(
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
             val elementClass = objectGenerator.objectClass
-            val collectionClass = CollectionFactory.getCollectionClass(
+            val collectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
                 dataType = DataType.REFERENCE,
                 referenceElementClass = elementClass,

@@ -55,7 +55,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
             val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
             val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
             val elementClass = dataType.resolveElementClass(referenceGenerator.objectClass) as Class<Any>
-            val collectionClass = CollectionFactory.getCollectionClass(
+            val collectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
                 dataType = DataType.REFERENCE,
                 referenceElementClass = elementClass,

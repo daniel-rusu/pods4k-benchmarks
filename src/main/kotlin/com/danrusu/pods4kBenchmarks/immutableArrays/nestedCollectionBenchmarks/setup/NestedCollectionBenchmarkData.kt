@@ -111,7 +111,7 @@ class NestedCollectionBenchmarkData private constructor(
             val nestedFieldGenerator = nestedFieldGeneratorFactory.create(generatorRngs)
             val nestedReferenceGenerator = nestedReferenceGeneratorFactory.create(generatorRngs)
 
-            val topLevelCollectionClass = CollectionFactory.getCollectionClass(
+            val topLevelCollectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
                 dataType = DataType.REFERENCE,
                 referenceElementClass = CollectionOwner::class.java,
