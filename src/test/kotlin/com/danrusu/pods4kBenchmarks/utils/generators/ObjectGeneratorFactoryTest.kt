@@ -13,15 +13,15 @@ class ObjectGeneratorFactoryTest {
     @Test
     fun `object generator factory wires field and reference generators`() {
         val factory = ObjectGeneratorFactory.of<TestObject, String>(
-            fieldsFactory = FieldGeneratorFactory { CountingFieldGenerator(NeverNullPolicy) },
-            referenceFactory = object : ObjectGeneratorFactory<String>() {
+            fieldGeneratorFactory = FieldGeneratorFactory { CountingFieldGenerator(NeverNullPolicy) },
+            referenceGeneratorFactory = object : ObjectGeneratorFactory<String>() {
                 override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<String> =
                     FixedStringGenerator("Hello")
             },
-        ) { fields, references ->
+        ) { fieldGenerator, referenceGenerator ->
             TestObject(
-                fieldValue = fields.nextInt(),
-                referenceValue = references.next(),
+                fieldValue = fieldGenerator.nextInt(),
+                referenceValue = referenceGenerator.next(),
             )
         }
 

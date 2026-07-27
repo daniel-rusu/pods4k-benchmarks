@@ -13,32 +13,32 @@ import strikt.assertions.message
 class FieldGeneratorTest {
     @Test
     fun `nullable field methods require a nullability policy`() {
-        val fields = CountingFieldGenerator(nullabilityPolicy = null)
+        val generator = CountingFieldGenerator(nullabilityPolicy = null)
 
         expectThrows<IllegalArgumentException> {
-            fields.nextNullableInt()
+            generator.nextNullableInt()
         }.message.isEqualTo("A NullabilityPolicy must be configured to generate nullable fields")
     }
 
     @Test
     fun `nullable field methods return null without advancing value generation`() {
-        val fields = CountingFieldGenerator(nullabilityPolicy = AlwaysNullPolicy)
+        val generator = CountingFieldGenerator(nullabilityPolicy = AlwaysNullPolicy)
 
-        expectThat(fields.nextNullableInt())
+        expectThat(generator.nextNullableInt())
             .isNull()
 
-        expectThat(fields.numNextIntCalls)
+        expectThat(generator.numNextIntCalls)
             .isEqualTo(0)
     }
 
     @Test
     fun `nullable field methods advance value generation when value is non-null`() {
-        val fields = CountingFieldGenerator(nullabilityPolicy = NeverNullPolicy)
+        val generator = CountingFieldGenerator(nullabilityPolicy = NeverNullPolicy)
 
-        expectThat(fields.nextNullableInt())
+        expectThat(generator.nextNullableInt())
             .isEqualTo(1)
 
-        expectThat(fields.numNextIntCalls)
+        expectThat(generator.numNextIntCalls)
             .isEqualTo(1)
     }
 }

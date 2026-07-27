@@ -3,13 +3,14 @@ package com.danrusu.pods4kBenchmarks.utils.generators
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import strikt.assertions.isTrue
 import kotlin.random.Random
 
 class AlphanumericCharactersTest {
     @Test
     fun `random returns an alphanumeric character`() {
         expectThat(AlphanumericCharacters.random(Random(123)) in AlphanumericCharacters.values)
-            .isEqualTo(true)
+            .isTrue()
     }
 
     @Test

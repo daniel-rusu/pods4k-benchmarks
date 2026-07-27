@@ -9,14 +9,14 @@ import strikt.assertions.message
 
 class DistributionTest {
     @Test
-    fun `range validation`() {
+    fun `rejects an empty value range`() {
         expectThrows<IllegalArgumentException> {
             10.percent inRange 10..9
         }.message.isEqualTo("values range (10..9) cannot be empty")
     }
 
     @Test
-    fun `range average validation`() {
+    fun `range average does not overflow`() {
         with(
             Distribution(
                 RngFactory(),
@@ -29,7 +29,7 @@ class DistributionTest {
     }
 
     @Test
-    fun `can accept a range up to Int MAX_VALUE`() {
+    fun `accepts a range ending at Int MAX_VALUE`() {
         val range = Int.MAX_VALUE - 8..Int.MAX_VALUE
         val distribution = Distribution(RngFactory(), 100.percent inRange range)
 
@@ -66,7 +66,7 @@ class DistributionTest {
     }
 
     @Test
-    fun `average validation`() {
+    fun `average value is weighted by bucket percentage`() {
         with(
             Distribution(
                 RngFactory(),

@@ -18,9 +18,9 @@ class FieldGeneratorFactoryTest {
             filterAcceptanceRng = filterAcceptanceRng,
         )
 
-        val fields = FieldGeneratorFactory.withRandomFields().create(generatorRngs)
+        val generator = FieldGeneratorFactory.withRandomFields().create(generatorRngs)
 
-        expectThat(List(3) { fields.nextInt() })
+        expectThat(List(3) { generator.nextInt() })
             .isEqualTo(listOf(123, 124, 125))
 
         expectThat(dataGenerationRng.numNextIntCalls)
@@ -42,9 +42,9 @@ class FieldGeneratorFactoryTest {
             nullabilityDecisionsRng = nullabilityDecisionsRng,
         )
 
-        val fields = FieldGeneratorFactory.withRandomNullableFields(nullRatio = 0.5).create(generatorRngs)
+        val generator = FieldGeneratorFactory.withRandomNullableFields(nullRatio = 0.5).create(generatorRngs)
 
-        expectThat(List(3) { fields.nextNullableInt() })
+        expectThat(List(3) { generator.nextNullableInt() })
             .isEqualTo(listOf(null, 123, null))
 
         expectThat(nullabilityDecisionsRng.numNextDoubleCalls)

@@ -32,5 +32,4 @@ class RngFactoryTest {
         expectThat(firstValues)
             .isNotEqualTo(secondValues)
     }
-
 }
