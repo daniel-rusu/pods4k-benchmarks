@@ -2,13 +2,13 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 
 /** Nullable counterpart to [CompoundElement] for null-related benchmarks. */
 class CompoundElementOfNullableValues(
-    val nullableReference: Any?,
-    val nullableBoolean: Boolean?,
-    val nullableByte: Byte?,
-    val nullableChar: Char?,
-    val nullableShort: Short?,
-    val nullableInt: Int?,
-    val nullableFloat: Float?,
-    val nullableLong: Long?,
-    val nullableDouble: Double?,
+    val referenceValue: Any?,
+    val booleanValue: Boolean?,
+    val byteValue: Byte?,
+    val charValue: Char?,
+    val shortValue: Short?,
+    val intValue: Int?,
+    val floatValue: Float?,
+    val longValue: Long?,
+    val doubleValue: Double?,
 )

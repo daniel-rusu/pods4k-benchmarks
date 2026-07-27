@@ -31,19 +31,19 @@ private const val NULL_RATIO = 0.5
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
     objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(
-        fieldsFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO),
-        referenceFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
-    ) { fields, references ->
+        fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO),
+        referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
+    ) { fieldGenerator, referenceGenerator ->
         CompoundElementOfNullableValues(
-            nullableReference = references.next(),
-            nullableBoolean = fields.nextNullableBoolean(),
-            nullableByte = fields.nextNullableByte(),
-            nullableChar = fields.nextNullableChar(),
-            nullableShort = fields.nextNullableShort(),
-            nullableInt = fields.nextNullableInt(),
-            nullableFloat = fields.nextNullableFloat(),
-            nullableLong = fields.nextNullableLong(),
-            nullableDouble = fields.nextNullableDouble(),
+            referenceValue = referenceGenerator.next(),
+            booleanValue = fieldGenerator.nextNullableBoolean(),
+            byteValue = fieldGenerator.nextNullableByte(),
+            charValue = fieldGenerator.nextNullableChar(),
+            shortValue = fieldGenerator.nextNullableShort(),
+            intValue = fieldGenerator.nextNullableInt(),
+            floatValue = fieldGenerator.nextNullableFloat(),
+            longValue = fieldGenerator.nextNullableLong(),
+            doubleValue = fieldGenerator.nextNullableDouble(),
         )
     },
 ) {
@@ -51,10 +51,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullReference(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableReference } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableReference } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableReference } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableReference } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.referenceValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.referenceValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.referenceValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.referenceValue } },
         )
     }
 
@@ -62,10 +62,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullBoolean(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableBoolean } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableBoolean } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableBoolean } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableBoolean } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.booleanValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.booleanValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.booleanValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.booleanValue } },
         )
     }
 
@@ -73,10 +73,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullByte(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableByte } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableByte } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableByte } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableByte } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.byteValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.byteValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.byteValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.byteValue } },
         )
     }
 
@@ -84,10 +84,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullChar(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableChar } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableChar } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableChar } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableChar } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.charValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.charValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.charValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.charValue } },
         )
     }
 
@@ -95,10 +95,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullShort(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableShort } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableShort } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableShort } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableShort } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.shortValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.shortValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.shortValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.shortValue } },
         )
     }
 
@@ -106,10 +106,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullInt(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableInt } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableInt } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableInt } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableInt } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.intValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.intValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.intValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.intValue } },
         )
     }
 
@@ -117,10 +117,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullFloat(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableFloat } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableFloat } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableFloat } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableFloat } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.floatValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.floatValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.floatValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.floatValue } },
         )
     }
 
@@ -128,10 +128,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullLong(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableLong } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableLong } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableLong } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableLong } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.longValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.longValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.longValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.longValue } },
         )
     }
 
@@ -139,10 +139,10 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     fun mapNotNullDouble(bh: Blackhole) {
         transformEachCollection(
             bh,
-            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableDouble } },
-            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.nullableDouble } },
-            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableDouble } },
-            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.nullableDouble } },
+            { list: List<CompoundElementOfNullableValues> -> list.mapNotNull { it.doubleValue } },
+            { list: PersistentList<CompoundElementOfNullableValues> -> list.mapNotNull { it.doubleValue } },
+            { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.doubleValue } },
+            { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.doubleValue } },
         )
     }
 }
