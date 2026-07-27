@@ -48,7 +48,7 @@ private const val NULL_RATIO = 0.5
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class FilterNotNull {
+open class FilterNotNullBenchmarks {
     /** Repeats the benchmark for every collection representation. */
     @Param
     private lateinit var collectionType: CollectionType
