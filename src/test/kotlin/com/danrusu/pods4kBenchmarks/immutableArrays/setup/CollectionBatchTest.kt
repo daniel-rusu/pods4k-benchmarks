@@ -52,6 +52,21 @@ class CollectionBatchTest {
     }
 
     @Test
+    fun `rejects a collection that does not match the outer array component type`() {
+        expectThrows<ArrayStoreException> {
+            CollectionBatch.create(
+                collectionType = CollectionType.LIST,
+                logicalElementClass = Int::class.javaObjectType,
+                collectionClass = List::class.java,
+                numCollections = 1,
+                sizeDistribution = fixedSizeDistribution(),
+            ) {
+                intArrayOf(1) // IntArray but expects List
+            }
+        }
+    }
+
+    @Test
     fun `requires a positive number of collections`() {
         expectThrows<IllegalArgumentException> {
             CollectionBatch.create(
