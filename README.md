@@ -10,14 +10,14 @@ The project uses the [Java Microbenchmark Harness (JMH)](https://github.com/open
 ## Project Layout
 
 - `build.gradle.kts`: JMH benchmark selection and result configuration.
-- `src/jmh/kotlin`: JMH benchmark classes. Categorized into flat collections of values, nested collections (eg. list of
-  orders with each order containing a list of products), and collections of objects.
+- `src/jmh/kotlin`: JMH benchmark classes. Categorized into flat collections of values, nested collections (e.g., a list
+  of orders with each order containing a list of products), and collections of objects.
 - `src/main/kotlin`: reusable data generators, collection factories, and deterministic benchmark-data builders.
 - `src/test/kotlin`: unit tests for shared utilities and data builders.
 
 ## Running Benchmarks
 
-1. Clone the repository and ensure you have JDK 21 installed
+1. Clone the repository and ensure you have JDK 21 installed.
 2. Set `jmh.includes` in [build.gradle.kts](build.gradle.kts) to the smallest class or package you want to measure:
 
    ```kotlin
@@ -27,13 +27,13 @@ The project uses the [Java Microbenchmark Harness (JMH)](https://github.com/open
    ```
 
 3. Prepare the machine:
-    * Plug in your laptop
-    * select a performance power profile
-    * Change your screen & sleep timeouts to `Never`
-    * Disable any screen savers
-    * Temporarily pause Windows updates
-    * Turn off unnecessary startup programs and services and restart your computer.
-    * Close all applications and stop any unnecessary processes to minimize interference.
+    * Plug in your laptop.
+    * Select a performance power profile.
+    * Change your screen and sleep timeouts to `Never`.
+    * Disable screen savers.
+    * Temporarily pause Windows updates.
+    * Turn off unnecessary startup programs and services, then restart your computer.
+    * Close applications and stop unnecessary processes to minimize interference.
 4. Run the selected benchmarks:
 
    ```shell
@@ -57,15 +57,15 @@ a broad include.
 
 ## JMH Conventions
 
-| Annotation                 | Explanation                                                                                                                                                                                                                                                                                                                                                                                                             |
-|:---------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `@State`                   | Marks the class as storing data that the benchmarks will operate on and controls how this data is shared. <br/> - `Scope.Benchmark` - The dataset will be shared across all threads.                                                                                                                                                                                                                                    |
-| `@Setup`                   | Marks the setup method that prepares the benchmarking dataset(s).<br/> - `Level.Trial`: Only perform the setup once for each benchmark.                                                                                                                                                                                                                                                                                 |
-| `@Benchmark`               | Marks the method that contains the operation that we want to benchmark.                                                                                                                                                                                                                                                                                                                                                 |
-| `@Param`                   | Parameterizes a variable with multiple values and repeats all the benchmarks for each value.                                                                                                                                                                                                                                                                                                                            |
-| `@BenchmarkMode`           | Specifies what we're trying to measure. <br/> - `Mode.Throughput`: Measures the number of operations per time unit.                                                                                                                                                                                                                                                                                                     |
-| `@OutputTimeUnit`          | Specifies the time unit to report the results in <br/> - `TimeUnit.SECONDS`: Report the results per second. <br/> - `TimeUnit.MILLISECONDS`: Report the results per millisecond.                                                                                                                                                                                                                                        |
-| `@OperationsPerInvocation` | Specifies how many times the operation is being performed in 1 execution of the benchmark method. <br/> - This is used to avoid local runtime optimizations that produce misleadingly-fast results if we perform an operation on a small dataset repeatedly.<br/> - We create hundreds of randomized datasets and in a single benchmark invocation, loop through each dataset and perform the operation being measured. |
-| `@Warmup`                  | Controls warmup behavior so the performance reaches a steady state before the benchmark begins.<br/> - `iterations`: The # of warmup iterations that should be performed. <br/> - `time`: The # of time units that each warmup iteration should last. <br/> - `timeUnit`: The time unit (eg. seconds, milliseconds, etc.)                                                                                               |
-| `@Measurement`             | Controls how many measurements to take and how long each measurement should last.<br/> - The configuration is similar to `@Warmup` except that it controls the actual benchmark measurements.                                                                                                                                                                                                                           |
-| `@Fork`                    | Controls how many JVM processes should be created to run each benchmark. <br/> - This should be set to at least 1 in order to avoid benchmarks from affecting each other. A value at least 2 is even better as it provides more information about repeatability and margin of error.                                                                                                                                    |
+| Annotation                 | Explanation                                                                                                                                                                                                                                                                                                |
+|:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@State`                   | Marks the class as storing data that the benchmarks will operate on and controls how this data is shared. <br/> - `Scope.Benchmark` - The dataset will be shared across all threads.                                                                                                                       |
+| `@Setup`                   | Marks the setup method that prepares benchmark data.<br/> - `Level.Trial`: Performs setup once for each benchmark trial.                                                                                                                                                                                   |
+| `@Benchmark`               | Marks the method that contains the operation that we want to benchmark.                                                                                                                                                                                                                                    |
+| `@Param`                   | Parameterizes a variable with multiple values and repeats all the benchmarks for each value.                                                                                                                                                                                                               |
+| `@BenchmarkMode`           | Specifies what we're trying to measure. <br/> - `Mode.Throughput`: Measures the number of operations per time unit.                                                                                                                                                                                        |
+| `@OutputTimeUnit`          | Specifies the time unit to report the results in <br/> - `TimeUnit.SECONDS`: Report the results per second. <br/> - `TimeUnit.MILLISECONDS`: Report the results per millisecond.                                                                                                                           |
+| `@OperationsPerInvocation` | Specifies how many logical operations one benchmark-method invocation performs, allowing JMH to normalize its reported score per operation. <br/> - Most benchmarks process hundreds of deterministically generated collections per invocation. Pairwise benchmarks process half as many collection pairs. |
+| `@Warmup`                  | Controls warmup so execution reaches a steady state before measurement.<br/> - `iterations`: Number of warmup iterations. <br/> - `time`: Duration of each warmup iteration. <br/> - `timeUnit`: Unit for the duration (e.g., seconds or milliseconds).                                                    |
+| `@Measurement`             | Controls how many measurements to take and how long each measurement should last.                                                                                                                                                                                                                          |
+| `@Fork`                    | Controls how many JVM processes should be created to run each benchmark. <br/> - This should be set to at least 1 in order to avoid benchmarks from affecting each other. A value at least 2 is even better as it provides more information about repeatability and margin of error.                       |
