@@ -18,27 +18,27 @@ class ObjectCollectionBenchmarkDataTest {
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST)) {
             // A List[] component type prevents benchmark loops from needing a per-collection cast to List.
-            expectThat(listData.javaClass.componentType)
+            expectThat(lists.javaClass.componentType)
                 .isEqualTo(List::class.java)
-            expectThat(listData[0])
+            expectThat(lists[0])
                 .isA<List<String>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST)) {
-            expectThat(persistentListData[0])
+            expectThat(persistentLists[0])
                 .isA<PersistentList<String>>()
         }
         with(createData(CollectionType.ARRAY)) {
-            expectThat(arrayData[0])
+            expectThat(arrays[0])
                 .isA<Array<String>>()
         }
         with(createData(CollectionType.IMMUTABLE_ARRAY)) {
-            expectThat(immutableArrayData[0])
+            expectThat(immutableArrays[0])
                 .isA<ImmutableArray<String>>()
         }
     }
 
     @Test
-    fun `all collection types contain identical data`() {
+    fun `all collection representations contain identical data`() {
         val expected = createData(CollectionType.LIST).normalized(CollectionType.LIST)
 
         CollectionType.entries.forEach { collectionType ->
@@ -58,19 +58,19 @@ class ObjectCollectionBenchmarkDataTest {
         val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY)
 
         expectThrows<IllegalStateException> {
-            listData.persistentListData
+            listData.persistentLists
         }.message.isEqualTo("Requested PERSISTENT_LIST data, but the batch contains LIST data")
 
         expectThrows<IllegalStateException> {
-            persistentListData.listData
+            persistentListData.lists
         }.message.isEqualTo("Requested LIST data, but the batch contains PERSISTENT_LIST data")
 
         expectThrows<IllegalStateException> {
-            arrayData.immutableArrayData
+            arrayData.immutableArrays
         }.message.isEqualTo("Requested IMMUTABLE_ARRAY data, but the batch contains ARRAY data")
 
         expectThrows<IllegalStateException> {
-            immutableArrayData.arrayData
+            immutableArrayData.arrays
         }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
@@ -85,10 +85,10 @@ class ObjectCollectionBenchmarkDataTest {
 
     private fun ObjectCollectionBenchmarkData<String>.normalized(collectionType: CollectionType): List<List<String>> {
         return when (collectionType) {
-            CollectionType.LIST -> listData.map { it.toList() }
-            CollectionType.PERSISTENT_LIST -> persistentListData.map { it.toList() }
-            CollectionType.ARRAY -> arrayData.map { it.toList() }
-            CollectionType.IMMUTABLE_ARRAY -> immutableArrayData.map { it.toList() }
+            CollectionType.LIST -> lists.map { it.toList() }
+            CollectionType.PERSISTENT_LIST -> persistentLists.map { it.toList() }
+            CollectionType.ARRAY -> arrays.map { it.toList() }
+            CollectionType.IMMUTABLE_ARRAY -> immutableArrays.map { it.toList() }
         }
     }
 }

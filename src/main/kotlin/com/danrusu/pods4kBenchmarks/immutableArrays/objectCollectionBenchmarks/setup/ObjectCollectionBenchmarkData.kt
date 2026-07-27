@@ -21,16 +21,16 @@ class ObjectCollectionBenchmarkData<T> private constructor(
     @PublishedApi internal val batch: CollectionBatch,
     private val elementClass: Class<T & Any>,
 ) {
-    val listData: Array<List<T>>
+    val lists: Array<List<T>>
         get() = batch.getCollections(CollectionType.LIST, elementClass)
 
-    val persistentListData: Array<PersistentList<T>>
+    val persistentLists: Array<PersistentList<T>>
         get() = batch.getCollections(CollectionType.PERSISTENT_LIST, elementClass)
 
-    val arrayData: Array<Array<T>>
+    val arrays: Array<Array<T>>
         get() = batch.getCollections(CollectionType.ARRAY, elementClass)
 
-    val immutableArrayData: Array<ImmutableArray<T>>
+    val immutableArrays: Array<ImmutableArray<T>>
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, elementClass)
 
     companion object {
@@ -47,18 +47,18 @@ class ObjectCollectionBenchmarkData<T> private constructor(
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
             val elementClass = objectGenerator.objectClass
             val collectionClass = CollectionFactory.getCollectionClass(
-                collectionType,
-                DataType.REFERENCE,
-                elementClass,
+                collectionType = collectionType,
+                dataType = DataType.REFERENCE,
+                referenceElementClass = elementClass,
             )
 
             return ObjectCollectionBenchmarkData(
                 batch = CollectionBatch.create(
-                    collectionType,
-                    elementClass,
-                    collectionClass,
-                    numCollections,
-                    sizeDistribution
+                    collectionType = collectionType,
+                    logicalElementClass = elementClass,
+                    collectionClass = collectionClass,
+                    numCollections = numCollections,
+                    sizeDistribution = sizeDistribution,
                 ) { size ->
                     CollectionFactory.createCollection(size, collectionType, elementClass) {
                         objectGenerator.next()

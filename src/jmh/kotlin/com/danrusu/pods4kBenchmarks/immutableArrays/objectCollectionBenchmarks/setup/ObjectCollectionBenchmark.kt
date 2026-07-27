@@ -31,7 +31,7 @@ abstract class ObjectCollectionBenchmark<T>(
     /** Creates the objects stored in each collection. */
     private val objectGeneratorFactory: ObjectGeneratorFactory<T>,
 ) {
-    /** Repeats each benchmark for every collection type */
+    /** Repeats each benchmark for every collection representation. */
     @Param
     protected lateinit var collectionType: CollectionType
 
@@ -39,7 +39,7 @@ abstract class ObjectCollectionBenchmark<T>(
     internal lateinit var data: ObjectCollectionBenchmarkData<T>
 
     @Setup(Level.Trial)
-    fun setupCollections() {
+    fun setupBenchmarkData() {
         data = ObjectCollectionBenchmarkData.create(
             collectionType = collectionType,
             numCollections = numCollections,
@@ -57,10 +57,10 @@ abstract class ObjectCollectionBenchmark<T>(
         transformImmutableArray: (ImmutableArray<T>) -> Any?,
     ) {
         when (collectionType) {
-            LIST -> data.listData.forEach { bh.consume(transformList(it)) }
-            PERSISTENT_LIST -> data.persistentListData.forEach { bh.consume(transformPersistentList(it)) }
-            ARRAY -> data.arrayData.forEach { bh.consume(transformArray(it)) }
-            IMMUTABLE_ARRAY -> data.immutableArrayData.forEach { bh.consume(transformImmutableArray(it)) }
+            LIST -> data.lists.forEach { bh.consume(transformList(it)) }
+            PERSISTENT_LIST -> data.persistentLists.forEach { bh.consume(transformPersistentList(it)) }
+            ARRAY -> data.arrays.forEach { bh.consume(transformArray(it)) }
+            IMMUTABLE_ARRAY -> data.immutableArrays.forEach { bh.consume(transformImmutableArray(it)) }
         }
     }
 }
