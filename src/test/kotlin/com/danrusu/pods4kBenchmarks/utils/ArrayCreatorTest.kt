@@ -2,6 +2,9 @@ package com.danrusu.pods4kBenchmarks.utils
 
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.hasSize
+import strikt.assertions.isA
+import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNull
 import java.math.BigDecimal
@@ -93,5 +96,48 @@ class ArrayCreatorTest {
             expectThat(this[2])
                 .isNull()
         }
+    }
+
+    @Test
+    fun `can create nested generic arrays`() {
+        @Suppress("UNCHECKED_CAST")
+        val nestedGenericArrays: Array<Array<String>> = ArrayCreator.createArray(
+            componentClass = String::class.java.arrayType() as Class<Array<String>>,
+            size = 3,
+        ) { index ->
+            Array(index) { "$it" }
+        }
+
+        expectThat(nestedGenericArrays).hasSize(3)
+        expectThat(nestedGenericArrays[0])
+            .isA<Array<String>>()
+            .isEmpty()
+
+        expectThat(nestedGenericArrays[1])
+            .isEqualTo(arrayOf("0"))
+
+        expectThat(nestedGenericArrays[2])
+            .isEqualTo(arrayOf("0", "1"))
+    }
+
+    @Test
+    fun `can create nested primitive arrays`() {
+        val nestedPrimitiveArrays: Array<IntArray> = ArrayCreator.createArray(
+            componentClass = IntArray::class.java,
+            size = 3,
+        ) { index ->
+            IntArray(index) { it }
+        }
+
+        expectThat(nestedPrimitiveArrays).hasSize(3)
+        expectThat(nestedPrimitiveArrays[0])
+            .isA<IntArray>()
+            .isEmpty()
+
+        expectThat(nestedPrimitiveArrays[1])
+            .isEqualTo(intArrayOf(0))
+
+        expectThat(nestedPrimitiveArrays[2])
+            .isEqualTo(intArrayOf(0, 1))
     }
 }
