@@ -38,9 +38,9 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = 1000
-
 private const val NULL_RATIO = 0.5
 
+/** Benchmarks `filterNotNull` across nullable reference and boxed primitive elements. */
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -49,7 +49,7 @@ private const val NULL_RATIO = 0.5
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
 open class FilterNotNull {
-    /** Repeats the benchmark for every collection type. */
+    /** Repeats the benchmark for every collection representation. */
     @Param
     private lateinit var collectionType: CollectionType
 
@@ -60,7 +60,7 @@ open class FilterNotNull {
     private lateinit var data: NullableFlatCollectionBenchmarkData
 
     @Setup(Level.Trial)
-    fun setupCollections() {
+    fun setupBenchmarkData() {
         data = NullableFlatCollectionBenchmarkData.create(
             collectionType = collectionType,
             dataType = dataType,
@@ -75,51 +75,51 @@ open class FilterNotNull {
     fun filterNotNull(bh: Blackhole) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> data.listData<String>().forEach { bh.consume(it.filterNotNull()) }
-                BOOLEAN -> data.listData<Boolean>().forEach { bh.consume(it.filterNotNull()) }
-                BYTE -> data.listData<Byte>().forEach { bh.consume(it.filterNotNull()) }
-                CHAR -> data.listData<Char>().forEach { bh.consume(it.filterNotNull()) }
-                SHORT -> data.listData<Short>().forEach { bh.consume(it.filterNotNull()) }
-                INT -> data.listData<Int>().forEach { bh.consume(it.filterNotNull()) }
-                FLOAT -> data.listData<Float>().forEach { bh.consume(it.filterNotNull()) }
-                LONG -> data.listData<Long>().forEach { bh.consume(it.filterNotNull()) }
-                DOUBLE -> data.listData<Double>().forEach { bh.consume(it.filterNotNull()) }
+                REFERENCE -> data.lists<String>().forEach { bh.consume(it.filterNotNull()) }
+                BOOLEAN -> data.lists<Boolean>().forEach { bh.consume(it.filterNotNull()) }
+                BYTE -> data.lists<Byte>().forEach { bh.consume(it.filterNotNull()) }
+                CHAR -> data.lists<Char>().forEach { bh.consume(it.filterNotNull()) }
+                SHORT -> data.lists<Short>().forEach { bh.consume(it.filterNotNull()) }
+                INT -> data.lists<Int>().forEach { bh.consume(it.filterNotNull()) }
+                FLOAT -> data.lists<Float>().forEach { bh.consume(it.filterNotNull()) }
+                LONG -> data.lists<Long>().forEach { bh.consume(it.filterNotNull()) }
+                DOUBLE -> data.lists<Double>().forEach { bh.consume(it.filterNotNull()) }
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> data.persistentListData<String>().forEach { bh.consume(it.filterNotNull()) }
-                BOOLEAN -> data.persistentListData<Boolean>().forEach { bh.consume(it.filterNotNull()) }
-                BYTE -> data.persistentListData<Byte>().forEach { bh.consume(it.filterNotNull()) }
-                CHAR -> data.persistentListData<Char>().forEach { bh.consume(it.filterNotNull()) }
-                SHORT -> data.persistentListData<Short>().forEach { bh.consume(it.filterNotNull()) }
-                INT -> data.persistentListData<Int>().forEach { bh.consume(it.filterNotNull()) }
-                FLOAT -> data.persistentListData<Float>().forEach { bh.consume(it.filterNotNull()) }
-                LONG -> data.persistentListData<Long>().forEach { bh.consume(it.filterNotNull()) }
-                DOUBLE -> data.persistentListData<Double>().forEach { bh.consume(it.filterNotNull()) }
+                REFERENCE -> data.persistentLists<String>().forEach { bh.consume(it.filterNotNull()) }
+                BOOLEAN -> data.persistentLists<Boolean>().forEach { bh.consume(it.filterNotNull()) }
+                BYTE -> data.persistentLists<Byte>().forEach { bh.consume(it.filterNotNull()) }
+                CHAR -> data.persistentLists<Char>().forEach { bh.consume(it.filterNotNull()) }
+                SHORT -> data.persistentLists<Short>().forEach { bh.consume(it.filterNotNull()) }
+                INT -> data.persistentLists<Int>().forEach { bh.consume(it.filterNotNull()) }
+                FLOAT -> data.persistentLists<Float>().forEach { bh.consume(it.filterNotNull()) }
+                LONG -> data.persistentLists<Long>().forEach { bh.consume(it.filterNotNull()) }
+                DOUBLE -> data.persistentLists<Double>().forEach { bh.consume(it.filterNotNull()) }
             }
 
             ARRAY -> when (dataType) {
-                REFERENCE -> data.arrayData<String>().forEach { bh.consume(it.filterNotNull()) }
-                BOOLEAN -> data.arrayData<Boolean>().forEach { bh.consume(it.filterNotNull()) }
-                BYTE -> data.arrayData<Byte>().forEach { bh.consume(it.filterNotNull()) }
-                CHAR -> data.arrayData<Char>().forEach { bh.consume(it.filterNotNull()) }
-                SHORT -> data.arrayData<Short>().forEach { bh.consume(it.filterNotNull()) }
-                INT -> data.arrayData<Int>().forEach { bh.consume(it.filterNotNull()) }
-                FLOAT -> data.arrayData<Float>().forEach { bh.consume(it.filterNotNull()) }
-                LONG -> data.arrayData<Long>().forEach { bh.consume(it.filterNotNull()) }
-                DOUBLE -> data.arrayData<Double>().forEach { bh.consume(it.filterNotNull()) }
+                REFERENCE -> data.arrays<String>().forEach { bh.consume(it.filterNotNull()) }
+                BOOLEAN -> data.arrays<Boolean>().forEach { bh.consume(it.filterNotNull()) }
+                BYTE -> data.arrays<Byte>().forEach { bh.consume(it.filterNotNull()) }
+                CHAR -> data.arrays<Char>().forEach { bh.consume(it.filterNotNull()) }
+                SHORT -> data.arrays<Short>().forEach { bh.consume(it.filterNotNull()) }
+                INT -> data.arrays<Int>().forEach { bh.consume(it.filterNotNull()) }
+                FLOAT -> data.arrays<Float>().forEach { bh.consume(it.filterNotNull()) }
+                LONG -> data.arrays<Long>().forEach { bh.consume(it.filterNotNull()) }
+                DOUBLE -> data.arrays<Double>().forEach { bh.consume(it.filterNotNull()) }
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> data.immutableArrayData<String>().forEach { bh.consume(it.filterNotNull()) }
-                BOOLEAN -> data.immutableArrayData<Boolean>().forEach { bh.consume(it.filterNotNull()) }
-                BYTE -> data.immutableArrayData<Byte>().forEach { bh.consume(it.filterNotNull()) }
-                CHAR -> data.immutableArrayData<Char>().forEach { bh.consume(it.filterNotNull()) }
-                SHORT -> data.immutableArrayData<Short>().forEach { bh.consume(it.filterNotNull()) }
-                INT -> data.immutableArrayData<Int>().forEach { bh.consume(it.filterNotNull()) }
-                FLOAT -> data.immutableArrayData<Float>().forEach { bh.consume(it.filterNotNull()) }
-                LONG -> data.immutableArrayData<Long>().forEach { bh.consume(it.filterNotNull()) }
-                DOUBLE -> data.immutableArrayData<Double>().forEach { bh.consume(it.filterNotNull()) }
+                REFERENCE -> data.immutableArrays<String>().forEach { bh.consume(it.filterNotNull()) }
+                BOOLEAN -> data.immutableArrays<Boolean>().forEach { bh.consume(it.filterNotNull()) }
+                BYTE -> data.immutableArrays<Byte>().forEach { bh.consume(it.filterNotNull()) }
+                CHAR -> data.immutableArrays<Char>().forEach { bh.consume(it.filterNotNull()) }
+                SHORT -> data.immutableArrays<Short>().forEach { bh.consume(it.filterNotNull()) }
+                INT -> data.immutableArrays<Int>().forEach { bh.consume(it.filterNotNull()) }
+                FLOAT -> data.immutableArrays<Float>().forEach { bh.consume(it.filterNotNull()) }
+                LONG -> data.immutableArrays<Long>().forEach { bh.consume(it.filterNotNull()) }
+                DOUBLE -> data.immutableArrays<Double>().forEach { bh.consume(it.filterNotNull()) }
             }
         }
     }

@@ -23,7 +23,7 @@ class NullableFlatCollectionBenchmarkDataTest {
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
-            val lists = listData<Boolean>()
+            val lists = lists<Boolean>()
             // A List[] component type prevents benchmark loops from needing a per-collection cast to List.
             expectThat(lists.javaClass.componentType)
                 .isEqualTo(List::class.java)
@@ -31,21 +31,21 @@ class NullableFlatCollectionBenchmarkDataTest {
                 .isA<List<Boolean?>>()
         }
         with(createData(CollectionType.PERSISTENT_LIST, DataType.BOOLEAN)) {
-            expectThat(persistentListData<Boolean>()[0])
+            expectThat(persistentLists<Boolean>()[0])
                 .isA<PersistentList<Boolean?>>()
         }
         with(createData(CollectionType.ARRAY, DataType.BOOLEAN)) {
-            expectThat(arrayData<Boolean>()[0])
+            expectThat(arrays<Boolean>()[0])
                 .isA<Array<Boolean?>>()
         }
         with(createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)) {
-            expectThat(immutableArrayData<Boolean>()[0])
+            expectThat(immutableArrays<Boolean>()[0])
                 .isA<ImmutableArray<Boolean?>>()
         }
     }
 
     @Test
-    fun `all collection types contain identical nullable data`() {
+    fun `all collection representations contain identical nullable data`() {
         for (dataType in DataType.entries) {
             val expected = createData(CollectionType.LIST, dataType).normalized(CollectionType.LIST, dataType)
 
@@ -85,7 +85,7 @@ class NullableFlatCollectionBenchmarkDataTest {
         val data = createData(CollectionType.ARRAY, DataType.BOOLEAN)
 
         expectThrows<IllegalStateException> {
-            data.arrayData<Int>()
+            data.arrays<Int>()
         }.message.isEqualTo(
             "Requested logical element class java.lang.Integer, but the batch contains java.lang.Boolean"
         )
@@ -99,19 +99,19 @@ class NullableFlatCollectionBenchmarkDataTest {
         val immutableArrayData = createData(CollectionType.IMMUTABLE_ARRAY, DataType.BOOLEAN)
 
         expectThrows<IllegalStateException> {
-            listData.persistentListData<Boolean>()
+            listData.persistentLists<Boolean>()
         }.message.isEqualTo("Requested PERSISTENT_LIST data, but the batch contains LIST data")
 
         expectThrows<IllegalStateException> {
-            persistentListData.listData<Boolean>()
+            persistentListData.lists<Boolean>()
         }.message.isEqualTo("Requested LIST data, but the batch contains PERSISTENT_LIST data")
 
         expectThrows<IllegalStateException> {
-            arrayData.immutableArrayData<Boolean>()
+            arrayData.immutableArrays<Boolean>()
         }.message.isEqualTo("Requested IMMUTABLE_ARRAY data, but the batch contains ARRAY data")
 
         expectThrows<IllegalStateException> {
-            immutableArrayData.arrayData<Boolean>()
+            immutableArrayData.arrays<Boolean>()
         }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
@@ -145,9 +145,9 @@ class NullableFlatCollectionBenchmarkDataTest {
     private inline fun <reified T : Any> NullableFlatCollectionBenchmarkData.normalized(
         collectionType: CollectionType,
     ): List<List<Any?>> = when (collectionType) {
-        CollectionType.LIST -> listData<T>().map { it.toList() }
-        CollectionType.PERSISTENT_LIST -> persistentListData<T>().map { it.toList() }
-        CollectionType.ARRAY -> arrayData<T>().map { it.toList() }
-        CollectionType.IMMUTABLE_ARRAY -> immutableArrayData<T>().map { it.toList() }
+        CollectionType.LIST -> lists<T>().map { it.toList() }
+        CollectionType.PERSISTENT_LIST -> persistentLists<T>().map { it.toList() }
+        CollectionType.ARRAY -> arrays<T>().map { it.toList() }
+        CollectionType.IMMUTABLE_ARRAY -> immutableArrays<T>().map { it.toList() }
     }
 }

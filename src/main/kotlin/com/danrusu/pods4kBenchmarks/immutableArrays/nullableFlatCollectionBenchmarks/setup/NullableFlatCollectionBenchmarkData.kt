@@ -22,19 +22,19 @@ import kotlinx.collections.immutable.PersistentList
 class NullableFlatCollectionBenchmarkData private constructor(
     @PublishedApi internal val batch: CollectionBatch,
 ) {
-    inline fun <reified T : Any> listData(): Array<List<T?>> {
+    inline fun <reified T : Any> lists(): Array<List<T?>> {
         return batch.getCollections(CollectionType.LIST, T::class.javaObjectType)
     }
 
-    inline fun <reified T : Any> persistentListData(): Array<PersistentList<T?>> {
+    inline fun <reified T : Any> persistentLists(): Array<PersistentList<T?>> {
         return batch.getCollections(CollectionType.PERSISTENT_LIST, T::class.javaObjectType)
     }
 
-    inline fun <reified T : Any> arrayData(): Array<Array<T?>> {
+    inline fun <reified T : Any> arrays(): Array<Array<T?>> {
         return batch.getCollections(CollectionType.ARRAY, T::class.javaObjectType)
     }
 
-    inline fun <reified T : Any> immutableArrayData(): Array<ImmutableArray<T?>> {
+    inline fun <reified T : Any> immutableArrays(): Array<ImmutableArray<T?>> {
         return batch.getCollections(CollectionType.IMMUTABLE_ARRAY, T::class.javaObjectType)
     }
 
@@ -52,34 +52,34 @@ class NullableFlatCollectionBenchmarkData private constructor(
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-            val fields = fieldGeneratorFactory.create(generatorRngs)
-            val references = referenceGeneratorFactory.create(generatorRngs)
-            val elementClass = dataType.resolveElementClass(references.objectClass) as Class<Any>
+            val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+            val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
+            val elementClass = dataType.resolveElementClass(referenceGenerator.objectClass) as Class<Any>
             val collectionClass = CollectionFactory.getCollectionClass(
-                collectionType,
-                DataType.REFERENCE, // All collections will store references because the primitive values are boxed
-                elementClass,
+                collectionType = collectionType,
+                dataType = DataType.REFERENCE,
+                referenceElementClass = elementClass,
             )
 
             return NullableFlatCollectionBenchmarkData(
                 batch = CollectionBatch.create(
-                    collectionType,
-                    elementClass,
-                    collectionClass,
-                    numCollections,
-                    sizeDistribution
+                    collectionType = collectionType,
+                    logicalElementClass = elementClass,
+                    collectionClass = collectionClass,
+                    numCollections = numCollections,
+                    sizeDistribution = sizeDistribution,
                 ) { size ->
                     CollectionFactory.createCollection(size, collectionType, elementClass) {
                         when (dataType) {
-                            DataType.REFERENCE -> references.next()
-                            DataType.BOOLEAN -> fields.nextNullableBoolean()
-                            DataType.BYTE -> fields.nextNullableByte()
-                            DataType.CHAR -> fields.nextNullableChar()
-                            DataType.SHORT -> fields.nextNullableShort()
-                            DataType.INT -> fields.nextNullableInt()
-                            DataType.FLOAT -> fields.nextNullableFloat()
-                            DataType.LONG -> fields.nextNullableLong()
-                            DataType.DOUBLE -> fields.nextNullableDouble()
+                            DataType.REFERENCE -> referenceGenerator.next()
+                            DataType.BOOLEAN -> fieldGenerator.nextNullableBoolean()
+                            DataType.BYTE -> fieldGenerator.nextNullableByte()
+                            DataType.CHAR -> fieldGenerator.nextNullableChar()
+                            DataType.SHORT -> fieldGenerator.nextNullableShort()
+                            DataType.INT -> fieldGenerator.nextNullableInt()
+                            DataType.FLOAT -> fieldGenerator.nextNullableFloat()
+                            DataType.LONG -> fieldGenerator.nextNullableLong()
+                            DataType.DOUBLE -> fieldGenerator.nextNullableDouble()
                         }
                     }
                 },
