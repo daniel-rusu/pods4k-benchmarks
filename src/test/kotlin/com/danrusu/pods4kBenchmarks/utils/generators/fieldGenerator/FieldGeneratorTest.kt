@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.utils.generators
+package com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.CountingFieldGenerator

@@ -1,8 +1,8 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory

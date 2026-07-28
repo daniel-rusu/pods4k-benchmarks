@@ -1,6 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.fixtures
 
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
 

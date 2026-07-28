@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.utils.generators
+package com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.RecordingRandom
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs

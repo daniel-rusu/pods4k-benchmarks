@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators
 
+import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.CountingFieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.FixedStringGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy

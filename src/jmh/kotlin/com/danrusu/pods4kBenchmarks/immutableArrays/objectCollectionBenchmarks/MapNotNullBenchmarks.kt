@@ -4,7 +4,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.mapNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValues
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.nullable
 import kotlinx.collections.immutable.PersistentList

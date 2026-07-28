@@ -18,7 +18,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.nullable
 import org.openjdk.jmh.annotations.Benchmark
