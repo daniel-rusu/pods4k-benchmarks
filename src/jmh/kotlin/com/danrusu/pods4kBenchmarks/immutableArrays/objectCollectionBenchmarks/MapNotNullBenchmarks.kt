@@ -5,8 +5,8 @@ import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.mapNotNu
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValues
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.nullable
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.nullable
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode

@@ -8,7 +8,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**

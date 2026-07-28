@@ -4,8 +4,8 @@ import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlin.random.Random
 
 private const val MAX_VALUE_GENERATION_ATTEMPTS = 100

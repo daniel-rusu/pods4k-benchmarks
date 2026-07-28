@@ -18,7 +18,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**

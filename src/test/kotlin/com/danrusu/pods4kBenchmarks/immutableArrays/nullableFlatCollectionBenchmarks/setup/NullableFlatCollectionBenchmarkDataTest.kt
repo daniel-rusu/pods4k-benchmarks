@@ -6,8 +6,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.nullable
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.nullable
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat

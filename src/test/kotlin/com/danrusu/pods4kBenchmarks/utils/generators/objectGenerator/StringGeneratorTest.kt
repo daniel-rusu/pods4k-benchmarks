@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.utils.generators
+package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat

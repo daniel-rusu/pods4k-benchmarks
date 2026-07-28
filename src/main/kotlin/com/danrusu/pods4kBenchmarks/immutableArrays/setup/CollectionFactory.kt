@@ -11,7 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 

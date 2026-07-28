@@ -7,7 +7,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTAB
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Param

@@ -2,7 +2,7 @@ package com.danrusu.pods4kBenchmarks.utils.generators.fixtures
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
-import com.danrusu.pods4kBenchmarks.utils.generators.ObjectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 
 internal data class TestObject(
     val fieldValue: Int,
