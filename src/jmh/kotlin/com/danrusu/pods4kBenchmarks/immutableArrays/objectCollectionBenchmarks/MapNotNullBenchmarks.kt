@@ -31,19 +31,23 @@ private const val NULL_RATIO = 0.5
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
     objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(
-        fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO),
+        fieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
         referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
     ) { fieldGenerator, referenceGenerator ->
+        // match reference null placement so that benchmarks are directly comparable across data types
+        val reference = referenceGenerator.next()
+        val isNull = reference == null
+
         CompoundElementOfNullableValues(
-            referenceValue = referenceGenerator.next(),
-            booleanValue = fieldGenerator.nextNullableBoolean(),
-            byteValue = fieldGenerator.nextNullableByte(),
-            charValue = fieldGenerator.nextNullableChar(),
-            shortValue = fieldGenerator.nextNullableShort(),
-            intValue = fieldGenerator.nextNullableInt(),
-            floatValue = fieldGenerator.nextNullableFloat(),
-            longValue = fieldGenerator.nextNullableLong(),
-            doubleValue = fieldGenerator.nextNullableDouble(),
+            referenceValue = reference,
+            booleanValue = if (isNull) null else fieldGenerator.nextBoolean(),
+            byteValue = if (isNull) null else fieldGenerator.nextByte(),
+            charValue = if (isNull) null else fieldGenerator.nextChar(),
+            shortValue = if (isNull) null else fieldGenerator.nextShort(),
+            intValue = if (isNull) null else fieldGenerator.nextInt(),
+            floatValue = if (isNull) null else fieldGenerator.nextFloat(),
+            longValue = if (isNull) null else fieldGenerator.nextLong(),
+            doubleValue = if (isNull) null else fieldGenerator.nextDouble(),
         )
     },
 ) {
