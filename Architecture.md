@@ -4,7 +4,18 @@
 
 ### Purpose and Scope
 
+This project uses JMH to benchmark operations on [Immutable Arrays][immutable-arrays-url] with equivalent operations on
+regular arrays, `ArrayList`, and [PersistentList][persistent-list-url].
+
 ### Architecture at a Glance
+
+1. Benchmark classes define
+    * Operations to benchmark across representations (eg. `List<Boolean>.filter{...}`, `BooleanArray.filter{...}`, ...)
+    * Recipe for data generation (eg. size distribution, element generation, etc.)
+2. JMH iterates through each combination of `CollectionType` and `DataType`
+3. Create fixed-seed RNG streams and use the data-generation recipe to create collections for the current
+   `CollectionType` & `DataType`
+4. Invoke the operation on each collection and measure throughput
 
 ## 2. Benchmark Model
 
@@ -89,3 +100,7 @@
 ### Operations per Invocation
 
 ### Public API Boundary
+
+[immutable-arrays-url]: https://github.com/daniel-rusu/pods4k/tree/main/immutable-arrays
+
+[persistent-list-url]: https://github.com/Kotlin/kotlinx.collections.immutable
