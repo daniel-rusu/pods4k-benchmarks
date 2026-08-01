@@ -29,15 +29,59 @@ regular arrays, `ArrayList`, and [PersistentList][persistent-list-url].
 
 ## 3. Benchmark Categories
 
+Benchmark families are organized by the structure of the data that is consumed.
+
 ### Flat Collections
+
+For operating on data structured as `CollectionType<DataType>`
+
+Example `FilterBenchmarks` scenarios:
+
+| Parameters                                      | Measured Operation                  |
+|-------------------------------------------------|-------------------------------------|
+| `CollectionType = LIST` & `DataType = BOOLEAN`  | `List<Int>.filter { predicate }`    |
+| `CollectionType = ARRAY` & `DataType = BOOLEAN` | `BooleanArray.filter { predicate }` |
 
 ### Nullable Flat Collections
 
-### Object Collections
+For operating on data structured as `CollectionType<DataType?>`
+
+Example `FilterNotNullBenchmarks` scenarios:
+
+| Parameters                                  | Measured Operation            |
+|---------------------------------------------|-------------------------------|
+| `CollectionType = LIST` & `DataType = INT`  | `List<Int?>.filterNotNull()`  |
+| `CollectionType = ARRAY` & `DataType = INT` | `Array<Int?>.filterNotNull()` |
 
 ### Nested Collections
 
-*Parent/child scenarios with separate size models for the outer and nested collections.*
+For operating on data structured as `CollectionType<CollectionOwner<CollectionType<DataType>>`
+
+* E.g. List of orders with each order containing a list of products
+
+Example `FlatMapBenchmarks` scenarios:
+
+| Parameters                                      | Measured Operation                                                            |
+|-------------------------------------------------|-------------------------------------------------------------------------------|
+| `CollectionType = LIST` & `DataType = BOOLEAN`  | `List<CollectionOwner<List<Boolean>>.flatMap { it.nestedCollection }`         |
+| `CollectionType = ARRAY` & `DataType = BOOLEAN` | `List<CollectionOwner<BooleanArray>.flatMap { it.nestedCollection.asList() }` |
+
+Nested collections use a separate size distribution to better model the real world as the number of products in an order
+it usually smaller than the number of orders.
+
+### Object Collections
+
+For operating on data structured as `CollectionType<CustomType>`
+
+Example `MapBenchmarks` scenarios:
+
+| Parameters               | Measured Operation               |
+|--------------------------|----------------------------------|
+| `CollectionType = LIST`  | `List<Person>.map { it.field }`  |
+| `CollectionType = ARRAY` | `Array<Person>.map { it.field }` |
+
+These benchmarks are only parameterized by `CollectionType` so they contain 9 separate benchmark methods to measure
+the impact of different field types (eg. `mapBoolean()` measures `CollectionType<Person>.map { it.isMarried }` )
 
 ## 4. Code Organization
 
