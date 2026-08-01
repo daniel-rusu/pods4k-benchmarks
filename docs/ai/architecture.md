@@ -44,8 +44,8 @@ exposed to its benchmarks.
 - `FlatCollectionBenchmarkData`, `NullableFlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and
   `NestedCollectionBenchmarkData`: typed trial-data builders. The nullable flat builder stores boxed nullable elements
   and is used by `FilterNotNullBenchmarks`.
-- `FlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and `NestedCollectionBenchmark`: JMH state and dispatch
-  helpers.
+- `FlatCollectionBenchmark`, `NullableFlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and
+  `NestedCollectionBenchmark`: JMH state and dispatch helpers.
 - `FlatDataFilter`: benchmark-only factories that generate a controlled predicate acceptance ratio.
 
 ## Invariants

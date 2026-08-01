@@ -25,6 +25,7 @@ Use this map to locate the smallest relevant area before making a change.
 
 - Root: `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/`.
 - Flat: `flatCollectionBenchmarks/`; base state in `setup/FlatCollectionBenchmark.kt`.
+- Nullable flat: `nullableFlatCollectionBenchmarks/`; base state in `setup/NullableFlatCollectionBenchmark.kt`.
 - Object: `objectCollectionBenchmarks/`; generic base state in `setup/ObjectCollectionBenchmark.kt`.
 - Nested: `nestedCollectionBenchmarks/`; base state in `setup/NestedCollectionBenchmark.kt`.
 - Shared benchmark-only filtering: `setup/FlatDataFilter.kt`.
