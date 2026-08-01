@@ -85,27 +85,48 @@ the impact of different field types (eg. `mapBoolean()` measures `CollectionType
 
 ## 4. Code Organization
 
-### Benchmark Definitions (`src/jmh`)
+This repository is structured into 3 source-sets:
 
-#### Benchmark Classes
+### Source-Set Boundary
 
-#### Base States and Parameter Dispatch
+| Source set        | Architectural responsibility                                                               |
+|-------------------|--------------------------------------------------------------------------------------------|
+| `src/main/kotlin` | Reusable utilities, shared infrastructure, and deterministic benchmark-data builders.      |
+| `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, benchmark-only fixtures, and measured operations. |
+| `src/test/kotlin` | Tests for the utilities and benchmark-data builders in `src/main`.                         |
 
-### Benchmark Data (`src/main/.../immutableArrays`)
+* `src/jmh/kotlin` depends on `src/main/kotlin`
+* `src/test/kotlin` depends on `src/main/kotlin`
 
-#### Benchmark-Family Data Builders
+This keeps data generation and materialization directly unit-testable and prevents JMH lifecycle concerns from leaking
+into reusable setup logic.
 
-#### Collection Construction and Storage
+### Benchmark organization
 
-### Data-Generation Utilities (`src/main/.../utils`)
+A `*Benchmarks` class defines the recipe for measuring an operation across different collections. It extends from the
+`*CollectionBenchmark` class in its benchmark category. The `*CollectionBenchmark` manages the JMH parameters and uses
+the `*CollectionBenchmarkData` class to generate the benchmark data for the current trial.
 
-#### Distributions
+For example, the `filter` operation is measured on flat collections and is structured as:
 
-#### Generators and Random Sources
+```text
+src
+├── jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays
+│   └── flatCollectionBenchmarks
+│       ├── setup
+│       │   └── FlatCollectionBenchmark.kt      # Base class for all benchmarks that operate on flat collections
+│       └── FilterBenchmarks.kt                 # Recipe for benchmarking the filter operation
+├── main/kotlin/...
+│   └── flatCollectionBenchmarks
+│       └── setup
+│           └── FlatCollectionBenchmarkData.kt  # Generates collections for the current benchmark trial
+└── test/kotlin/...
+    └── flatCollectionBenchmarks
+        └── setup
+            └── FlatCollectionBenchmarkDataTest.kt  # Validates generated data
+```
 
-### Tests (`src/test`)
-
-### Build Configuration
+The nested, nullable-flat, and object-collection benchmark categories follow the same general pattern.
 
 ## 5. Benchmark Lifecycle
 
