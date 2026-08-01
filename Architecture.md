@@ -123,24 +123,12 @@ src
 └── test/kotlin/...
     └── flatCollectionBenchmarks
         └── setup
-            └── FlatCollectionBenchmarkDataTest.kt  # Validates generated data
+            └── FlatCollectionBenchmarkDataTest.kt  # Validates generated data is identical across collection types etc.
 ```
 
 The nested, nullable-flat, and object-collection benchmark categories follow the same general pattern.
 
-## 5. Benchmark Lifecycle
-
-### JMH Parameter Selection
-
-### Trial Setup
-
-### Data Generation and Materialization
-
-### Typed Operation Dispatch
-
-### Measurement and Result Consumption
-
-## 6. Data Construction
+## 5. Data Construction
 
 ### Deterministic Random Streams
 
@@ -154,7 +142,7 @@ The nested, nullable-flat, and object-collection benchmark categories follow the
 
 ### Benchmark-Family Data Builders
 
-## 7. Measurement Invariants
+## 6. Measurement Invariants
 
 ### Setup Versus Measured Work
 
