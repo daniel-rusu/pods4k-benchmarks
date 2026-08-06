@@ -112,23 +112,22 @@ class FlatCollectionBenchmarkData private constructor(
                 dataType = dataType,
                 referenceElementClass = referenceGenerator.objectClass,
             )
-            return FlatCollectionBenchmarkData(
-                batch = CollectionBatch.create(
+            val batch = CollectionBatch.create(
+                collectionType = collectionType,
+                logicalElementClass = dataType.resolveElementClass(referenceGenerator.objectClass),
+                collectionClass = collectionClass,
+                numCollections = numCollections,
+                sizeDistribution = sizeDistribution,
+            ) { size ->
+                CollectionFactory.createCollection(
+                    size = size,
                     collectionType = collectionType,
-                    logicalElementClass = dataType.resolveElementClass(referenceGenerator.objectClass),
-                    collectionClass = collectionClass,
-                    numCollections = numCollections,
-                    sizeDistribution = sizeDistribution,
-                ) { size ->
-                    CollectionFactory.createCollection(
-                        size = size,
-                        collectionType = collectionType,
-                        dataType = dataType,
-                        fieldGenerator = fieldGenerator,
-                        referenceGenerator = referenceGenerator,
-                    )
-                },
-            )
+                    dataType = dataType,
+                    fieldGenerator = fieldGenerator,
+                    referenceGenerator = referenceGenerator,
+                )
+            }
+            return FlatCollectionBenchmarkData(batch)
         }
     }
 }

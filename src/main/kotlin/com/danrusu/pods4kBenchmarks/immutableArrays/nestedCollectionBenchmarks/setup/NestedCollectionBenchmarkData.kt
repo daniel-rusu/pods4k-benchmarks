@@ -117,27 +117,26 @@ class NestedCollectionBenchmarkData private constructor(
                 referenceElementClass = CollectionOwner::class.java,
             )
 
-            return NestedCollectionBenchmarkData(
-                batch = CollectionBatch.create(
-                    collectionType = collectionType,
-                    logicalElementClass = dataType.resolveElementClass(nestedReferenceGenerator.objectClass),
-                    collectionClass = topLevelCollectionClass,
-                    numCollections = numCollections,
-                    sizeDistribution = topLevelSizeDistribution,
-                ) { topLevelSize ->
-                    CollectionFactory.createCollection(topLevelSize, collectionType, CollectionOwner::class.java) {
-                        CollectionOwner(
-                            CollectionFactory.createCollection(
-                                size = nestedSizeDistribution.nextValue(),
-                                collectionType = collectionType,
-                                dataType = dataType,
-                                fieldGenerator = nestedFieldGenerator,
-                                referenceGenerator = nestedReferenceGenerator,
-                            )
+            val batch = CollectionBatch.create(
+                collectionType = collectionType,
+                logicalElementClass = dataType.resolveElementClass(nestedReferenceGenerator.objectClass),
+                collectionClass = topLevelCollectionClass,
+                numCollections = numCollections,
+                sizeDistribution = topLevelSizeDistribution,
+            ) { topLevelSize ->
+                CollectionFactory.createCollection(topLevelSize, collectionType, CollectionOwner::class.java) {
+                    CollectionOwner(
+                        CollectionFactory.createCollection(
+                            size = nestedSizeDistribution.nextValue(),
+                            collectionType = collectionType,
+                            dataType = dataType,
+                            fieldGenerator = nestedFieldGenerator,
+                            referenceGenerator = nestedReferenceGenerator,
                         )
-                    }
-                },
-            )
+                    )
+                }
+            }
+            return NestedCollectionBenchmarkData(batch)
         }
     }
 }

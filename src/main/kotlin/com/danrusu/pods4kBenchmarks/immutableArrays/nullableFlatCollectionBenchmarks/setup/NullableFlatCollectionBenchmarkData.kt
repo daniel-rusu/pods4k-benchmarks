@@ -61,29 +61,28 @@ class NullableFlatCollectionBenchmarkData private constructor(
                 referenceElementClass = elementClass,
             )
 
-            return NullableFlatCollectionBenchmarkData(
-                batch = CollectionBatch.create(
-                    collectionType = collectionType,
-                    logicalElementClass = elementClass,
-                    collectionClass = collectionClass,
-                    numCollections = numCollections,
-                    sizeDistribution = sizeDistribution,
-                ) { size ->
-                    CollectionFactory.createCollection(size, collectionType, elementClass) {
-                        when (dataType) {
-                            DataType.REFERENCE -> referenceGenerator.next()
-                            DataType.BOOLEAN -> fieldGenerator.nextNullableBoolean()
-                            DataType.BYTE -> fieldGenerator.nextNullableByte()
-                            DataType.CHAR -> fieldGenerator.nextNullableChar()
-                            DataType.SHORT -> fieldGenerator.nextNullableShort()
-                            DataType.INT -> fieldGenerator.nextNullableInt()
-                            DataType.FLOAT -> fieldGenerator.nextNullableFloat()
-                            DataType.LONG -> fieldGenerator.nextNullableLong()
-                            DataType.DOUBLE -> fieldGenerator.nextNullableDouble()
-                        }
+            val batch = CollectionBatch.create(
+                collectionType = collectionType,
+                logicalElementClass = elementClass,
+                collectionClass = collectionClass,
+                numCollections = numCollections,
+                sizeDistribution = sizeDistribution,
+            ) { size ->
+                CollectionFactory.createCollection(size, collectionType, elementClass) {
+                    when (dataType) {
+                        DataType.REFERENCE -> referenceGenerator.next()
+                        DataType.BOOLEAN -> fieldGenerator.nextNullableBoolean()
+                        DataType.BYTE -> fieldGenerator.nextNullableByte()
+                        DataType.CHAR -> fieldGenerator.nextNullableChar()
+                        DataType.SHORT -> fieldGenerator.nextNullableShort()
+                        DataType.INT -> fieldGenerator.nextNullableInt()
+                        DataType.FLOAT -> fieldGenerator.nextNullableFloat()
+                        DataType.LONG -> fieldGenerator.nextNullableLong()
+                        DataType.DOUBLE -> fieldGenerator.nextNullableDouble()
                     }
-                },
-            )
+                }
+            }
+            return NullableFlatCollectionBenchmarkData(batch)
         }
     }
 }

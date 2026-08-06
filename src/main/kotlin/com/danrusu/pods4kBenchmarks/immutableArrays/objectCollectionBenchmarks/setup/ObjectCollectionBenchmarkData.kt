@@ -52,20 +52,18 @@ class ObjectCollectionBenchmarkData<T> private constructor(
                 referenceElementClass = elementClass,
             )
 
-            return ObjectCollectionBenchmarkData(
-                batch = CollectionBatch.create(
-                    collectionType = collectionType,
-                    logicalElementClass = elementClass,
-                    collectionClass = collectionClass,
-                    numCollections = numCollections,
-                    sizeDistribution = sizeDistribution,
-                ) { size ->
-                    CollectionFactory.createCollection(size, collectionType, elementClass) {
-                        objectGenerator.next()
-                    }
-                },
-                elementClass = elementClass,
-            )
+            val batch = CollectionBatch.create(
+                collectionType = collectionType,
+                logicalElementClass = elementClass,
+                collectionClass = collectionClass,
+                numCollections = numCollections,
+                sizeDistribution = sizeDistribution,
+            ) { size ->
+                CollectionFactory.createCollection(size, collectionType, elementClass) {
+                    objectGenerator.next()
+                }
+            }
+            return ObjectCollectionBenchmarkData(batch, elementClass)
         }
     }
 }
