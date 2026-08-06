@@ -140,15 +140,20 @@ by the benchmark, so they vary only by `CollectionType`. Their construction flow
 
 ## 6. Measurement Invariants
 
-### Setup Versus Measured Work
-
-### Equivalent Operations Across Representations
-
-### Comparable Input Data
-
-### Operations per Invocation
-
-### Public API Boundary
+- Public API Boundary
+- Equivalent operations across representations
+- Only current representation is materialized
+    - Avoids unfair cache boost of last representation
+- Operations per Invocation
+    - Reduce L1 cache boost
+    - Reduce CPU branch predictor boost
+- All representations get identical data
+    - Identical sequence of collection sizes
+    - Identical element values
+    - Primitive specialization
+- Identical attributes across data types
+    - nullability
+    - predicates
 
 [immutable-arrays-url]: https://github.com/daniel-rusu/pods4k/tree/main/immutable-arrays
 
