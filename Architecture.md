@@ -107,6 +107,37 @@ The nested, nullable-flat, and object-collection benchmark categories follow the
 
 ## 5. Data Construction
 
+This is the data generation flow for the `drop` operation. The nested, nullable-flat, and object-collection benchmark
+categories follow the same general pattern:
+
+1. `DropBenchmarks` specifies the data generation recipe:
+    * `numCollections` to create
+    * Default `DistributionFactory` for sampling the collection sizes
+    * Default `ObjectGeneratorFactory<String>` & `FieldGeneratorFactory` for random strings & primitives
+2. JMH iterates through every `CollectionType` & `DataType`, and creates `DropBenchmarks` with the current combination.
+3. JMH calls `FlatCollectionBenchmark.setupBenchmarkData()` to begin data construction.
+4. Data creation is delegated to `FlatCollectionBenchmarkData.create(...)` which performs the following actions
+    * Create `SplittableRandom` RNG stream from constant seed
+    * Split off separate RNG streams for each aspect of data generation (values, collection sizes, etc.)
+    * Use the factories and associated RNG streams to create size `Distribution`, `FieldGenerator`, & `ObjectGenerator`
+    * Create a `CollectionBatch` with `numCollections` collections. Each collection is created with `CollectionFactory`
+        * size sampled from the size `Distribution`
+        * `CollectionType` & `DataType` controls the type of collection to be created
+        * elements generated from the `FieldGenerator` or `ObjectGenerator` depending on the `DataType`
+
+Although there are 27 `CollectionType` & `DataType` combinations, benchmarking data is only constructed for the current
+combination.
+
+* E.g. when `CollectionType = ARRAY` & `DataType = BOOLEAN`, the `CollectionBatch` will contain `Array<BooleanArray>`.
+  The `drop` operation will be called each `BooleanArray` instance.
+
+### Nullability Handling
+
+### Predicate Handling
+
+The object-collection benchmarks are the current exception to the common parameter matrix: their custom type is fixed
+by the benchmark, so they vary only by `CollectionType`. Their construction flow is otherwise the same.
+
 ## 6. Measurement Invariants
 
 ### Setup Versus Measured Work
