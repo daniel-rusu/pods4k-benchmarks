@@ -125,7 +125,7 @@ categories follow the same general pattern:
         * `CollectionType` & `DataType` controls the type of collection to be created
         * elements generated from the `FieldGenerator` or `ObjectGenerator` depending on the `DataType`
 
-Although there are 27 `CollectionType` & `DataType` combinations, benchmarking data is only constructed for the current
+Although there are 36 `CollectionType` & `DataType` combinations, benchmarking data is only constructed for the current
 combination.
 
 * E.g. when `CollectionType = ARRAY` & `DataType = BOOLEAN`, the `CollectionBatch` will contain `Array<BooleanArray>`.

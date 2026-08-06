@@ -18,7 +18,8 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
 ## Data Flow
 
 1. A JMH base state receives a fixed `numCollections` plus generator and distribution factories.
-2. `@Param` supplies a `CollectionType` and, where relevant, a `DataType`.
+2. `@Param` supplies both a `CollectionType` and a `DataType`, producing 36 parameter combinations per benchmark
+   method.
 3. `@Setup(Level.Trial)` calls the matching `*BenchmarkData.create` factory.
 4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/filter streams, and passes its
    single-collection construction logic to `CollectionBatch`, which materializes only the selected representation.

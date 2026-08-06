@@ -44,9 +44,9 @@ Results are written to `build/results/jmh/results.csv`. Check the relative error
 result whose error exceeds 5% because environmental interference may have made it unreliable.
 
 Benchmark runs are deliberately long. Total measurement time grows with the number of benchmark methods, JMH parameter
-combinations, warmup and measurement iterations, and forks. Flat benchmarks commonly expand across four collection
-types and nine data types, so even one benchmark class can take tens of minutes. Inspect its annotations before running
-a broad include.
+combinations, warmup and measurement iterations, and forks. Every benchmark expands across four collection types and
+nine data types (36 combinations per benchmark method), so even one benchmark class can take tens of minutes. Inspect
+its annotations before running a broad include.
 
 ## Validation Without Running Benchmarks
 

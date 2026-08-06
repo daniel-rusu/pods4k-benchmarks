@@ -6,6 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
@@ -19,8 +20,9 @@ import org.openjdk.jmh.infra.Blackhole
 /**
  * Base state for benchmarks over collections of objects [T].
  *
- * Each trial materializes [numCollections] collections for one [CollectionType]. Subclasses define the measured
- * operation and pass equivalent transforms for all four representations to [transformEachCollection].
+ * Each trial materializes [numCollections] collections for the current [CollectionType]. Subclasses must switch on the
+ * [DataType] parameter as they control the shape of [T] and know what the dataType represents. Subclasses define the
+ * measured operation and pass equivalent transforms for all four representations to [transformEachCollection].
  */
 @State(Scope.Benchmark)
 abstract class ObjectCollectionBenchmark<T>(
@@ -34,6 +36,10 @@ abstract class ObjectCollectionBenchmark<T>(
     /** Repeats each benchmark for every collection representation. */
     @Param
     protected lateinit var collectionType: CollectionType
+
+    /** Repeats each benchmark for `REFERENCE` and the eight primitive families. */
+    @Param
+    protected lateinit var dataType: DataType
 
     @PublishedApi
     internal lateinit var data: ObjectCollectionBenchmarkData<T>

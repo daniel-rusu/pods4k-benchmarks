@@ -4,6 +4,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElement
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -42,101 +43,81 @@ open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>(
     },
 ) {
     @Benchmark
-    fun mapReference(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.referenceValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.referenceValue } },
-            { array: Array<CompoundElement> -> array.map { it.referenceValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.referenceValue } },
-        )
-    }
+    fun map(bh: Blackhole) {
+        when (dataType) {
+            DataType.REFERENCE -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.referenceValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.referenceValue } },
+                { array: Array<CompoundElement> -> array.map { it.referenceValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.referenceValue } },
+            )
 
-    @Benchmark
-    fun mapBoolean(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.booleanValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.booleanValue } },
-            { array: Array<CompoundElement> -> array.map { it.booleanValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.booleanValue } },
-        )
-    }
+            DataType.BOOLEAN -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.booleanValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.booleanValue } },
+                { array: Array<CompoundElement> -> array.map { it.booleanValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.booleanValue } },
+            )
 
-    @Benchmark
-    fun mapByte(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.byteValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.byteValue } },
-            { array: Array<CompoundElement> -> array.map { it.byteValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.byteValue } },
-        )
-    }
+            DataType.BYTE -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.byteValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.byteValue } },
+                { array: Array<CompoundElement> -> array.map { it.byteValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.byteValue } },
+            )
 
-    @Benchmark
-    fun mapChar(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.charValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.charValue } },
-            { array: Array<CompoundElement> -> array.map { it.charValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.charValue } },
-        )
-    }
+            DataType.CHAR -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.charValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.charValue } },
+                { array: Array<CompoundElement> -> array.map { it.charValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.charValue } },
+            )
 
-    @Benchmark
-    fun mapShort(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.shortValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.shortValue } },
-            { array: Array<CompoundElement> -> array.map { it.shortValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.shortValue } },
-        )
-    }
+            DataType.SHORT -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.shortValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.shortValue } },
+                { array: Array<CompoundElement> -> array.map { it.shortValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.shortValue } },
+            )
 
-    @Benchmark
-    fun mapInt(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.intValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.intValue } },
-            { array: Array<CompoundElement> -> array.map { it.intValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.intValue } },
-        )
-    }
+            DataType.INT -> {
+                transformEachCollection(
+                    bh,
+                    { list: List<CompoundElement> -> list.map { it.intValue } },
+                    { list: PersistentList<CompoundElement> -> list.map { it.intValue } },
+                    { array: Array<CompoundElement> -> array.map { it.intValue } },
+                    { array: ImmutableArray<CompoundElement> -> array.map { it.intValue } },
+                )
+            }
 
-    @Benchmark
-    fun mapFloat(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.floatValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.floatValue } },
-            { array: Array<CompoundElement> -> array.map { it.floatValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.floatValue } },
-        )
-    }
+            DataType.FLOAT -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.floatValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.floatValue } },
+                { array: Array<CompoundElement> -> array.map { it.floatValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.floatValue } },
+            )
 
-    @Benchmark
-    fun mapLong(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.longValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.longValue } },
-            { array: Array<CompoundElement> -> array.map { it.longValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.longValue } },
-        )
-    }
+            DataType.LONG -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.longValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.longValue } },
+                { array: Array<CompoundElement> -> array.map { it.longValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.longValue } },
+            )
 
-    @Benchmark
-    fun mapDouble(bh: Blackhole) {
-        transformEachCollection(
-            bh,
-            { list: List<CompoundElement> -> list.map { it.doubleValue } },
-            { list: PersistentList<CompoundElement> -> list.map { it.doubleValue } },
-            { array: Array<CompoundElement> -> array.map { it.doubleValue } },
-            { array: ImmutableArray<CompoundElement> -> array.map { it.doubleValue } },
-        )
+            DataType.DOUBLE -> transformEachCollection(
+                bh,
+                { list: List<CompoundElement> -> list.map { it.doubleValue } },
+                { list: PersistentList<CompoundElement> -> list.map { it.doubleValue } },
+                { array: Array<CompoundElement> -> array.map { it.doubleValue } },
+                { array: ImmutableArray<CompoundElement> -> array.map { it.doubleValue } },
+            )
+        }
     }
 }
