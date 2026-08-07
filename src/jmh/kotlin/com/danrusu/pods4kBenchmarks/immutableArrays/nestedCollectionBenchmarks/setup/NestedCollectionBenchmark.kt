@@ -9,6 +9,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -29,10 +30,7 @@ import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerat
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
-import org.openjdk.jmh.annotations.Param
-import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
-import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.infra.Blackhole
 
 /**
@@ -41,7 +39,6 @@ import org.openjdk.jmh.infra.Blackhole
  * Here, "collection" includes [List], [PersistentList], [Array], and [ImmutableArray] representations rather than only
  * implementations of the Kotlin [Collection] interface.
  */
-@State(Scope.Benchmark)
 abstract class NestedCollectionBenchmark(
     /** Number of distinct top-level collections processed by each benchmark invocation. */
     private val numCollections: Int,
@@ -55,15 +52,7 @@ abstract class NestedCollectionBenchmark(
     private val nestedFieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
     /** Creates reference generators for nested collection elements. */
     private val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
-) {
-    /** Repeats each benchmark for every collection representation. */
-    @Param
-    protected lateinit var collectionType: CollectionType
-
-    /** Repeats each benchmark for a string reference type and all eight primitive families. */
-    @Param
-    protected lateinit var dataType: DataType
-
+) : CollectionBenchmark() {
     @PublishedApi
     internal lateinit var data: NestedCollectionBenchmarkData
 

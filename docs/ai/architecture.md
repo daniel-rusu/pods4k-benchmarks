@@ -17,10 +17,11 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
 
 ## Data Flow
 
-1. A JMH base state receives a fixed `numCollections` plus generator and distribution factories.
-2. `@Param` supplies both a `CollectionType` and a `DataType`, producing 36 parameter combinations per benchmark
-   method.
-3. `@Setup(Level.Trial)` calls the matching `*BenchmarkData.create` factory.
+1. `CollectionBenchmark` defines the shared `Scope.Benchmark` state and uses `@Param` to supply both a
+   `CollectionType` and a `DataType`, producing 36 parameter combinations per benchmark method.
+2. A specialized benchmark base receives a fixed `numCollections` plus the generator and distribution factories for
+   its data shape.
+3. Its `@Setup(Level.Trial)` method calls the matching `*BenchmarkData.create` factory.
 4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/filter streams, and passes its
    single-collection construction logic to `CollectionBatch`, which materializes only the selected representation.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
@@ -42,11 +43,12 @@ exposed to its benchmarks.
   representation.
 - `DistributionFactory`: flat and nested collection-size models.
 - `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable element generation.
+- `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
 - `FlatCollectionBenchmarkData`, `NullableFlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and
   `NestedCollectionBenchmarkData`: typed trial-data builders. The nullable flat builder stores boxed nullable elements
   and is used by `FilterNotNullBenchmarks`.
 - `FlatCollectionBenchmark`, `NullableFlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and
-  `NestedCollectionBenchmark`: JMH state and dispatch helpers.
+  `NestedCollectionBenchmark`: specialized trial setup and statically typed dispatch helpers.
 - `FlatDataFilter`: benchmark-only factories that generate a controlled predicate acceptance ratio.
 
 ## Invariants

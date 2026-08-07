@@ -24,10 +24,12 @@ Use this map to locate the smallest relevant area before making a change.
 ## JMH Benchmarks
 
 - Root: `src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/`.
-- Flat: `flatCollectionBenchmarks/`; base state in `setup/FlatCollectionBenchmark.kt`.
-- Nullable flat: `nullableFlatCollectionBenchmarks/`; base state in `setup/NullableFlatCollectionBenchmark.kt`.
-- Object: `objectCollectionBenchmarks/`; generic base state in `setup/ObjectCollectionBenchmark.kt`.
-- Nested: `nestedCollectionBenchmarks/`; base state in `setup/NestedCollectionBenchmark.kt`.
+- Shared state and the `CollectionType`/`DataType` parameters: `setup/CollectionBenchmark.kt`.
+- Flat: `flatCollectionBenchmarks/`; specialized setup and dispatch in `setup/FlatCollectionBenchmark.kt`.
+- Nullable flat: `nullableFlatCollectionBenchmarks/`; specialized setup and dispatch in
+  `setup/NullableFlatCollectionBenchmark.kt`.
+- Object: `objectCollectionBenchmarks/`; generic setup and dispatch in `setup/ObjectCollectionBenchmark.kt`.
+- Nested: `nestedCollectionBenchmarks/`; specialized setup and dispatch in `setup/NestedCollectionBenchmark.kt`.
 - Shared benchmark-only filtering: `setup/FlatDataFilter.kt`.
 - Pairwise flat operations use `transformEachPairOfCollections` and
   `@OperationsPerInvocation(NUM_COLLECTIONS / 2)`.

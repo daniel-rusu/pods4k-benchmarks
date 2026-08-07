@@ -9,6 +9,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -30,10 +31,7 @@ import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGener
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.OperationsPerInvocation
-import org.openjdk.jmh.annotations.Param
-import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
-import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.infra.Blackhole
 
 /**
@@ -43,7 +41,6 @@ import org.openjdk.jmh.infra.Blackhole
  * Subclasses pass equivalent statically typed operations to [transformEachCollection] or
  * [transformEachPairOfCollections].
  */
-@State(Scope.Benchmark)
 abstract class FlatCollectionBenchmark(
     /** Number of distinct collections processed by each invocation, or paired without reuse. */
     private val numCollections: Int,
@@ -53,15 +50,7 @@ abstract class FlatCollectionBenchmark(
     private val fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
     /** Creates reference element values. */
     private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
-) {
-    /** Repeats each benchmark for every collection representation. */
-    @Param
-    protected lateinit var collectionType: CollectionType
-
-    /** Repeats each benchmark for `REFERENCE` and the eight primitive families. */
-    @Param
-    protected lateinit var dataType: DataType
-
+) : CollectionBenchmark() {
     @PublishedApi
     internal lateinit var data: FlatCollectionBenchmarkData
 
