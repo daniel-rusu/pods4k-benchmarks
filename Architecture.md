@@ -133,10 +133,20 @@ combination.
 
 ### Nullability Handling
 
+Benchmarks that deal with null values, such as `FilterNotNullBenchmarks`, specify factories that create `null` values
+null-ratio portion of the time. During data generation, the next element will be null if a random `double` is less than
+the null ratio.
+
 ### Predicate Handling
 
-The object-collection benchmarks are the current exception to the common parameter matrix: their custom type is fixed
-by the benchmark, so they vary only by `CollectionType`. Their construction flow is otherwise the same.
+Predicate decisions are shifted to the data generation phase in order to remove the RNG overhead from the benchmark and
+focus on the performance of the operation.
+
+Benchmarks that deal with predicates, such as `FilterBenchmarks`, specify the acceptance ratio. Elements are accepted if
+their value is smaller than the median value of their data type. When generating the next element, the RNG determines
+whether it should be accepted by checking whether a random `double` is less than the acceptance ratio. If the next
+element should pass the predicate then we repeatedly generate random values discarding them until we find one smaller
+than the median value (and vice versa).
 
 ## 6. Measurement Invariants
 
