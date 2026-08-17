@@ -148,22 +148,43 @@ whether it should be accepted by checking whether a random `double` is less than
 element should pass the predicate then we repeatedly generate random values discarding them until we find one smaller
 than the median value (and vice versa).
 
-## 6. Measurement Invariants
+## 6. Fair-Comparison Safeguards
 
-- Public API Boundary
-- Equivalent operations across representations
-- Only current representation is materialized
-    - Avoids unfair cache boost of last representation
-- Operations per Invocation
-    - Reduce L1 cache boost
-    - Reduce CPU branch predictor boost
-- All representations get identical data
-    - Identical sequence of collection sizes
-    - Identical element values
-    - Primitive specialization
-- Identical attributes across data types
-    - nullability
-    - predicates
+### Comparable API Work
+
+Each benchmark supplies equivalent, statically typed operations for every supported representation through its published
+public API. JVM arrays and immutable arrays retain their primitive-specialized forms to represent real-world usage.
+
+### Equivalent, Deterministic Inputs
+
+Each parameterized trial starts with a new zero-seeded `RngFactory`. For a given `DataType`, every `CollectionType`
+therefore receives the same collection sizes and element values.
+
+A `SplittableRandom` RNG is split into separate streams for values, collection sizes, nullability, and
+predicate-acceptance decisions. Generating String elements that consumes more random values cannot change collection
+sizes, null positions, or which elements should satisfy a predicate. This makes throughput measurements directly
+comparable across different collections libraries and also across different data types.
+
+### Isolated Trial Data
+
+`@Setup(Level.Trial)` constructs inputs before timed work and materializes only the active `CollectionType`/`DataType`
+combination. Competing representations cannot add cache pressure or gain an advantage from their position in the setup
+or benchmark sequence.
+
+### Batched Work and Score Normalization
+
+One invocation processes 1,000 distinct, prebuilt collections instead of repeatedly operating on one hot input. This
+broadens the working set and varies sizes and values within the invocation, reducing cache and branch-prediction bias.
+
+Collection sizes are sampled from a distribution that models the mix of empty, small, medium, and occasional large
+collections found in business workloads. The resulting variation represents real-world usage while also preventing the
+CPU branch predictor from predicting the traversal lengths in advance.
+
+### JMH Measurement Controls
+
+Every produced result is consumed by `Blackhole`, preventing unused work from being optimized away. Current benchmark
+classes also use the same protocol: throughput mode, ten one-second warmup iterations, seven one-second measurement
+iterations, and two independent JVM forks.
 
 [immutable-arrays-url]: https://github.com/daniel-rusu/pods4k/tree/main/immutable-arrays
 
