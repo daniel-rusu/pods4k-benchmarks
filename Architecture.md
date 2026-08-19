@@ -91,30 +91,15 @@ into reusable setup logic.
 
 ### Benchmark organization
 
-A `*Benchmarks` class defines the recipe for measuring an operation across different collections. It extends from the
-`*CollectionBenchmark` class in its benchmark category. The `*CollectionBenchmark` manages the JMH parameters and uses
-the `*CollectionBenchmarkData` class to generate the benchmark data for the current trial.
+An operation is benchmarked in `<Operation>Benchmarks` which defines equivalent operations across different collection
+types along with the data-generation recipe for how collections should be created. It extends from
+`<Category>CollectionBenchmark` depending on its benchmark category. `<Category>CollectionBenchmark` uses
+`<Category>CollectionBenchmarkData` to generate the benchmark data for the current trial and invokes the appropriate
+typed operation on each collection in the current batch.
 
-For example, the `filter` operation is measured on flat collections and is structured as:
-
-```text
-src
-├── jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays
-│   └── flatCollectionBenchmarks
-│       ├── setup
-│       │   └── FlatCollectionBenchmark.kt      # Base class for all benchmarks that operate on flat collections
-│       └── FilterBenchmarks.kt                 # Recipe for benchmarking the filter operation
-├── main/kotlin/...
-│   └── flatCollectionBenchmarks
-│       └── setup
-│           └── FlatCollectionBenchmarkData.kt  # Generates collections for the current benchmark trial
-└── test/kotlin/...
-    └── flatCollectionBenchmarks
-        └── setup
-            └── FlatCollectionBenchmarkDataTest.kt  # Validates generated data is identical across collection types etc.
-```
-
-The nested, nullable-flat, and object-collection benchmark categories follow the same general pattern.
+For example, the `filter` operation is benchmarked in `FilterBenchmarks`. It extends from `FlatCollectionBenchmark`
+because we're filtering flat data.  `FlatCollectionBenchmarkData` is used to generate the dataset for each
+`CollectionType` & `DataType` combination.
 
 ## 5. Data Construction
 
