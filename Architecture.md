@@ -116,16 +116,15 @@ categories follow the same general pattern:
     * Create `SplittableRandom` RNG stream from constant seed
     * Split off separate RNG streams for each aspect of data generation (values, collection sizes, etc.)
     * Use the factories and associated RNG streams to create size `Distribution`, `FieldGenerator`, & `ObjectGenerator`
-    * Create a `CollectionBatch` with `numCollections` collections. Each collection is created with `CollectionFactory`
+    * Create a `CollectionBatch` with an array of `numCollections` collections. Each collection is created with
+      `CollectionFactory`
         * size sampled from the size `Distribution`
         * `CollectionType` & `DataType` controls the type of collection to be created
         * elements generated from the `FieldGenerator` or `ObjectGenerator` depending on the `DataType`
 
 Although there are 36 `CollectionType` & `DataType` combinations, benchmarking data is only constructed for the current
-combination.
-
-* E.g. when `CollectionType = ARRAY` & `DataType = BOOLEAN`, the `CollectionBatch` will contain `Array<BooleanArray>`.
-  The `drop` operation will be called each `BooleanArray` instance.
+combination. Eg. the `CollectionBatch` stores an array of `List<Boolean>` collections when `CollectionType = LIST` &
+`DataType = BOOLEAN`.
 
 ### Nullability Handling
 
@@ -135,14 +134,14 @@ the null ratio.
 
 ### Predicate Handling
 
-Predicate decisions are shifted to the data generation phase in order to remove the RNG overhead from the benchmark and
-focus on the performance of the operation.
-
 Benchmarks that deal with predicates, such as `FilterBenchmarks`, specify the acceptance ratio. Elements are accepted if
 their value is smaller than the median value of their data type. When generating the next element, the RNG determines
 whether it should be accepted by checking whether a random `double` is less than the acceptance ratio. If the next
-element should pass the predicate then we repeatedly generate random values discarding them until we find one smaller
-than the median value (and vice versa).
+element should be accepted then we repeatedly generate random values discarding them until we find one smaller than the
+median value (and vice versa).
+
+Note that predicate decisions are shifted to the data generation phase in order to remove the RNG overhead from the
+benchmark, and instead focus on the performance of the operation.
 
 ## 6. Fair-Comparison Safeguards
 
