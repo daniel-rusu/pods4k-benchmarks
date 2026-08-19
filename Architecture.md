@@ -7,25 +7,36 @@
 This project uses JMH to benchmark operations on [Immutable Arrays][immutable-arrays-url] with equivalent operations on
 regular arrays, `ArrayList`, and [PersistentList][persistent-list-url].
 
-### Architecture at a Glance
-
-1. Benchmark classes define
-    * Operations to benchmark across representations (eg. `List<Boolean>.filter{...}`, `BooleanArray.filter{...}`, ...)
-    * Recipe for data generation (eg. size distribution, element generation, etc.)
-2. JMH iterates through each combination of `CollectionType` and `DataType`
-3. Create fixed-seed RNG streams and use the data-generation recipe to create collections for the current
-   `CollectionType` & `DataType`
-4. Invoke the operation on each collection and measure throughput
-
-## 2. Benchmark Model
+## 1. Benchmark Model
 
 ### Collection Representations
 
+`CollectionType` selects one of four representations for a trial:
+
+* `LIST`: an `ArrayList` exposed as `List<T>`
+* `PERSISTENT_LIST`: `kotlinx.collections.immutable.PersistentList<T>`
+* `ARRAY`: `Array<T>` for references and nullable values, or the matching primitive array for non-null primitives
+* `IMMUTABLE_ARRAY`: `ImmutableArray<T>` for references and nullable values, or the matching primitive-specialized
+  immutable array
+
 ### Data Types
+
+`DataType` covers `REFERENCE` plus `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, and `DOUBLE`.
 
 ### Parameter Matrix
 
-### Work per Invocation
+`CollectionBenchmark` exposes `CollectionType` and `DataType` as JMH `@Param` axes. JMH therefore runs each benchmark
+as 4 X 9 = 36 independent trials.
+
+## 2. Architecture at a Glance
+
+1. Benchmark classes define
+    * The operation to benchmark across representations (eg. `List<Boolean>.filter {...}`, `BooleanArray.filter {...}`)
+    * Recipe for data generation (eg. size distribution, element generation, etc.)
+2. JMH iterates through each combination of `CollectionType` and `DataType`
+3. Create fixed-seed RNG streams and use the data-generation recipe to create a batch of collections for the current
+   `CollectionType` & `DataType`
+4. Invoke the operation on each collection and measure throughput normalizing the results based on the batch size
 
 ## 3. Benchmark Categories
 
