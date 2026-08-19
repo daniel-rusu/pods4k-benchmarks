@@ -30,6 +30,7 @@ Use this map to locate the smallest relevant area before making a change.
   `setup/NullableFlatCollectionBenchmark.kt`.
 - Object: `objectCollectionBenchmarks/`; generic setup and dispatch in `setup/ObjectCollectionBenchmark.kt`.
 - Nested: `nestedCollectionBenchmarks/`; specialized setup and dispatch in `setup/NestedCollectionBenchmark.kt`.
+- Shared batch-size defaults and cache-footprint guidance: `setup/BenchmarkBatchSize.kt`.
 - Shared benchmark-only filtering: `setup/FlatDataFilter.kt`.
 - Pairwise flat operations use `transformEachPairOfCollections` and
   `@OperationsPerInvocation(NUM_COLLECTIONS / 2)`.

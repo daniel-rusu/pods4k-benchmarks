@@ -173,12 +173,11 @@ or benchmark sequence.
 
 ### Batched Work and Score Normalization
 
-One invocation processes 1,000 distinct, prebuilt collections instead of repeatedly operating on one hot input. This
-broadens the working set and varies sizes and values within the invocation, reducing cache and branch-prediction bias.
+One invocation processes hundreds of distinct, prebuilt collections instead of repeatedly operating on one hot input.
+This broadens the working set with varied sizes and values, reducing cache and branch-prediction bias.
 
 Collection sizes are sampled from a distribution that models the mix of empty, small, medium, and occasional large
-collections found in business workloads. The resulting variation represents real-world usage while also preventing the
-CPU branch predictor from predicting the traversal lengths in advance.
+collections found in business workloads.
 
 ### JMH Measurement Controls
 

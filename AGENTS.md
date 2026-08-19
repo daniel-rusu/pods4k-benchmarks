@@ -48,6 +48,10 @@
   `RngFactory` master seed and purpose-specific streams so value generation does not also change collection sizes,
   null placement, or filter acceptance.
 - Consume benchmark results with JMH `Blackhole`.
+- Start with the shared batch defaults in
+  [`BenchmarkBatchSize`](src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/BenchmarkBatchSize.kt).
+  Choose a tier from the collection and element data actually fetched or written by the operation, not the total setup
+  dataset; unusual access or allocation patterns may justify a documented local override.
 - Keep `@OperationsPerInvocation` aligned with the number of collections processed per invocation; pairwise benchmarks usually process `NUM_COLLECTIONS / 2` collection pairs.
 - Avoid changing warmup, measurement, fork counts, or `jmh.includes` as part of unrelated edits.
 - Do not run benchmarks casually; they can take many minutes or hours.

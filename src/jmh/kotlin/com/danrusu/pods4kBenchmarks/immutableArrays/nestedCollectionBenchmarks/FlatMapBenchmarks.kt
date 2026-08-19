@@ -12,6 +12,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.flatMap
 import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.CollectionOwner
 import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.NestedCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -24,7 +25,7 @@ import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-private const val NUM_COLLECTIONS = 250
+private const val NUM_COLLECTIONS = BenchmarkBatchSize.NESTED_COLLECTIONS
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)

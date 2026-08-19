@@ -13,6 +13,16 @@
 - `./gradlew jmhJar` additionally runs the JMH bytecode generator, compiles its generated harness classes, and packages the executable JMH jar.
 - `./gradlew build --no-daemon` depends on `jmhClasses`, but it does not generate the JMH harness; CI adds `jmhJar` for that validation.
 
+## Adding Or Changing A Benchmark
+
+- Start with a shared tier from
+  [`BenchmarkBatchSize`](../../src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/BenchmarkBatchSize.kt).
+- Select the tier from bytes fetched or written while processing the collections and their visited elements, including
+  material results and temporary storage. The total trial dataset is not the relevant cache footprint when an operation
+  touches only part of it.
+- Use a benchmark-local override only when an unusual access, result, or allocation pattern falls outside the shared
+  heuristic, and document why.
+
 ## Running Benchmarks
 
 - Configure `jmh.includes` in `build.gradle.kts` to target the class/package being investigated.
@@ -36,4 +46,5 @@
 - If JMH ran, report the command, include filter, JVM/JDK if known, and result file path.
 - Do not claim performance improvement from code inspection alone.
 - Treat high relative error as inconclusive; README recommends rerunning when relative error is above 5%.
-- Mention any changes to `jmh.includes`, warmup, measurement, fork count, data distributions, or `OperationsPerInvocation`.
+- Mention any changes to batch size, `jmh.includes`, warmup, measurement, fork count, data distributions, or
+  `OperationsPerInvocation`.

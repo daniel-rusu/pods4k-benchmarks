@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -23,7 +24,7 @@ import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-private const val NUM_COLLECTIONS = 1000
+private const val NUM_COLLECTIONS = BenchmarkBatchSize.SPARSE_ACCESS
 
 // Inspects (1 / 0.02) = 50 elements on average
 // The median is 35 elements because 1 - (1 - 0.02)^35 = ~50.7%.

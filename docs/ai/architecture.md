@@ -44,6 +44,8 @@ exposed to its benchmarks.
 - `DistributionFactory`: flat and nested collection-size models.
 - `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable element generation.
 - `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
+- `BenchmarkBatchSize`: shared collection-count defaults chosen by the data each operation fetches or writes, rather
+  than the total trial dataset size.
 - `FlatCollectionBenchmarkData`, `NullableFlatCollectionBenchmarkData`, `ObjectCollectionBenchmarkData`, and
   `NestedCollectionBenchmarkData`: typed trial-data builders. The nullable flat builder stores boxed nullable elements
   and is used by `FilterNotNullBenchmarks`.
@@ -55,6 +57,8 @@ exposed to its benchmarks.
 
 - Changing value generation for one data type must not also change sizes, null positions, or filter decisions.
 - Each invocation processes distinct prebuilt collections; setup cost is excluded unless construction is the scenario.
+- Benchmarks use the shared `BenchmarkBatchSize` tier matching their access and result pattern unless a documented
+  benchmark-local override is warranted.
 - `@OperationsPerInvocation` equals the number of operations performed by one method call. Pairwise helpers process
   `NUM_COLLECTIONS / 2` pairs.
 - Comparisons use normal public APIs and equivalent operations across all representations supported by that benchmark.

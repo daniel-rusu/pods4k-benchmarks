@@ -28,6 +28,8 @@ Use this checklist when reviewing Codex-generated changes in this repo.
 - Data setup happens in `@Setup(Level.Trial)` unless construction cost is the benchmark target.
 - Constant master seeds and purpose-specific RNG streams keep sizes, values, null placement, and filter decisions
   independent where required.
+- Batch size uses the shared tier matching the bytes actually fetched or written while processing collections and their
+  elements; benchmark-local overrides explain the unusual access or allocation pattern.
 - `@OperationsPerInvocation` matches collections processed per invocation, including pairwise loops.
 - `jmh.includes` changes are intentional and called out.
 - Benchmark claims distinguish compile checks from actual JMH runs.
