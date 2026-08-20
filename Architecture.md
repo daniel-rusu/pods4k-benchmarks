@@ -42,32 +42,25 @@ Benchmark categories describe the shape of the data consumed by an operation:
 Nested outer and inner collection sizes use separate distributions. This models cases such as orders containing fewer
 products than the total number of orders.
 
-## 4. Code Organization
+## Code Organization
 
-This repository is structured into 3 source-sets:
+| Source set        | Responsibility                                                                            |
+|-------------------|-------------------------------------------------------------------------------------------|
+| `src/main/kotlin` | Reusable utilities, shared infrastructure, and deterministic data builders                |
+| `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, benchmark-only fixtures, and measured operations |
+| `src/test/kotlin` | Tests for utilities and data builders in `src/main`                                       |
 
-### Source-Set Boundary
+Reusable data construction stays in `src/main` so it can be unit-tested without JMH. Benchmark lifecycle and
+scenario-specific code stay in `src/jmh`.
 
-| Source set        | Architectural responsibility                                                               |
-|-------------------|--------------------------------------------------------------------------------------------|
-| `src/main/kotlin` | Reusable utilities, shared infrastructure, and deterministic benchmark-data builders.      |
-| `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, benchmark-only fixtures, and measured operations. |
-| `src/test/kotlin` | Tests for the utilities and benchmark-data builders in `src/main`.                         |
+Each operation follows the same structure:
 
-This keeps data generation and materialization directly unit-testable and prevents JMH lifecycle concerns from leaking
-into reusable setup logic.
+- `<Operation>Benchmarks` defines the operations and data recipe.
+- The class extends the matching `<Category>CollectionBenchmark`.
+- `<Category>CollectionBenchmarkData` creates the trial data.
+- The category base class dispatches to the typed operation for the active representation.
 
-### Benchmark organization
-
-An operation is benchmarked in `<Operation>Benchmarks` which defines equivalent operations across different collection
-types along with the data-generation recipe for how collections should be created. It extends from
-`<Category>CollectionBenchmark` depending on its benchmark category. `<Category>CollectionBenchmark` uses
-`<Category>CollectionBenchmarkData` to generate the benchmark data for the current trial and invokes the appropriate
-typed operation on each collection in the current batch.
-
-For example, the `filter` operation is benchmarked in `FilterBenchmarks`. It extends from `FlatCollectionBenchmark`
-because we're filtering flat data.  `FlatCollectionBenchmarkData` is used to generate the dataset for each
-`CollectionType` & `DataType` combination.
+For example, `FilterBenchmarks` extends `FlatCollectionBenchmark` and uses `FlatCollectionBenchmarkData`.
 
 ## 5. Data Construction
 
