@@ -104,42 +104,23 @@ median value (and vice versa).
 Note that predicate decisions are shifted to the data generation phase in order to remove the RNG overhead from the
 benchmark, and instead focus on the performance of the operation.
 
-## 6. Fair-Comparison Safeguards
+## Fair-Comparison Safeguards
 
-### Comparable API Work
-
-Each benchmark supplies equivalent, statically typed operations for every supported representation through its published
-public API. JVM arrays and immutable arrays retain their primitive-specialized forms to represent real-world usage.
-
-### Equivalent, Deterministic Inputs
-
-Each parameterized trial starts with a new zero-seeded `RngFactory`. For a given `DataType`, every `CollectionType`
-therefore receives the same collection sizes and element values.
-
-A `SplittableRandom` RNG is split into separate streams for values, collection sizes, nullability, and
-predicate-acceptance decisions. Generating String elements that consumes more random values cannot change collection
-sizes, null positions, or which elements should satisfy a predicate. This makes throughput measurements directly
-comparable across different collections libraries and also across different data types.
-
-### Isolated Trial Data
-
-`@Setup(Level.Trial)` constructs inputs before timed work and materializes only the active `CollectionType`/`DataType`
-combination. Competing representations cannot add cache pressure or gain an advantage from their position in the setup
-or benchmark sequence.
-
-### Batched Work and Score Normalization
-
-One invocation processes hundreds of distinct, prebuilt collections instead of repeatedly operating on one hot input.
-This broadens the working set with varied sizes and values, reducing cache and branch-prediction bias.
-
-Collection sizes are sampled from a distribution that models the mix of empty, small, medium, and occasional large
-collections found in business workloads.
-
-### JMH Measurement Controls
-
-Every produced result is consumed by `Blackhole`, preventing unused work from being optimized away. Current benchmark
-classes also use the same protocol: throughput mode, ten one-second warmup iterations, seven one-second measurement
-iterations, and two independent JVM forks.
+- **Public APIs:** every representation uses an equivalent, statically typed operation through its published API.
+- **Realistic specialization:** JVM arrays and Immutable Arrays retain primitive-specialized forms.
+- **Equivalent inputs:**
+    - Same sequence of collection sizes is used across all `CollectionType` & `DataType` combinations.
+    - A given `DataType` results in the same sequence of values across all `CollectionType` representations.
+    - Operations that deal with null elements encounter the same sequence of null-element positions across all
+      `CollectionType` & `DataType` combinations.
+    - Operations that deal with predicates encounter the same sequence of predicate acceptance across all
+      `CollectionType` & `DataType` combinations.
+- **Isolated setup:** `@Setup(Level.Trial)` excludes construction from timed work and materializes only the active
+  representation, avoiding cross-representation cache pressure.
+- **Batched work:** each invocation processes hundreds of prebuilt collections instead of one repeatedly hot input.
+- **Correct normalization:** `@OperationsPerInvocation` matches the number of collections processed; pairwise benchmarks
+  use `NUM_COLLECTIONS / 2`.
+- **Dead-code prevention:** every result is consumed by `Blackhole`.
 
 [immutable-arrays-url]: https://github.com/daniel-rusu/pods4k/tree/main/immutable-arrays
 
