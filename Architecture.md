@@ -32,12 +32,12 @@ Together, these axes produce **36 independent trials** per benchmark method.
 
 Benchmark categories describe the shape of the data consumed by an operation:
 
-| Category      | Shape                                                       | Examples                                                                          |
-|---------------|-------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| Flat          | `CollectionType<DataType>`                                  | `BooleanArray`<br/>`List<Boolean>`                                                |
-| Nullable flat | `CollectionType<DataType?>`                                 | `Array<Double?>`<br/>`List<Double?>`                                              |
-| Nested        | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `Array<CollectionOwner<BooleanArray>>`<br/>`List<CollectionOwner<List<Boolean>>>` |
-| Object        | `CollectionType<CustomType>`                                | `Array<CustomType>`<br/>`List<CustomType>`                                        |
+| Category      | Shape                                                       | Examples                                                                    |
+|---------------|-------------------------------------------------------------|-----------------------------------------------------------------------------|
+| Flat          | `CollectionType<DataType>`                                  | `BooleanArray`<br/>`List<Boolean>`                                          |
+| Nullable flat | `CollectionType<DataType?>`                                 | `Array<Double?>`<br/>`List<Double?>`                                        |
+| Nested        | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `Array<CollectionOwner<ByteArray>>`<br/>`List<CollectionOwner<List<Byte>>>` |
+| Object        | `CollectionType<CustomType>`                                | `Array<CustomType>`<br/>`List<CustomType>`                                  |
 
 Nested outer and inner collection sizes use separate distributions. This models cases such as orders containing fewer
 products than the total number of orders.
