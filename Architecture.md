@@ -19,51 +19,28 @@ This project uses JMH to compare the published [Immutable Array][immutable-array
 
 Together, these axes produce **36 independent trials** per benchmark method.
 
-## 2. Architecture at a Glance
+## Runtime Flow
 
-1. Benchmark classes define
-    * The operation to benchmark across representations (eg. `List<Boolean>.filter {...}`, `BooleanArray.filter {...}`)
-    * Recipe for data generation (eg. size distribution, element generation, etc.)
-2. JMH iterates through each combination of `CollectionType` and `DataType`
-3. Create fixed-seed RNG streams and use the data-generation recipe to create a batch of collections for the current
-   `CollectionType` & `DataType`
-4. Invoke the operation on each collection and measure throughput normalizing the results based on the batch size
+1. A benchmark class defines equivalent, statically typed operations for each collection representation and supplies a
+   data-generation recipe.
+2. JMH selects one `CollectionType` and `DataType` combination.
+3. `@Setup(Level.Trial)` builds a deterministic batch for only that combination.
+4. The benchmark invokes the operation on every collection in the batch.
+5. JMH consumes each result with `Blackhole` and normalizes the score using `@OperationsPerInvocation`.
 
-## 3. Benchmark Categories
+## Benchmark Categories
 
-Benchmark families are organized by the structure of the data that is consumed.
+Benchmark categories describe the shape of the data consumed by an operation:
 
-### Flat Collections
+| Category      | Shape                                                       | Examples                                                                          |
+|---------------|-------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| Flat          | `CollectionType<DataType>`                                  | `BooleanArray`<br/>`List<Boolean>`                                                |
+| Nullable flat | `CollectionType<DataType?>`                                 | `Array<Double?>`<br/>`List<Double?>`                                              |
+| Nested        | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `Array<CollectionOwner<BooleanArray>>`<br/>`List<CollectionOwner<List<Boolean>>>` |
+| Object        | `CollectionType<CustomType>`                                | `Array<CustomType>`<br/>`List<CustomType>`                                        |
 
-For operating on data structured as `CollectionType<DataType>`
-
-* E.g. `List<BOOLEAN>` when `CollectionType = LIST` & `DataType = BOOLEAN`
-* E.g. `BooleanArray` when `CollectionType = ARRAY` & `DataType = BOOLEAN`
-
-### Nullable Flat Collections
-
-For operating on data structured as `CollectionType<DataType?>`
-
-* E.g. `List<Double?>` when `CollectionType = LIST` & `DataType = DOUBLE`
-* E.g. `Array<Float?>` when `CollectionType = ARRAY` & `DataType = FLOAT`
-
-### Nested Collections
-
-For operating on data structured as `CollectionType<CollectionOwner<CollectionType<DataType>>`. Represents nested
-scenarios such as a list of orders with each order containing a list of products.
-
-* E.g. `List<CollectionOwner<List<Boolean>>` when `CollectionType = LIST` & `DataType = BOOLEAN`
-* E.g. `Array<CollectionOwner<BooleanArray>` when `CollectionType = ARRAY` & `DataType = BOOLEAN`
-
-The nested collection is constructed from a separate size distribution to better model the real world as the number of
-products in an order it usually smaller than the number of orders.
-
-### Object Collections
-
-For operating on data structured as `CollectionType<CustomType>`. Parameterized by `CollectionType`:
-
-* E.g. `List<CustomType>` when `CollectionType = LIST`
-* E.g. `Array<CustomType>` when `CollectionType = ARRAY`
+Nested outer and inner collection sizes use separate distributions. This models cases such as orders containing fewer
+products than the total number of orders.
 
 ## 4. Code Organization
 
