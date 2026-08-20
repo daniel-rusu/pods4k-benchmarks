@@ -1,32 +1,23 @@
 # Benchmark Architecture
 
-## 1. Overview
+## Purpose
 
-### Purpose and Scope
+This project uses JMH to compare the published [Immutable Array][immutable-arrays-url] API with equivalent operations on
+`List`, [PersistentList][persistent-list-url], and JVM arrays.
 
-This project uses JMH to benchmark operations on [Immutable Arrays][immutable-arrays-url] with equivalent operations on
-regular arrays, `ArrayList`, and [PersistentList][persistent-list-url].
+## Benchmark Matrix
 
-## 1. Benchmark Model
+`CollectionBenchmark` defines two JMH `@Param` axes:
 
-### Collection Representations
+- `CollectionType`
+    - `LIST`: `ArrayList` exposed as `List<T>`
+    - `PERSISTENT_LIST`: `kotlinx.collections.immutable.PersistentList<T>`
+    - `ARRAY`: `Array<T>` for references and nullable values; primitive arrays for non-null primitives
+    - `IMMUTABLE_ARRAY`: `ImmutableArray<T>` for references and nullable values; primitive-specialized immutable arrays
+      for non-null primitives
+- `DataType`: `REFERENCE`, `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, and `DOUBLE`
 
-`CollectionType` selects one of four representations for a trial:
-
-* `LIST`: an `ArrayList` exposed as `List<T>`
-* `PERSISTENT_LIST`: `kotlinx.collections.immutable.PersistentList<T>`
-* `ARRAY`: `Array<T>` for references and nullable values, or the matching primitive array for non-null primitives
-* `IMMUTABLE_ARRAY`: `ImmutableArray<T>` for references and nullable values, or the matching primitive-specialized
-  immutable array
-
-### Data Types
-
-`DataType` covers `REFERENCE` plus `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, and `DOUBLE`.
-
-### Parameter Matrix
-
-`CollectionBenchmark` exposes `CollectionType` and `DataType` as JMH `@Param` axes. JMH therefore runs each benchmark
-as 4 X 9 = 36 independent trials.
+Together, these axes produce **36 independent trials** per benchmark method.
 
 ## 2. Architecture at a Glance
 
