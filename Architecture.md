@@ -2,45 +2,46 @@
 
 ## Purpose
 
-This project uses JMH to compare the published [Immutable Array][immutable-arrays-url] API with equivalent operations on
-`List`, [PersistentList][persistent-list-url], and JVM arrays.
+This project uses JMH to compare [Immutable Arrays][immutable-arrays-url] with equivalent operations on regular arrays,
+`ArrayList`, and lists from  [kotlinx.collections.immutable][persistent-list-url].
 
 ## Benchmark Matrix
 
-`CollectionBenchmark` defines two JMH `@Param` axes:
+`CollectionBenchmark` defines two JMH parameters:
 
 - `CollectionType`
-    - `LIST`: `ArrayList` exposed as `List<T>`
-    - `PERSISTENT_LIST`: `kotlinx.collections.immutable.PersistentList<T>`
-    - `ARRAY`: `Array<T>` for references and nullable values; primitive arrays for non-null primitives
-    - `IMMUTABLE_ARRAY`: `ImmutableArray<T>` for references and nullable values; primitive-specialized immutable arrays
-      for non-null primitives
-- `DataType`: `REFERENCE`, `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, and `DOUBLE`
+    - `LIST`: uses `ArrayList` exposed as `List<T>`
+    - `PERSISTENT_LIST`: uses `PersistentList` from `kotlinx.collections.immutable`
+    - `ARRAY`: uses `Array<T>` for references and primitive arrays for non-null primitives
+    - `IMMUTABLE_ARRAY`: uses `ImmutableArray<T>` for references and primitive variants for non-null primitives
+- `DataType`
+    - `REFERENCE`, `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, and `DOUBLE`
 
 Together, these axes produce **36 independent trials** per benchmark method.
 
 ## Runtime Flow
 
-1. A benchmark class defines equivalent, statically typed operations for each collection representation and supplies a
-   data-generation recipe.
+1. A benchmark class defines:
+    - Equivalent, statically typed operations for each collection representation.
+    - Data-generation recipe for populating collections.
 2. JMH selects one `CollectionType` and `DataType` combination.
-3. `@Setup(Level.Trial)` builds a deterministic batch for only that combination.
-4. The benchmark invokes the operation on every collection in the batch.
-5. JMH consumes each result with `Blackhole` and normalizes the score using `@OperationsPerInvocation`.
+3. `@Setup(Level.Trial)` builds a deterministic batch of collections for only that combination.
+4. The benchmark invokes the operation on every collection in the batch consuming the result with `Blackhole`.
+5. The throughput is normalized based on `@OperationsPerInvocation` (usually batch size).
 
 ## Benchmark Categories
 
 Benchmark categories describe the shape of the data consumed by an operation:
 
-| Category      | Shape                                                       | Examples                                                                    |
-|---------------|-------------------------------------------------------------|-----------------------------------------------------------------------------|
-| Flat          | `CollectionType<DataType>`                                  | `BooleanArray`<br/>`List<Boolean>`                                          |
-| Nullable flat | `CollectionType<DataType?>`                                 | `Array<Double?>`<br/>`List<Double?>`                                        |
-| Nested        | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `Array<CollectionOwner<ByteArray>>`<br/>`List<CollectionOwner<List<Byte>>>` |
-| Object        | `CollectionType<CustomType>`                                | `Array<CustomType>`<br/>`List<CustomType>`                                  |
+| Category            | Shape                                                       | Examples                                                                      |
+|---------------------|-------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Flat                | `CollectionType<DataType>`                                  | `List<Boolean>` <br/> `BooleanArray`                                          |
+| NullableFlat        | `CollectionType<DataType?>`                                 | `List<Double?>` <br/> `Array<Double?>`                                        |
+| Nested <sup>1</sup> | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `List<CollectionOwner<List<Byte>>>` <br/> `Array<CollectionOwner<ByteArray>>` |
+| Object              | `CollectionType<CustomType>`                                | `List<CustomType>` <br/>  `Array<CustomType>`                                 |
 
-Nested outer and inner collection sizes use separate distributions. This models cases such as orders containing fewer
-products than the total number of orders.
+<sup>1</sup> Nested data uses separate distributions for outer and inner collection sizes. This models common cases
+such as managing many orders with each order containing a few products.
 
 ## Code Organization
 
@@ -48,19 +49,14 @@ products than the total number of orders.
 |-------------------|-------------------------------------------------------------------------------------------|
 | `src/main/kotlin` | Reusable utilities, shared infrastructure, and deterministic data builders                |
 | `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, benchmark-only fixtures, and measured operations |
-| `src/test/kotlin` | Tests for utilities and data builders in `src/main`                                       |
+| `src/test/kotlin` | Validation tests for utilities and data builders from `src/main`                          |
 
-Reusable data construction stays in `src/main` so it can be unit-tested without JMH. Benchmark lifecycle and
-scenario-specific code stay in `src/jmh`.
+Each benchmark follows the same structure:
 
-Each operation follows the same structure:
+- `<Operation>Benchmarks` extends `<Category>CollectionBenchmark` based on the shape of the data being consumed
+- `<Category>CollectionBenchmark` uses `<Category>CollectionBenchmarkData` to create the trial data
 
-- `<Operation>Benchmarks` defines the operations and data recipe.
-- The class extends the matching `<Category>CollectionBenchmark`.
-- `<Category>CollectionBenchmarkData` creates the trial data.
-- The category base class dispatches to the typed operation for the active representation.
-
-For example, `FilterBenchmarks` extends `FlatCollectionBenchmark` and uses `FlatCollectionBenchmarkData`.
+For example, `FilterBenchmarks` extends `FlatCollectionBenchmark` which uses `FlatCollectionBenchmarkData`.
 
 ## 5. Data Construction
 
@@ -107,20 +103,18 @@ benchmark, and instead focus on the performance of the operation.
 ## Fair-Comparison Safeguards
 
 - **Public APIs:** every representation uses an equivalent, statically typed operation through its published API.
-- **Realistic specialization:** JVM arrays and Immutable Arrays retain primitive-specialized forms.
+- **Specialization:** JVM arrays and Immutable Arrays retain primitive-specialized forms.
 - **Equivalent inputs:**
     - Same sequence of collection sizes is used across all `CollectionType` & `DataType` combinations.
-    - A given `DataType` results in the same sequence of values across all `CollectionType` representations.
-    - Operations that deal with null elements encounter the same sequence of null-element positions across all
-      `CollectionType` & `DataType` combinations.
-    - Operations that deal with predicates encounter the same sequence of predicate acceptance across all
-      `CollectionType` & `DataType` combinations.
+    - A `DataType` has the same sequence of values across all `CollectionType` representations.
+    - Nullable elements have the same sequence of null positions across all `CollectionType` & `DataType` combinations.
+    - Predicates have the same sequence of predicate acceptance across all `CollectionType` & `DataType` combinations.
 - **Isolated setup:** `@Setup(Level.Trial)` excludes construction from timed work and materializes only the active
   representation, avoiding cross-representation cache pressure.
 - **Batched work:** each invocation processes hundreds of prebuilt collections instead of one repeatedly hot input.
 - **Correct normalization:** `@OperationsPerInvocation` matches the number of collections processed; pairwise benchmarks
   use `NUM_COLLECTIONS / 2`.
-- **Dead-code prevention:** every result is consumed by `Blackhole`.
+- **Dead-code prevention:** every result is consumed by `Blackhole` to prevent JIT from eliminating the operation.
 
 [immutable-arrays-url]: https://github.com/daniel-rusu/pods4k/tree/main/immutable-arrays
 
