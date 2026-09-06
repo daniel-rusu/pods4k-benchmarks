@@ -33,15 +33,12 @@ Together, these axes produce **36 independent trials** per benchmark method.
 
 Benchmark categories describe the shape of the data consumed by an operation:
 
-| Category            | Shape                                                       | Examples                                                                      |
-|---------------------|-------------------------------------------------------------|-------------------------------------------------------------------------------|
-| Flat                | `CollectionType<DataType>`                                  | `List<Boolean>` <br/> `BooleanArray`                                          |
-| NullableFlat        | `CollectionType<DataType?>`                                 | `List<Double?>` <br/> `Array<Double?>`                                        |
-| Nested <sup>1</sup> | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `List<CollectionOwner<List<Byte>>>` <br/> `Array<CollectionOwner<ByteArray>>` |
-| Object              | `CollectionType<CustomType>`                                | `List<CustomType>` <br/>  `Array<CustomType>`                                 |
-
-<sup>1</sup> Nested data uses separate distributions for outer and inner collection sizes. This models common cases
-such as managing many orders with each order containing a few products.
+| Category     | Shape                                                       | Examples                                                                      |
+|--------------|-------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Flat         | `CollectionType<DataType>`                                  | `List<Boolean>` <br/> `BooleanArray`                                          |
+| NullableFlat | `CollectionType<DataType?>`                                 | `List<Double?>` <br/> `Array<Double?>`                                        |
+| Nested       | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `List<CollectionOwner<List<Byte>>>` <br/> `Array<CollectionOwner<ByteArray>>` |
+| Object       | `CollectionType<CustomType>`                                | `List<CustomType>` <br/>  `Array<CustomType>`                                 |
 
 ## Code Organization
 
@@ -58,47 +55,46 @@ Each benchmark follows the same structure:
 
 For example, `FilterBenchmarks` extends `FlatCollectionBenchmark` which uses `FlatCollectionBenchmarkData`.
 
-## 5. Data Construction
+## Data Construction
 
 This is the data generation flow for the `drop` operation. The nested, nullable-flat, and object-collection benchmark
 categories follow the same general pattern:
 
 1. `DropBenchmarks` specifies the data generation recipe:
     * `numCollections` to create
-    * Default `DistributionFactory` for sampling the collection sizes
-    * Default `ObjectGeneratorFactory<String>` & `FieldGeneratorFactory` for random strings & primitives
+    * Default `DistributionFactory` for sampling collection sizes
+    * Default `ObjectGeneratorFactory<String>` & `FieldGeneratorFactory` for random string & primitive values
 2. JMH iterates through every `CollectionType` & `DataType`, and creates `DropBenchmarks` with the current combination.
 3. JMH calls `FlatCollectionBenchmark.setupBenchmarkData()` to begin data construction.
-4. Data creation is delegated to `FlatCollectionBenchmarkData.create(...)` which performs the following actions
-    * Create `SplittableRandom` RNG stream from constant seed
-    * Split off separate RNG streams for each aspect of data generation (values, collection sizes, etc.)
-    * Use the factories and associated RNG streams to create size `Distribution`, `FieldGenerator`, & `ObjectGenerator`
-    * Create a `CollectionBatch` with an array of `numCollections` collections. Each collection is created with
-      `CollectionFactory`
-        * size sampled from the size `Distribution`
-        * `CollectionType` & `DataType` controls the type of collection to be created
-        * elements generated from the `FieldGenerator` or `ObjectGenerator` depending on the `DataType`
+4. Data creation is delegated to `FlatCollectionBenchmarkData.create(...)` which performs the following:
+    * Creates an `RngFactory` from a constant seed
+    * Splits independent RNG streams for sizes, values, null placement, and predicate decisions.
+    * Builds the requested size distribution and element generators.
+    * Uses `CollectionFactory` to materialize a `CollectionBatch` containing an array of `NUM_COLLECTIONS` collections.
+        * Collection are populated with elements generated from the `FieldGenerator` or `ObjectGenerator` depending on
+          the `DataType`
 
-Although there are 36 `CollectionType` & `DataType` combinations, benchmarking data is only constructed for the current
-combination. Eg. the `CollectionBatch` stores an array of `List<Boolean>` collections when `CollectionType = LIST` &
-`DataType = BOOLEAN`.
+Although a benchmark has 36 parameter combinations, a `CollectionBatch` stores only the current combination. For
+example, the `LIST`/`BOOLEAN` trial contains an array of `List<Boolean>` collections.
+
+### Collection Sizes
+
+Collection sizes are sampled from the specified size `Distribution`.
+
+Nested data uses separate distributions for outer and inner collection sizes. This models common business cases such as
+managing many orders with each order usually only containing a few products.
 
 ### Nullability Handling
 
-Benchmarks that deal with null values, such as `FilterNotNullBenchmarks`, specify factories that create `null` values
-null-ratio portion of the time. During data generation, the next element will be null if a random `double` is less than
-the null ratio.
+Benchmarks that deal with nullable elements produce `null` according to a configured null ratio.
 
 ### Predicate Handling
 
-Benchmarks that deal with predicates, such as `FilterBenchmarks`, specify the acceptance ratio. Elements are accepted if
-their value is smaller than the median value of their data type. When generating the next element, the RNG determines
-whether it should be accepted by checking whether a random `double` is less than the acceptance ratio. If the next
-element should be accepted then we repeatedly generate random values discarding them until we find one smaller than the
-median value (and vice versa).
+Benchmarks that deal with predicates generate elements that pass according to a configured acceptance ratio.
 
-Note that predicate decisions are shifted to the data generation phase in order to remove the RNG overhead from the
-benchmark, and instead focus on the performance of the operation.
+They use `FlatDataFilter` to preselect whether each value should match, then generate a value on the required side of
+the data-type's median. An element is accepted if it's smaller than the median. This controls acceptance ratios without
+adding RNG overhead to the measurement.
 
 ## Fair-Comparison Safeguards
 
@@ -114,7 +110,7 @@ benchmark, and instead focus on the performance of the operation.
 - **Batched work:** each invocation processes hundreds of prebuilt collections instead of one repeatedly hot input.
 - **Correct normalization:** `@OperationsPerInvocation` matches the number of collections processed; pairwise benchmarks
   use `NUM_COLLECTIONS / 2`.
-- **Dead-code prevention:** every result is consumed by `Blackhole` to prevent JIT from eliminating the operation.
+- **Dead-code prevention:** every result is consumed by `Blackhole` to prevent the JIT from eliminating the operation.
 
 [immutable-arrays-url]: https://github.com/daniel-rusu/pods4k/tree/main/immutable-arrays
 
