@@ -9,13 +9,19 @@ This project uses JMH to compare [Immutable Arrays][immutable-arrays-url] with e
 
 `CollectionBenchmark` defines two JMH parameters:
 
-- `CollectionType`
-    - `LIST`: uses `ArrayList` exposed as `List<T>`
-    - `PERSISTENT_LIST`: uses `PersistentList` from `kotlinx.collections.immutable`
-    - `ARRAY`: uses `Array<T>` for references and primitive arrays for non-null primitives
-    - `IMMUTABLE_ARRAY`: uses `ImmutableArray<T>` for references and primitive variants for non-null primitives
-- `DataType`
-    - `REFERENCE`, `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, and `DOUBLE`
+The type of collection being benchmarked:
+
+| CollectionType    |                                                                                               |
+|-------------------|-----------------------------------------------------------------------------------------------|
+| `LIST`            | `ArrayList` stored as `List<T>`                                                               |
+| `PERSISTENT_LIST` | `PersistentList<T>` from `kotlinx.collections.immutable`                                      |
+| `ARRAY`           | `Array<T>`, or primitive arrays for primitives (eg. `BooleanArray`)                           |
+| `IMMUTABLE_ARRAY` | `ImmutableArray<T>`, or primitive variants for non-null primitives (eg. `ImmutableByteArray`) |
+
+and the type of values stored in each collection:
+
+| DataType | `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`, and `REFERENCE` (usually String) |
+|----------|--------------------------------------------------------------------------------------------------------|
 
 Together, these axes produce **36 independent trials** per benchmark method.
 
@@ -44,7 +50,7 @@ Benchmark categories describe the shape of the data consumed by an operation:
 
 | Source set        | Responsibility                                                                            |
 |-------------------|-------------------------------------------------------------------------------------------|
-| `src/main/kotlin` | Reusable utilities, shared infrastructure, and deterministic data builders                |
+| `src/main/kotlin` | Reusable generators, collection factories, and deterministic data builders                |
 | `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, benchmark-only fixtures, and measured operations |
 | `src/test/kotlin` | Validation tests for utilities and data builders from `src/main`                          |
 
