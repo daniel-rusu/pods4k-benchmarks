@@ -9,8 +9,6 @@ This project uses JMH to compare [Immutable Arrays][immutable-arrays-url] with e
 
 `CollectionBenchmark` defines two JMH parameters:
 
-The type of collection being benchmarked:
-
 | CollectionType    |                                                                                               |
 |-------------------|-----------------------------------------------------------------------------------------------|
 | `LIST`            | `ArrayList` stored as `List<T>`                                                               |
@@ -18,33 +16,30 @@ The type of collection being benchmarked:
 | `ARRAY`           | `Array<T>`, or primitive arrays for primitives (eg. `BooleanArray`)                           |
 | `IMMUTABLE_ARRAY` | `ImmutableArray<T>`, or primitive variants for non-null primitives (eg. `ImmutableByteArray`) |
 
-and the type of values stored in each collection:
+and
 
-| DataType | `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`, and `REFERENCE` (usually String) |
-|----------|--------------------------------------------------------------------------------------------------------|
+| DataType | `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`, & `REFERENCE` (usually String) |
+|----------|------------------------------------------------------------------------------------------------------|
 
 Together, these axes produce **36 independent trials** per benchmark method.
 
-## Runtime Flow
-
-1. A benchmark class defines:
-    - Equivalent, statically typed operations for each collection representation.
-    - Data-generation recipe for populating collections.
-2. JMH selects one `CollectionType` and `DataType` combination.
-3. `@Setup(Level.Trial)` builds a deterministic batch of collections for only that combination.
-4. The benchmark invokes the operation on every collection in the batch consuming the result with `Blackhole`.
-5. The throughput is normalized based on `@OperationsPerInvocation` (usually batch size).
-
 ## Benchmark Categories
 
-Benchmark categories describe the shape of the data consumed by an operation:
+Benchmarks are categorized based on the shape of data being consumed:
 
-| Category     | Shape                                                       | Examples                                                                      |
-|--------------|-------------------------------------------------------------|-------------------------------------------------------------------------------|
-| Flat         | `CollectionType<DataType>`                                  | `List<Boolean>` <br/> `BooleanArray`                                          |
-| NullableFlat | `CollectionType<DataType?>`                                 | `List<Double?>` <br/> `Array<Double?>`                                        |
-| Nested       | `CollectionType<CollectionOwner<CollectionType<DataType>>>` | `List<CollectionOwner<List<Byte>>>` <br/> `Array<CollectionOwner<ByteArray>>` |
-| Object       | `CollectionType<CustomType>`                                | `List<CustomType>` <br/>  `Array<CustomType>`                                 |
+| Category     | Input Shape Examples                                                        | Example Benchmark         |
+|--------------|-----------------------------------------------------------------------------|---------------------------|
+| Flat         | `List<Float>` <br/> `FloatArray`                                            | `FilterBenchmarks`        |
+| NullableFlat | `List<Double?>` <br/> `Array<Double?>`                                      | `FilterNotNullBenchmarks` |
+| Nested       | `List<CollectionOwner<List<Int>>>` <br/> `Array<CollectionOwner<IntArray>>` | `FlatMapBenchmarks`       |
+| Object       | `List<CustomType>` <br/>  `Array<CustomType>`                               | `MapBenchmarks`           |
+
+Together, the benchmark category and benchmark matrix define the type of data being consumed. Examples:
+
+* `FilterBenchmarks` is in the Flat category
+    * Trial for `(ARRAY, LONG)` measures `LongArray.filter { ... }`.
+* `FilterNotNullBenchmarks` is in the NullableFlat category
+    * Trial for `(IMMUTABLE_ARRAY, INT)` measures `ImmutableArray<Int?>.filterNotNull()`.
 
 ## Code Organization
 
@@ -60,6 +55,16 @@ Each benchmark follows the same structure:
 - `<Category>CollectionBenchmark` uses `<Category>CollectionBenchmarkData` to create the trial data
 
 For example, `FilterBenchmarks` extends `FlatCollectionBenchmark` which uses `FlatCollectionBenchmarkData`.
+
+## Runtime Flow
+
+1. A benchmark class defines:
+    - Equivalent, statically typed operations for each collection representation.
+    - Data-generation recipe for populating collections.
+2. JMH selects one `CollectionType` and `DataType` combination.
+3. `@Setup(Level.Trial)` builds a deterministic batch of collections for only that combination.
+4. The benchmark invokes the operation on every collection in the batch consuming the result with `Blackhole`.
+5. The throughput is normalized based on `@OperationsPerInvocation` (usually batch size).
 
 ## Data Construction
 
