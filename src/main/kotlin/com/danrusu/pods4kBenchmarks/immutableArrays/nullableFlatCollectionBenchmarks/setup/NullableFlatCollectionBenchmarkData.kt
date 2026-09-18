@@ -9,6 +9,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
@@ -47,11 +48,13 @@ class NullableFlatCollectionBenchmarkData private constructor(
             numCollections: Int,
             sizeDistributionFactory: DistributionFactory,
             fieldGeneratorFactory: FieldGeneratorFactory,
-            referenceGeneratorFactory: ObjectGeneratorFactory<String?>,
+            referenceGeneratorFactory: ObjectGeneratorFactory<String>,
+            nullabilityPolicyFactory: NullabilityPolicyFactory,
         ): NullableFlatCollectionBenchmarkData {
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
+            val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
             val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
             val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
             val elementClass = dataType.resolveElementClass(referenceGenerator.objectClass) as Class<Any>
@@ -70,15 +73,15 @@ class NullableFlatCollectionBenchmarkData private constructor(
             ) { size ->
                 CollectionFactory.createCollection(size, collectionType, elementClass) {
                     when (dataType) {
-                        DataType.REFERENCE -> referenceGenerator.next()
-                        DataType.BOOLEAN -> fieldGenerator.nextNullableBoolean()
-                        DataType.BYTE -> fieldGenerator.nextNullableByte()
-                        DataType.CHAR -> fieldGenerator.nextNullableChar()
-                        DataType.SHORT -> fieldGenerator.nextNullableShort()
-                        DataType.INT -> fieldGenerator.nextNullableInt()
-                        DataType.FLOAT -> fieldGenerator.nextNullableFloat()
-                        DataType.LONG -> fieldGenerator.nextNullableLong()
-                        DataType.DOUBLE -> fieldGenerator.nextNullableDouble()
+                        DataType.REFERENCE -> nullabilityPolicy.nullable { referenceGenerator.next() }
+                        DataType.BOOLEAN -> nullabilityPolicy.nullable { fieldGenerator.nextBoolean() }
+                        DataType.BYTE -> nullabilityPolicy.nullable { fieldGenerator.nextByte() }
+                        DataType.CHAR -> nullabilityPolicy.nullable { fieldGenerator.nextChar() }
+                        DataType.SHORT -> nullabilityPolicy.nullable { fieldGenerator.nextShort() }
+                        DataType.INT -> nullabilityPolicy.nullable { fieldGenerator.nextInt() }
+                        DataType.FLOAT -> nullabilityPolicy.nullable { fieldGenerator.nextFloat() }
+                        DataType.LONG -> nullabilityPolicy.nullable { fieldGenerator.nextLong() }
+                        DataType.DOUBLE -> nullabilityPolicy.nullable { fieldGenerator.nextDouble() }
                     }
                 }
             }

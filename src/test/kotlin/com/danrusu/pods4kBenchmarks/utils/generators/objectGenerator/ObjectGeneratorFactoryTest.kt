@@ -4,7 +4,6 @@ import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.CountingFieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.FixedStringGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestObject
 import org.junit.jupiter.api.Test
@@ -15,7 +14,7 @@ class ObjectGeneratorFactoryTest {
     @Test
     fun `object generator factory wires field and reference generators`() {
         val factory = ObjectGeneratorFactory.of<TestObject, String>(
-            fieldGeneratorFactory = FieldGeneratorFactory { CountingFieldGenerator(NeverNullPolicy) },
+            fieldGeneratorFactory = FieldGeneratorFactory { CountingFieldGenerator() },
             referenceGeneratorFactory = object : ObjectGeneratorFactory<String>() {
                 override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<String> =
                     FixedStringGenerator("Hello")

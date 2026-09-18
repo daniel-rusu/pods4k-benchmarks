@@ -1,9 +1,9 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlin.random.Random
@@ -86,7 +86,7 @@ object FlatDataFilter {
         acceptRatio: Double,
         acceptanceRandom: Random,
         private val source: FieldGenerator,
-    ) : FieldGenerator() {
+    ) : FieldGenerator {
         private val sampler = FilterAcceptanceSampler(acceptRatio, acceptanceRandom)
 
         override fun nextBoolean(): Boolean = sampler.nextValueMatching(::shouldAccept, source::nextBoolean)

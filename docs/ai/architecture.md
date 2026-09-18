@@ -42,7 +42,9 @@ exposed to its benchmarks.
 - `CollectionBatch`: shared outer-array materialization, erased storage, and runtime validation for one trial-data
   representation.
 - `DistributionFactory`: flat and nested collection-size models.
-- `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable element generation.
+- `FieldGeneratorFactory` and `ObjectGeneratorFactory`: configurable non-null element generation.
+- `NullabilityPolicyFactory`: creates fresh policies from the dedicated nullability RNG stream. Nullable benchmark-data
+  builders own these policies and apply them uniformly to primitive and reference sources.
 - `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
 - `BenchmarkBatchSize`: shared collection-count defaults chosen by the data each operation fetches or writes, rather
   than the total trial dataset size.

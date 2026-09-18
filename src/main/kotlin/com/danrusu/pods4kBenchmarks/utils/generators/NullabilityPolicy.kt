@@ -15,6 +15,26 @@ abstract class NullabilityPolicy {
     }
 }
 
+/** Creates fresh nullability policies from benchmark RNG streams. */
+fun interface NullabilityPolicyFactory {
+    /** Creates a policy using the provided RNG streams. */
+    fun create(generatorRngs: GeneratorRngs): NullabilityPolicy
+
+    companion object {
+        /** Creates policies that choose null values according to [nullRatio]. */
+        fun random(nullRatio: Double): NullabilityPolicyFactory {
+            require(nullRatio in 0.0..1.0) { "nullRatio ($nullRatio) must be between 0.0 and 1.0" }
+
+            return NullabilityPolicyFactory { generatorRngs ->
+                RandomNullabilityPolicy(
+                    nullRatio = nullRatio,
+                    random = generatorRngs.nullabilityDecisionsRng,
+                )
+            }
+        }
+    }
+}
+
 /**
  * Randomly chooses null values according to [nullRatio].
  */

@@ -3,6 +3,7 @@ package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -73,6 +74,22 @@ class NullableObjectGeneratorTest {
 
         expectThat(numNulls)
             .isIn(1..19)
+    }
+
+    @Test
+    fun `factory overload creates a fresh policy for each generator`() {
+        var numPoliciesCreated = 0
+        val policyFactory = NullabilityPolicyFactory {
+            numPoliciesCreated++
+            NeverNullPolicy
+        }
+        val nullableFactory = ObjectGeneratorFactory.randomStrings().nullable(policyFactory)
+
+        nullableFactory.create(TestGeneratorRngs())
+        nullableFactory.create(TestGeneratorRngs())
+
+        expectThat(numPoliciesCreated)
+            .isEqualTo(2)
     }
 }
 

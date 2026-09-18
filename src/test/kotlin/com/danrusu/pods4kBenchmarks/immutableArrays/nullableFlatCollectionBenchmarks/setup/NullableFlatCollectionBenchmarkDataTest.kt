@@ -5,9 +5,11 @@ import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
+import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.nullable
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -81,6 +83,41 @@ class NullableFlatCollectionBenchmarkDataTest {
     }
 
     @Test
+    fun `framework policy makes values from a non-null reference factory nullable`() {
+        val data = createData(
+            collectionType = CollectionType.LIST,
+            dataType = DataType.REFERENCE,
+            nullabilityPolicyFactory = NullabilityPolicyFactory { AlwaysNullPolicy },
+        )
+
+        expectThat(data.lists<String>().flatMap { it }.all { it == null })
+            .isEqualTo(true)
+    }
+
+    @Test
+    fun `always-null and never-null policies handle boundary behavior`() {
+        for (dataType in DataType.entries) {
+            val alwaysNullValues = createData(
+                collectionType = CollectionType.LIST,
+                dataType = dataType,
+                nullabilityPolicyFactory = NullabilityPolicyFactory { AlwaysNullPolicy },
+            ).normalized(CollectionType.LIST, dataType).flatten()
+            val neverNullValues = createData(
+                collectionType = CollectionType.LIST,
+                dataType = dataType,
+                nullabilityPolicyFactory = NullabilityPolicyFactory { NeverNullPolicy },
+            ).normalized(CollectionType.LIST, dataType).flatten()
+
+            expectThat(alwaysNullValues.all { it == null })
+                .describedAs("always-null $dataType values")
+                .isEqualTo(true)
+            expectThat(neverNullValues.none { it == null })
+                .describedAs("never-null $dataType values")
+                .isEqualTo(true)
+        }
+    }
+
+    @Test
     fun `rejects access using the wrong element type`() {
         val data = createData(CollectionType.ARRAY, DataType.BOOLEAN)
 
@@ -118,13 +155,17 @@ class NullableFlatCollectionBenchmarkDataTest {
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
+        nullabilityPolicyFactory: NullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
+        fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+        referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     ): NullableFlatCollectionBenchmarkData = NullableFlatCollectionBenchmarkData.create(
         collectionType = collectionType,
         dataType = dataType,
         numCollections = 5,
         sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO),
-        referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
+        fieldGeneratorFactory = fieldGeneratorFactory,
+        referenceGeneratorFactory = referenceGeneratorFactory,
+        nullabilityPolicyFactory = nullabilityPolicyFactory,
     )
 
     private fun NullableFlatCollectionBenchmarkData.normalized(

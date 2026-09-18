@@ -1,16 +1,10 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
 import kotlin.random.Random
 
-/**
- * Generates random values for simple benchmark fields from a [Random] stream.
- */
-class RandomFieldGenerator(
-    private val random: Random,
-    nullabilityPolicy: NullabilityPolicy? = null,
-) : FieldGenerator(nullabilityPolicy) {
+/** Generates random primitive values from a [Random] stream. */
+class RandomFieldGenerator(private val random: Random) : FieldGenerator {
     override fun nextBoolean(): Boolean = random.nextBoolean()
 
     override fun nextByte(): Byte {

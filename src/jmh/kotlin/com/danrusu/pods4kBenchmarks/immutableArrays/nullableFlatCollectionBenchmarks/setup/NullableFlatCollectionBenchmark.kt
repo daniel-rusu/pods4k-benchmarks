@@ -18,6 +18,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
@@ -36,10 +37,12 @@ abstract class NullableFlatCollectionBenchmark(
     private val numCollections: Int,
     /** Controls generated collection sizes. */
     private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
-    /** Creates nullable boxed primitive element values. */
-    private val fieldGeneratorFactory: FieldGeneratorFactory,
-    /** Creates nullable reference element values. */
-    private val referenceGeneratorFactory: ObjectGeneratorFactory<String?>,
+    /** Creates non-null boxed primitive element values. */
+    private val fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    /** Creates non-null reference element values. */
+    private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
+    /** Creates the policy that owns null placement for every data type. */
+    private val nullabilityPolicyFactory: NullabilityPolicyFactory,
 ) : CollectionBenchmark() {
     @PublishedApi
     internal lateinit var data: NullableFlatCollectionBenchmarkData
@@ -53,6 +56,7 @@ abstract class NullableFlatCollectionBenchmark(
             sizeDistributionFactory = sizeDistributionFactory,
             fieldGeneratorFactory = fieldGeneratorFactory,
             referenceGeneratorFactory = referenceGeneratorFactory,
+            nullabilityPolicyFactory = nullabilityPolicyFactory,
         )
     }
 

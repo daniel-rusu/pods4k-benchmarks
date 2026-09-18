@@ -4,9 +4,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.filterNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup.NullableFlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.nullable
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -31,8 +29,7 @@ private const val NULL_RATIO = 0.5
 @Fork(2)
 open class FilterNotNullBenchmarks : NullableFlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    fieldGeneratorFactory = FieldGeneratorFactory.withRandomNullableFields(NULL_RATIO),
-    referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
+    nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
 ) {
     @Benchmark
     fun filterNotNull(bh: Blackhole) {

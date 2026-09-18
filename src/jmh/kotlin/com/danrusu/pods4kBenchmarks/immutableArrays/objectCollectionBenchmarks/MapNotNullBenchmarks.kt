@@ -6,9 +6,11 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.s
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.nullable
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -32,26 +34,11 @@ private const val NULL_RATIO = 0.5
 @Fork(2)
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
-    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElementOfNullableValues, String?>(
+    objectGeneratorFactory = NullableCompoundElementFactory(
         fieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-        referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings().nullable(NULL_RATIO),
-    ) { fieldGenerator, referenceGenerator ->
-        // match reference null placement so that benchmarks are directly comparable across data types
-        val reference = referenceGenerator.next()
-        val isNull = reference == null
-
-        CompoundElementOfNullableValues(
-            referenceValue = reference,
-            booleanValue = if (isNull) null else fieldGenerator.nextBoolean(),
-            byteValue = if (isNull) null else fieldGenerator.nextByte(),
-            charValue = if (isNull) null else fieldGenerator.nextChar(),
-            shortValue = if (isNull) null else fieldGenerator.nextShort(),
-            intValue = if (isNull) null else fieldGenerator.nextInt(),
-            floatValue = if (isNull) null else fieldGenerator.nextFloat(),
-            longValue = if (isNull) null else fieldGenerator.nextLong(),
-            doubleValue = if (isNull) null else fieldGenerator.nextDouble(),
-        )
-    },
+        stringGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
+        nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
+    ),
 ) {
     @Benchmark
     fun mapNotNull(bh: Blackhole) {
@@ -127,6 +114,39 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
                 { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.doubleValue } },
                 { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.doubleValue } },
             )
+        }
+    }
+}
+
+class NullableCompoundElementFactory(
+    val fieldGeneratorFactory: FieldGeneratorFactory,
+    val stringGeneratorFactory: ObjectGeneratorFactory<String>,
+    val nullabilityPolicyFactory: NullabilityPolicyFactory,
+) : ObjectGeneratorFactory<CompoundElementOfNullableValues>() {
+    override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<CompoundElementOfNullableValues> {
+        val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+        val referenceGenerator = stringGeneratorFactory.create(generatorRngs)
+        val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
+
+        return object : ObjectGenerator<CompoundElementOfNullableValues> {
+            override val objectClass: Class<CompoundElementOfNullableValues> =
+                CompoundElementOfNullableValues::class.java
+
+            override fun next(): CompoundElementOfNullableValues {
+                val isNull = nullabilityPolicy.shouldGenerateNull()
+
+                return CompoundElementOfNullableValues(
+                    referenceValue = if (isNull) null else referenceGenerator.next(),
+                    booleanValue = if (isNull) null else fieldGenerator.nextBoolean(),
+                    byteValue = if (isNull) null else fieldGenerator.nextByte(),
+                    charValue = if (isNull) null else fieldGenerator.nextChar(),
+                    shortValue = if (isNull) null else fieldGenerator.nextShort(),
+                    intValue = if (isNull) null else fieldGenerator.nextInt(),
+                    floatValue = if (isNull) null else fieldGenerator.nextFloat(),
+                    longValue = if (isNull) null else fieldGenerator.nextLong(),
+                    doubleValue = if (isNull) null else fieldGenerator.nextDouble(),
+                )
+            }
         }
     }
 }
