@@ -26,7 +26,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
@@ -48,8 +48,8 @@ abstract class NestedCollectionBenchmark(
     /** Controls the sizes of the nested collections that will be generated. */
     private val nestedCollectionSizeDistributionFactory: DistributionFactory =
         DistributionFactory.NestedListSizeDistribution,
-    /** Creates simple field generators for primitive nested collection elements. */
-    private val nestedFieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    /** Creates simple primitive generators for primitive nested collection elements. */
+    private val nestedPrimitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
     /** Creates reference generators for nested collection elements. */
     private val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
 ) : CollectionBenchmark() {
@@ -64,7 +64,7 @@ abstract class NestedCollectionBenchmark(
             numCollections = numCollections,
             topLevelSizeDistributionFactory = topLevelSizeDistributionFactory,
             nestedCollectionSizeDistributionFactory = nestedCollectionSizeDistributionFactory,
-            nestedFieldGeneratorFactory = nestedFieldGeneratorFactory,
+            nestedPrimitiveGeneratorFactory = nestedPrimitiveGeneratorFactory,
             nestedReferenceGeneratorFactory = nestedReferenceGeneratorFactory,
         )
     }

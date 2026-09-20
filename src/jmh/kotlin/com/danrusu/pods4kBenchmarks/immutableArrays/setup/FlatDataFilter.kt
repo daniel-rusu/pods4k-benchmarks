@@ -2,8 +2,8 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlin.random.Random
@@ -46,16 +46,16 @@ object FlatDataFilter {
 
     inline fun shouldAccept(value: Double): Boolean = value < MEDIAN_DOUBLE
 
-    /** Creates a [FieldGeneratorFactory] that produces values which pass the predicate [acceptRatio] of the time */
-    fun createFieldGeneratorFactory(
+    /** Creates a [PrimitiveGeneratorFactory] that produces values which pass the predicate [acceptRatio] of the time */
+    fun createPrimitiveGeneratorFactory(
         acceptRatio: Double,
-        sourceFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-    ): FieldGeneratorFactory = object : FieldGeneratorFactory {
+        sourceFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+    ): PrimitiveGeneratorFactory = object : PrimitiveGeneratorFactory {
         init {
             require(acceptRatio in 0.0..1.0)
         }
 
-        override fun create(generatorRngs: GeneratorRngs): FieldGenerator = FilteredFieldGenerator(
+        override fun create(generatorRngs: GeneratorRngs): PrimitiveGenerator = FilteredPrimitiveGenerator(
             acceptRatio = acceptRatio,
             acceptanceRandom = generatorRngs.filterAcceptanceRng,
             source = sourceFactory.create(generatorRngs),
@@ -82,11 +82,11 @@ object FlatDataFilter {
             )
         }
 
-    private class FilteredFieldGenerator(
+    private class FilteredPrimitiveGenerator(
         acceptRatio: Double,
         acceptanceRandom: Random,
-        private val source: FieldGenerator,
-    ) : FieldGenerator {
+        private val source: PrimitiveGenerator,
+    ) : PrimitiveGenerator {
         private val sampler = FilterAcceptanceSampler(acceptRatio, acceptanceRandom)
 
         override fun nextBoolean(): Boolean = sampler.nextValueMatching(::shouldAccept, source::nextBoolean)

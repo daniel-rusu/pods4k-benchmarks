@@ -38,7 +38,7 @@ private const val ACCEPT_RATIO = 0.02
 @Fork(2)
 open class AnyBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    fieldGeneratorFactory = FlatDataFilter.createFieldGeneratorFactory(acceptRatio = ACCEPT_RATIO),
+    primitiveGeneratorFactory = FlatDataFilter.createPrimitiveGeneratorFactory(acceptRatio = ACCEPT_RATIO),
     referenceGeneratorFactory = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO),
 ) {
     @Benchmark

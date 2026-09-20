@@ -74,7 +74,7 @@ Benchmark classes define the data-generation recipe:
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Batch Size                 | Controls how many collections will be created for the current `(CollectionType, DataType)`  combination.                                                                                                                              |
 | `DistributionFactory`      | - Creates `Distribution` to control collection sizes.<br/>- Batch will contain collections of varying sizes sampled from this distribution.<br/>- Nested collections use a separate `DistributionFactory` for inner collection sizes. |
-| `FieldGeneratorFactory`    | Creates `FieldGenerator` for generating primitive values.                                                                                                                                                                             |
+| `PrimitiveGeneratorFactory`    | Creates `PrimitiveGenerator` for generating primitive values.                                                                                                                                                                             |
 | `ObjectGeneratorFactory`   | Creates `ObjectGenerator` for generating object values.                                                                                                                                                                               |
 | `NullabilityPolicyFactory` | Creates `NullabilityPolicy` for deciding when values should be null.                                                                                                                                                                  |
 
@@ -86,14 +86,14 @@ categories follow the same general pattern:
 1. `DropBenchmarks` specifies the data generation recipe:
     * `numCollections` to create
     * Default `DistributionFactory` for sampling collection sizes
-    * Default `ObjectGeneratorFactory<String>` & `FieldGeneratorFactory` for random string & primitive values
+    * Default `ObjectGeneratorFactory<String>` & `PrimitiveGeneratorFactory` for random string & primitive values
 2. JMH iterates through every `CollectionType` & `DataType`, and creates `DropBenchmarks` with the current combination.
 3. JMH calls `FlatCollectionBenchmark.setupBenchmarkData()` to begin data construction.
 4. Data creation is delegated to `FlatCollectionBenchmarkData.create(...)` which performs the following:
     * Creates an `RngFactory` from a constant seed
     * Splits independent RNG streams for sizes, values, null placement, and predicate decisions.
     * Uses `CollectionFactory` to materialize a `CollectionBatch` containing an array of `NUM_COLLECTIONS` collections.
-        * Collection are populated with elements generated from the `FieldGenerator` or `ObjectGenerator` depending on
+        * Collection are populated with elements generated from the `PrimitiveGenerator` or `ObjectGenerator` depending on
           the `DataType`
 
 Although a benchmark has 36 parameter combinations, a `CollectionBatch` stores only the current combination. For

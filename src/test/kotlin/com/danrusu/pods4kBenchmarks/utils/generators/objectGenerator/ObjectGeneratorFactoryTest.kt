@@ -1,8 +1,8 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.CountingFieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.CountingPrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.FixedStringGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestObject
@@ -12,16 +12,16 @@ import strikt.assertions.isEqualTo
 
 class ObjectGeneratorFactoryTest {
     @Test
-    fun `object generator factory wires field and reference generators`() {
+    fun `object generator factory wires primitive and reference generators`() {
         val factory = ObjectGeneratorFactory.of<TestObject, String>(
-            fieldGeneratorFactory = FieldGeneratorFactory { CountingFieldGenerator() },
+            primitiveGeneratorFactory = PrimitiveGeneratorFactory { CountingPrimitiveGenerator() },
             referenceGeneratorFactory = object : ObjectGeneratorFactory<String>() {
                 override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<String> =
                     FixedStringGenerator("Hello")
             },
-        ) { fieldGenerator, referenceGenerator ->
+        ) { primitiveGenerator, referenceGenerator ->
             TestObject(
-                fieldValue = fieldGenerator.nextInt(),
+                primitiveValue = primitiveGenerator.nextInt(),
                 referenceValue = referenceGenerator.next(),
             )
         }
@@ -32,7 +32,7 @@ class ObjectGeneratorFactoryTest {
             .isEqualTo(TestObject::class.java)
 
         expectThat(generator.next())
-            .isEqualTo(TestObject(fieldValue = 1, referenceValue = "Hello"))
+            .isEqualTo(TestObject(primitiveValue = 1, referenceValue = "Hello"))
     }
 
     @Test

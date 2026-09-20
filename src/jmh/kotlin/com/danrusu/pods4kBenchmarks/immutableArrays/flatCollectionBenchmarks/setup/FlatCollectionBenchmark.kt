@@ -26,7 +26,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
@@ -47,7 +47,7 @@ abstract class FlatCollectionBenchmark(
     /** Controls generated collection sizes. */
     private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
     /** Creates primitive element values. */
-    private val fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    private val primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
     /** Creates reference element values. */
     private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
 ) : CollectionBenchmark() {
@@ -61,7 +61,7 @@ abstract class FlatCollectionBenchmark(
             dataType = dataType,
             numCollections = numCollections,
             sizeDistributionFactory = sizeDistributionFactory,
-            fieldGeneratorFactory = fieldGeneratorFactory,
+            primitiveGeneratorFactory = primitiveGeneratorFactory,
             referenceGeneratorFactory = referenceGeneratorFactory,
         )
     }

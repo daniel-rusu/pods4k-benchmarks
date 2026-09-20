@@ -5,7 +5,7 @@ import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
@@ -98,7 +98,7 @@ class FlatCollectionBenchmarkDataTest {
         dataType = dataType,
         numCollections = 5,
         sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        fieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+        primitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
         referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
     )
 

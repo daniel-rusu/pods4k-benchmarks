@@ -19,7 +19,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
@@ -38,7 +38,7 @@ abstract class NullableFlatCollectionBenchmark(
     /** Controls generated collection sizes. */
     private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
     /** Creates non-null boxed primitive element values. */
-    private val fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+    private val primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
     /** Creates non-null reference element values. */
     private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     /** Creates the policy that owns null placement for every data type. */
@@ -54,7 +54,7 @@ abstract class NullableFlatCollectionBenchmark(
             dataType = dataType,
             numCollections = numCollections,
             sizeDistributionFactory = sizeDistributionFactory,
-            fieldGeneratorFactory = fieldGeneratorFactory,
+            primitiveGeneratorFactory = primitiveGeneratorFactory,
             referenceGeneratorFactory = referenceGeneratorFactory,
             nullabilityPolicyFactory = nullabilityPolicyFactory,
         )

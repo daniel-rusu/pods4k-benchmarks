@@ -1,14 +1,14 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.fixtures
 
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 
 internal data class TestObject(
-    val fieldValue: Int,
+    val primitiveValue: Int,
     val referenceValue: String,
 )
 
-internal class CountingFieldGenerator : FieldGenerator {
+internal class CountingPrimitiveGenerator : PrimitiveGenerator {
     var numNextIntCalls = 0
         private set
 

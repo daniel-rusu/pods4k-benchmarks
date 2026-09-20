@@ -8,7 +8,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
@@ -35,7 +35,7 @@ private const val NULL_RATIO = 0.5
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
     objectGeneratorFactory = NullableCompoundElementFactory(
-        fieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+        primitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
         stringGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
         nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
     ),
@@ -119,12 +119,12 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
 }
 
 class NullableCompoundElementFactory(
-    val fieldGeneratorFactory: FieldGeneratorFactory,
+    val primitiveGeneratorFactory: PrimitiveGeneratorFactory,
     val stringGeneratorFactory: ObjectGeneratorFactory<String>,
     val nullabilityPolicyFactory: NullabilityPolicyFactory,
 ) : ObjectGeneratorFactory<CompoundElementOfNullableValues>() {
     override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<CompoundElementOfNullableValues> {
-        val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+        val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
         val referenceGenerator = stringGeneratorFactory.create(generatorRngs)
         val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
 
@@ -137,14 +137,14 @@ class NullableCompoundElementFactory(
 
                 return CompoundElementOfNullableValues(
                     referenceValue = if (isNull) null else referenceGenerator.next(),
-                    booleanValue = if (isNull) null else fieldGenerator.nextBoolean(),
-                    byteValue = if (isNull) null else fieldGenerator.nextByte(),
-                    charValue = if (isNull) null else fieldGenerator.nextChar(),
-                    shortValue = if (isNull) null else fieldGenerator.nextShort(),
-                    intValue = if (isNull) null else fieldGenerator.nextInt(),
-                    floatValue = if (isNull) null else fieldGenerator.nextFloat(),
-                    longValue = if (isNull) null else fieldGenerator.nextLong(),
-                    doubleValue = if (isNull) null else fieldGenerator.nextDouble(),
+                    booleanValue = if (isNull) null else primitiveGenerator.nextBoolean(),
+                    byteValue = if (isNull) null else primitiveGenerator.nextByte(),
+                    charValue = if (isNull) null else primitiveGenerator.nextChar(),
+                    shortValue = if (isNull) null else primitiveGenerator.nextShort(),
+                    intValue = if (isNull) null else primitiveGenerator.nextInt(),
+                    floatValue = if (isNull) null else primitiveGenerator.nextFloat(),
+                    longValue = if (isNull) null else primitiveGenerator.nextLong(),
+                    doubleValue = if (isNull) null else primitiveGenerator.nextDouble(),
                 )
             }
         }

@@ -1,8 +1,8 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 
 /** Creates [ObjectGenerator] instances from benchmark RNG streams */
 abstract class ObjectGeneratorFactory<T> {
@@ -10,28 +10,28 @@ abstract class ObjectGeneratorFactory<T> {
     abstract fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T>
 
     companion object {
-        /** Creates a factory for objects initialized from field and reference generators */
+        /** Creates a factory for objects initialized from primitive and reference generators. */
         inline fun <reified T : Any, R> of(
-            fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+            primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
             referenceGeneratorFactory: ObjectGeneratorFactory<R>,
-            noinline initializer: (fieldGenerator: FieldGenerator, referenceGenerator: ObjectGenerator<R>) -> T,
+            noinline initializer: (primitiveGenerator: PrimitiveGenerator, referenceGenerator: ObjectGenerator<R>) -> T,
         ): ObjectGeneratorFactory<T> = object : ObjectGeneratorFactory<T>() {
             override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T> = object : ObjectGenerator<T> {
                 override val objectClass: Class<T> = T::class.java
 
-                private val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+                private val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
                 private val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
 
-                override fun next(): T = initializer(fieldGenerator, referenceGenerator)
+                override fun next(): T = initializer(primitiveGenerator, referenceGenerator)
             }
         }
 
-        /** Creates a factory for the common case where [String] is used for reference fields. */
+        /** Creates a factory for the common case where [String] is used for reference values. */
         inline fun <reified T : Any> of(
-            fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
-            noinline initializer: (fieldGenerator: FieldGenerator, referenceGenerator: ObjectGenerator<String>) -> T,
+            primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+            noinline initializer: (primitiveGenerator: PrimitiveGenerator, referenceGenerator: ObjectGenerator<String>) -> T,
         ): ObjectGeneratorFactory<T> = of(
-            fieldGeneratorFactory = fieldGeneratorFactory,
+            primitiveGeneratorFactory = primitiveGeneratorFactory,
             referenceGeneratorFactory = randomStrings(),
             initializer = initializer,
         )

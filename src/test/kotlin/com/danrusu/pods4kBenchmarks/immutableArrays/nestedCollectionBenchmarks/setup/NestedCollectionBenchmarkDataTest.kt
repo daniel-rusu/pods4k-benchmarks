@@ -6,7 +6,7 @@ import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
@@ -121,7 +121,7 @@ class NestedCollectionBenchmarkDataTest {
         numCollections = 5,
         topLevelSizeDistributionFactory = DistributionFactory.ListSizeDistribution,
         nestedCollectionSizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
-        nestedFieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+        nestedPrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
         nestedReferenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
     )
 

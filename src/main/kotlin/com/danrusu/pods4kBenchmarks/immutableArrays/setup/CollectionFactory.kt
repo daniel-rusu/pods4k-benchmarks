@@ -10,7 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.utils.ArrayCreator
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
@@ -20,13 +20,13 @@ object CollectionFactory {
         size: Int,
         collectionType: CollectionType,
         dataType: DataType,
-        fieldGenerator: FieldGenerator,
+        primitiveGenerator: PrimitiveGenerator,
         referenceGenerator: ObjectGenerator<T>,
     ): Any = when (collectionType) {
-        CollectionType.LIST -> createList(size, dataType, fieldGenerator, referenceGenerator)
-        CollectionType.PERSISTENT_LIST -> createPersistentList(size, dataType, fieldGenerator, referenceGenerator)
-        CollectionType.ARRAY -> createArray(size, dataType, fieldGenerator, referenceGenerator)
-        CollectionType.IMMUTABLE_ARRAY -> createImmutableArray(size, dataType, fieldGenerator, referenceGenerator)
+        CollectionType.LIST -> createList(size, dataType, primitiveGenerator, referenceGenerator)
+        CollectionType.PERSISTENT_LIST -> createPersistentList(size, dataType, primitiveGenerator, referenceGenerator)
+        CollectionType.ARRAY -> createArray(size, dataType, primitiveGenerator, referenceGenerator)
+        CollectionType.IMMUTABLE_ARRAY -> createImmutableArray(size, dataType, primitiveGenerator, referenceGenerator)
     }
 
     fun <T> createCollection(
@@ -44,18 +44,18 @@ object CollectionFactory {
     fun <T> createList(
         size: Int,
         dataType: DataType,
-        fieldGenerator: FieldGenerator,
+        primitiveGenerator: PrimitiveGenerator,
         referenceGenerator: ObjectGenerator<T>,
     ): List<*> = when (dataType) {
         DataType.REFERENCE -> createList(size) { referenceGenerator.next() }
-        DataType.BOOLEAN -> createList(size) { fieldGenerator.nextBoolean() }
-        DataType.BYTE -> createList(size) { fieldGenerator.nextByte() }
-        DataType.CHAR -> createList(size) { fieldGenerator.nextChar() }
-        DataType.SHORT -> createList(size) { fieldGenerator.nextShort() }
-        DataType.INT -> createList(size) { fieldGenerator.nextInt() }
-        DataType.FLOAT -> createList(size) { fieldGenerator.nextFloat() }
-        DataType.LONG -> createList(size) { fieldGenerator.nextLong() }
-        DataType.DOUBLE -> createList(size) { fieldGenerator.nextDouble() }
+        DataType.BOOLEAN -> createList(size) { primitiveGenerator.nextBoolean() }
+        DataType.BYTE -> createList(size) { primitiveGenerator.nextByte() }
+        DataType.CHAR -> createList(size) { primitiveGenerator.nextChar() }
+        DataType.SHORT -> createList(size) { primitiveGenerator.nextShort() }
+        DataType.INT -> createList(size) { primitiveGenerator.nextInt() }
+        DataType.FLOAT -> createList(size) { primitiveGenerator.nextFloat() }
+        DataType.LONG -> createList(size) { primitiveGenerator.nextLong() }
+        DataType.DOUBLE -> createList(size) { primitiveGenerator.nextDouble() }
     }
 
     inline fun <T> createList(size: Int, crossinline initializer: () -> T): List<T> {
@@ -67,18 +67,18 @@ object CollectionFactory {
     fun <T> createPersistentList(
         size: Int,
         dataType: DataType,
-        fieldGenerator: FieldGenerator,
+        primitiveGenerator: PrimitiveGenerator,
         referenceGenerator: ObjectGenerator<T>,
     ): PersistentList<*> = when (dataType) {
         DataType.REFERENCE -> createPersistentList(size) { referenceGenerator.next() }
-        DataType.BOOLEAN -> createPersistentList(size) { fieldGenerator.nextBoolean() }
-        DataType.BYTE -> createPersistentList(size) { fieldGenerator.nextByte() }
-        DataType.CHAR -> createPersistentList(size) { fieldGenerator.nextChar() }
-        DataType.SHORT -> createPersistentList(size) { fieldGenerator.nextShort() }
-        DataType.INT -> createPersistentList(size) { fieldGenerator.nextInt() }
-        DataType.FLOAT -> createPersistentList(size) { fieldGenerator.nextFloat() }
-        DataType.LONG -> createPersistentList(size) { fieldGenerator.nextLong() }
-        DataType.DOUBLE -> createPersistentList(size) { fieldGenerator.nextDouble() }
+        DataType.BOOLEAN -> createPersistentList(size) { primitiveGenerator.nextBoolean() }
+        DataType.BYTE -> createPersistentList(size) { primitiveGenerator.nextByte() }
+        DataType.CHAR -> createPersistentList(size) { primitiveGenerator.nextChar() }
+        DataType.SHORT -> createPersistentList(size) { primitiveGenerator.nextShort() }
+        DataType.INT -> createPersistentList(size) { primitiveGenerator.nextInt() }
+        DataType.FLOAT -> createPersistentList(size) { primitiveGenerator.nextFloat() }
+        DataType.LONG -> createPersistentList(size) { primitiveGenerator.nextLong() }
+        DataType.DOUBLE -> createPersistentList(size) { primitiveGenerator.nextDouble() }
     }
 
     inline fun <T> createPersistentList(size: Int, crossinline initializer: () -> T): PersistentList<T> {
@@ -90,35 +90,35 @@ object CollectionFactory {
     fun <T> createArray(
         size: Int,
         dataType: DataType,
-        fieldGenerator: FieldGenerator,
+        primitiveGenerator: PrimitiveGenerator,
         referenceGenerator: ObjectGenerator<T>,
     ): Any = when (dataType) {
         DataType.REFERENCE -> ArrayCreator.createArray(referenceGenerator.objectClass, size) { referenceGenerator.next() }
-        DataType.BOOLEAN -> BooleanArray(size) { fieldGenerator.nextBoolean() }
-        DataType.BYTE -> ByteArray(size) { fieldGenerator.nextByte() }
-        DataType.CHAR -> CharArray(size) { fieldGenerator.nextChar() }
-        DataType.SHORT -> ShortArray(size) { fieldGenerator.nextShort() }
-        DataType.INT -> IntArray(size) { fieldGenerator.nextInt() }
-        DataType.FLOAT -> FloatArray(size) { fieldGenerator.nextFloat() }
-        DataType.LONG -> LongArray(size) { fieldGenerator.nextLong() }
-        DataType.DOUBLE -> DoubleArray(size) { fieldGenerator.nextDouble() }
+        DataType.BOOLEAN -> BooleanArray(size) { primitiveGenerator.nextBoolean() }
+        DataType.BYTE -> ByteArray(size) { primitiveGenerator.nextByte() }
+        DataType.CHAR -> CharArray(size) { primitiveGenerator.nextChar() }
+        DataType.SHORT -> ShortArray(size) { primitiveGenerator.nextShort() }
+        DataType.INT -> IntArray(size) { primitiveGenerator.nextInt() }
+        DataType.FLOAT -> FloatArray(size) { primitiveGenerator.nextFloat() }
+        DataType.LONG -> LongArray(size) { primitiveGenerator.nextLong() }
+        DataType.DOUBLE -> DoubleArray(size) { primitiveGenerator.nextDouble() }
     }
 
     fun <T> createImmutableArray(
         size: Int,
         dataType: DataType,
-        fieldGenerator: FieldGenerator,
+        primitiveGenerator: PrimitiveGenerator,
         referenceGenerator: ObjectGenerator<T>,
     ): Any = when (dataType) {
         DataType.REFERENCE -> ImmutableArray(size) { referenceGenerator.next() }
-        DataType.BOOLEAN -> ImmutableBooleanArray(size) { fieldGenerator.nextBoolean() }
-        DataType.BYTE -> ImmutableByteArray(size) { fieldGenerator.nextByte() }
-        DataType.CHAR -> ImmutableCharArray(size) { fieldGenerator.nextChar() }
-        DataType.SHORT -> ImmutableShortArray(size) { fieldGenerator.nextShort() }
-        DataType.INT -> ImmutableIntArray(size) { fieldGenerator.nextInt() }
-        DataType.FLOAT -> ImmutableFloatArray(size) { fieldGenerator.nextFloat() }
-        DataType.LONG -> ImmutableLongArray(size) { fieldGenerator.nextLong() }
-        DataType.DOUBLE -> ImmutableDoubleArray(size) { fieldGenerator.nextDouble() }
+        DataType.BOOLEAN -> ImmutableBooleanArray(size) { primitiveGenerator.nextBoolean() }
+        DataType.BYTE -> ImmutableByteArray(size) { primitiveGenerator.nextByte() }
+        DataType.CHAR -> ImmutableCharArray(size) { primitiveGenerator.nextChar() }
+        DataType.SHORT -> ImmutableShortArray(size) { primitiveGenerator.nextShort() }
+        DataType.INT -> ImmutableIntArray(size) { primitiveGenerator.nextInt() }
+        DataType.FLOAT -> ImmutableFloatArray(size) { primitiveGenerator.nextFloat() }
+        DataType.LONG -> ImmutableLongArray(size) { primitiveGenerator.nextLong() }
+        DataType.DOUBLE -> ImmutableDoubleArray(size) { primitiveGenerator.nextDouble() }
     }
 
     fun resolveCollectionClass(

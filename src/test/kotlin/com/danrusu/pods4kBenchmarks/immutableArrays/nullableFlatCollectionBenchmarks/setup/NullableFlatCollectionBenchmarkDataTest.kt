@@ -6,7 +6,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
@@ -156,14 +156,14 @@ class NullableFlatCollectionBenchmarkDataTest {
         collectionType: CollectionType,
         dataType: DataType,
         nullabilityPolicyFactory: NullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
-        fieldGeneratorFactory: FieldGeneratorFactory = FieldGeneratorFactory.withRandomFields(),
+        primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
         referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     ): NullableFlatCollectionBenchmarkData = NullableFlatCollectionBenchmarkData.create(
         collectionType = collectionType,
         dataType = dataType,
         numCollections = 5,
         sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        fieldGeneratorFactory = fieldGeneratorFactory,
+        primitiveGeneratorFactory = primitiveGeneratorFactory,
         referenceGeneratorFactory = referenceGeneratorFactory,
         nullabilityPolicyFactory = nullabilityPolicyFactory,
     )

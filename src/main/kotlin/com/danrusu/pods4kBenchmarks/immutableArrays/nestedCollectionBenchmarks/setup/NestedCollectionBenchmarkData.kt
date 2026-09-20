@@ -17,7 +17,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
@@ -101,14 +101,14 @@ class NestedCollectionBenchmarkData private constructor(
             numCollections: Int,
             topLevelSizeDistributionFactory: DistributionFactory,
             nestedCollectionSizeDistributionFactory: DistributionFactory,
-            nestedFieldGeneratorFactory: FieldGeneratorFactory,
+            nestedPrimitiveGeneratorFactory: PrimitiveGeneratorFactory,
             nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>,
         ): NestedCollectionBenchmarkData {
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
             val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
-            val nestedFieldGenerator = nestedFieldGeneratorFactory.create(generatorRngs)
+            val nestedPrimitiveGenerator = nestedPrimitiveGeneratorFactory.create(generatorRngs)
             val nestedReferenceGenerator = nestedReferenceGeneratorFactory.create(generatorRngs)
 
             val topLevelCollectionClass = CollectionFactory.resolveCollectionClass(
@@ -130,7 +130,7 @@ class NestedCollectionBenchmarkData private constructor(
                             size = nestedSizeDistribution.nextValue(),
                             collectionType = collectionType,
                             dataType = dataType,
-                            fieldGenerator = nestedFieldGenerator,
+                            primitiveGenerator = nestedPrimitiveGenerator,
                             referenceGenerator = nestedReferenceGenerator,
                         )
                     )

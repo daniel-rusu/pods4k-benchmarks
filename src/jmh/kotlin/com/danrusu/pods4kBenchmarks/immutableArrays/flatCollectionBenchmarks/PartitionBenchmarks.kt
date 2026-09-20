@@ -37,7 +37,7 @@ private const val ACCEPT_RATIO = 0.5
 @Fork(2)
 open class PartitionBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    fieldGeneratorFactory = FlatDataFilter.createFieldGeneratorFactory(acceptRatio = ACCEPT_RATIO),
+    primitiveGeneratorFactory = FlatDataFilter.createPrimitiveGeneratorFactory(acceptRatio = ACCEPT_RATIO),
     referenceGeneratorFactory = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO),
 ) {
     @Benchmark

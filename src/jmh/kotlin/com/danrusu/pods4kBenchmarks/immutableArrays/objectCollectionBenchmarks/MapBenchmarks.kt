@@ -29,17 +29,17 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 @Fork(2)
 open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>(
     numCollections = NUM_COLLECTIONS,
-    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { fieldGenerator, referenceGenerator ->
+    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { primitiveGenerator, referenceGenerator ->
         CompoundElement(
             referenceValue = referenceGenerator.next(),
-            booleanValue = fieldGenerator.nextBoolean(),
-            byteValue = fieldGenerator.nextByte(),
-            charValue = fieldGenerator.nextChar(),
-            shortValue = fieldGenerator.nextShort(),
-            intValue = fieldGenerator.nextInt(),
-            floatValue = fieldGenerator.nextFloat(),
-            longValue = fieldGenerator.nextLong(),
-            doubleValue = fieldGenerator.nextDouble(),
+            booleanValue = primitiveGenerator.nextBoolean(),
+            byteValue = primitiveGenerator.nextByte(),
+            charValue = primitiveGenerator.nextChar(),
+            shortValue = primitiveGenerator.nextShort(),
+            intValue = primitiveGenerator.nextInt(),
+            floatValue = primitiveGenerator.nextFloat(),
+            longValue = primitiveGenerator.nextLong(),
+            doubleValue = primitiveGenerator.nextDouble(),
         )
     },
 ) {

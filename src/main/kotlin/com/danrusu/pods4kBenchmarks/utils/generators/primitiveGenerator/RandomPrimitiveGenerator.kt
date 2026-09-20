@@ -1,10 +1,10 @@
-package com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator
+package com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.AlphanumericCharacters
 import kotlin.random.Random
 
 /** Generates random primitive values from a [Random] stream. */
-class RandomFieldGenerator(private val random: Random) : FieldGenerator {
+class RandomPrimitiveGenerator(private val random: Random) : PrimitiveGenerator {
     override fun nextBoolean(): Boolean = random.nextBoolean()
 
     override fun nextByte(): Byte {

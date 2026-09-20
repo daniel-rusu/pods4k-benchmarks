@@ -9,10 +9,10 @@ import kotlin.random.Random
  * independently while still being created from one benchmark seed.
  */
 interface GeneratorRngs {
-    /** Shared stream for generated element values, whether simple fields, references, or object fields. */
+    /** Shared stream for generated element values, whether primitives, references, or object properties. */
     val dataGenerationRng: Random
 
-    /** Shared stream for deciding whether simple fields, references, or objects should be null. */
+    /** Shared stream for deciding whether primitive values, references, or objects should be null. */
     val nullabilityDecisionsRng: Random
 
     /** Shared stream for deciding whether generated values should satisfy benchmark filter predicates. */

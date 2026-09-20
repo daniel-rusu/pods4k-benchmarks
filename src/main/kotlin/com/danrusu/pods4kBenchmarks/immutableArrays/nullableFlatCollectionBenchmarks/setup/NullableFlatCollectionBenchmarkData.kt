@@ -10,7 +10,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
@@ -47,7 +47,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
             dataType: DataType,
             numCollections: Int,
             sizeDistributionFactory: DistributionFactory,
-            fieldGeneratorFactory: FieldGeneratorFactory,
+            primitiveGeneratorFactory: PrimitiveGeneratorFactory,
             referenceGeneratorFactory: ObjectGeneratorFactory<String>,
             nullabilityPolicyFactory: NullabilityPolicyFactory,
         ): NullableFlatCollectionBenchmarkData {
@@ -55,7 +55,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
             val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
-            val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+            val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
             val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
             val elementClass = dataType.resolveElementClass(referenceGenerator.objectClass) as Class<Any>
             val collectionClass = CollectionFactory.resolveCollectionClass(
@@ -74,14 +74,14 @@ class NullableFlatCollectionBenchmarkData private constructor(
                 CollectionFactory.createCollection(size, collectionType, elementClass) {
                     when (dataType) {
                         DataType.REFERENCE -> nullabilityPolicy.nullable { referenceGenerator.next() }
-                        DataType.BOOLEAN -> nullabilityPolicy.nullable { fieldGenerator.nextBoolean() }
-                        DataType.BYTE -> nullabilityPolicy.nullable { fieldGenerator.nextByte() }
-                        DataType.CHAR -> nullabilityPolicy.nullable { fieldGenerator.nextChar() }
-                        DataType.SHORT -> nullabilityPolicy.nullable { fieldGenerator.nextShort() }
-                        DataType.INT -> nullabilityPolicy.nullable { fieldGenerator.nextInt() }
-                        DataType.FLOAT -> nullabilityPolicy.nullable { fieldGenerator.nextFloat() }
-                        DataType.LONG -> nullabilityPolicy.nullable { fieldGenerator.nextLong() }
-                        DataType.DOUBLE -> nullabilityPolicy.nullable { fieldGenerator.nextDouble() }
+                        DataType.BOOLEAN -> nullabilityPolicy.nullable { primitiveGenerator.nextBoolean() }
+                        DataType.BYTE -> nullabilityPolicy.nullable { primitiveGenerator.nextByte() }
+                        DataType.CHAR -> nullabilityPolicy.nullable { primitiveGenerator.nextChar() }
+                        DataType.SHORT -> nullabilityPolicy.nullable { primitiveGenerator.nextShort() }
+                        DataType.INT -> nullabilityPolicy.nullable { primitiveGenerator.nextInt() }
+                        DataType.FLOAT -> nullabilityPolicy.nullable { primitiveGenerator.nextFloat() }
+                        DataType.LONG -> nullabilityPolicy.nullable { primitiveGenerator.nextLong() }
+                        DataType.DOUBLE -> nullabilityPolicy.nullable { primitiveGenerator.nextDouble() }
                     }
                 }
             }

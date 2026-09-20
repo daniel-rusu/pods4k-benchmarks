@@ -17,7 +17,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator.FieldGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
@@ -99,13 +99,13 @@ class FlatCollectionBenchmarkData private constructor(
             dataType: DataType,
             numCollections: Int,
             sizeDistributionFactory: DistributionFactory,
-            fieldGeneratorFactory: FieldGeneratorFactory,
+            primitiveGeneratorFactory: PrimitiveGeneratorFactory,
             referenceGeneratorFactory: ObjectGeneratorFactory<String>,
         ): FlatCollectionBenchmarkData {
             val rngFactory = RngFactory()
             val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
             val sizeDistribution = sizeDistributionFactory.create(rngFactory)
-            val fieldGenerator = fieldGeneratorFactory.create(generatorRngs)
+            val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
             val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
             val collectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
@@ -123,7 +123,7 @@ class FlatCollectionBenchmarkData private constructor(
                     size = size,
                     collectionType = collectionType,
                     dataType = dataType,
-                    fieldGenerator = fieldGenerator,
+                    primitiveGenerator = primitiveGenerator,
                     referenceGenerator = referenceGenerator,
                 )
             }

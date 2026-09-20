@@ -1,4 +1,4 @@
-package com.danrusu.pods4kBenchmarks.utils.generators.fieldGenerator
+package com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.RecordingRandom
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-class FieldGeneratorFactoryTest {
+class PrimitiveGeneratorFactoryTest {
     @Test
-    fun `random field factory uses data generation rng for values`() {
+    fun `random primitive factory uses data generation rng for values`() {
         val dataGenerationRng = RecordingRandom(nextIntValues = generateSequence(123) { it + 1 })
         val nullabilityDecisionsRng = RecordingRandom()
         val filterAcceptanceRng = RecordingRandom()
@@ -18,7 +18,7 @@ class FieldGeneratorFactoryTest {
             filterAcceptanceRng = filterAcceptanceRng,
         )
 
-        val generator = FieldGeneratorFactory.withRandomFields().create(generatorRngs)
+        val generator = PrimitiveGeneratorFactory.withRandomValues().create(generatorRngs)
 
         expectThat(List(3) { generator.nextInt() })
             .isEqualTo(listOf(123, 124, 125))
