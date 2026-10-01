@@ -10,7 +10,7 @@ This repository benchmarks the published `pods4k` dependency through its public 
 - `src/main/kotlin`: reusable utilities and deterministic data builders. These types have no JMH dependency and are
   directly unit-testable.
 - `src/test/kotlin`: JUnit 5 + Strikt tests for shared utilities and benchmark data.
-- `src/jmh/kotlin`: JMH states, benchmark-only filtering/fixtures, and measured operations.
+- `src/jmh/kotlin`: JMH states, scenario-only fixtures, and measured operations.
 
 This split is the central architectural boundary: data construction belongs in `src/main` when it is reusable and
 testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
@@ -22,7 +22,7 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
 2. A specialized benchmark base receives a fixed `numCollections` plus the generator and distribution factories for
    its data shape.
 3. Its `@Setup(Level.Trial)` method calls the matching `*BenchmarkData.create` factory.
-4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/filter streams, and passes its
+4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/predicate-outcome streams, and passes its
    single-collection construction logic to `CollectionBatch`, which materializes only the selected representation.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
 
@@ -43,6 +43,9 @@ exposed to its benchmarks.
   representation.
 - `DistributionFactory`: flat and nested collection-size models.
 - `PrimitiveGeneratorFactory` and `ObjectGeneratorFactory`: configurable non-null element generation.
+- `PredicateMatchingPrimitiveGenerator` and `PredicateMatchingObjectGenerator`: reusable adapters that independently
+  choose a required predicate outcome, then rejection-sample the decorated source until a matching value is found.
+- `MedianValuePredicate`: the scenario predicate shared by predicate benchmark setup and measured operations.
 - `NullabilityPolicyFactory`: creates fresh policies from the dedicated nullability RNG stream. Nullable benchmark-data
   builders own these policies and apply them uniformly to primitive and reference sources.
 - `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
@@ -53,11 +56,10 @@ exposed to its benchmarks.
   and is used by `FilterNotNullBenchmarks`.
 - `FlatCollectionBenchmark`, `NullableFlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and
   `NestedCollectionBenchmark`: specialized trial setup and statically typed dispatch helpers.
-- `FlatDataFilter`: benchmark-only factories that generate a controlled predicate acceptance ratio.
 
 ## Invariants
 
-- Changing value generation for one data type must not also change sizes, null positions, or filter decisions.
+- Changing value generation for one data type must not also change sizes, null positions, or predicate outcomes.
 - Each invocation processes distinct prebuilt collections; setup cost is excluded unless construction is the scenario.
 - Benchmarks use the shared `BenchmarkBatchSize` tier matching their access and result pattern unless a documented
   benchmark-local override is warranted.

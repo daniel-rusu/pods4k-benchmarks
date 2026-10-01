@@ -11,7 +11,11 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -27,7 +31,7 @@ import java.util.concurrent.TimeUnit
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
 // Statistically, this will filter half of the values on average.
-private const val ACCEPT_RATIO = 0.5
+private const val MATCH_RATIO = 0.5
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -37,56 +41,60 @@ private const val ACCEPT_RATIO = 0.5
 @Fork(2)
 open class FilterBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    primitiveGeneratorFactory = FlatDataFilter.createPrimitiveGeneratorFactory(acceptRatio = ACCEPT_RATIO),
-    referenceGeneratorFactory = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO),
+    primitiveGeneratorFactory = PrimitiveGeneratorFactory
+        .randomValues()
+        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate),
+    referenceGeneratorFactory = ObjectGeneratorFactory
+        .randomStrings()
+        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate::matches),
 ) {
     @Benchmark
     fun filter(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Boolean> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Byte> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Char> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Short> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Int> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Float> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Long> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Double> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: List<String> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Boolean> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Byte> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Char> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Short> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Int> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Float> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Long> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<Double> -> list.filter { MedianValuePredicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Boolean> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Byte> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Char> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Short> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Int> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Float> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Long> -> list.filter { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Double> -> list.filter { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<String> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Char> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Short> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Int> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Float> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Long> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Double> -> list.filter { MedianValuePredicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: BooleanArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ByteArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: CharArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ShortArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: IntArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: FloatArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: LongArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: DoubleArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
+            { array: Array<String> -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: BooleanArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ByteArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: CharArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ShortArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: IntArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: FloatArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: LongArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: DoubleArray -> array.filter { MedianValuePredicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableBooleanArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableByteArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableCharArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableShortArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableIntArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableFloatArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableLongArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableDoubleArray -> array.filter { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableArray<String> -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableByteArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableCharArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableShortArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableIntArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableLongArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.filter { MedianValuePredicate.matches(it) } },
         )
     }
 }

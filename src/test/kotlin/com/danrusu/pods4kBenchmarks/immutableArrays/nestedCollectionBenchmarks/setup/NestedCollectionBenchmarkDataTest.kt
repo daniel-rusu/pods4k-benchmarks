@@ -121,7 +121,7 @@ class NestedCollectionBenchmarkDataTest {
         numCollections = 5,
         topLevelSizeDistributionFactory = DistributionFactory.ListSizeDistribution,
         nestedCollectionSizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
-        nestedPrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+        nestedPrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
         nestedReferenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
     )
 

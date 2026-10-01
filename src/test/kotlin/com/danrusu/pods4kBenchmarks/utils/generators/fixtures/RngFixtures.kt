@@ -8,7 +8,7 @@ internal class TestGeneratorRngs(
     masterSeed: Long = 0L,
     dataGenerationRng: Random? = null,
     nullabilityDecisionsRng: Random? = null,
-    filterAcceptanceRng: Random? = null,
+    predicateOutcomeRng: Random? = null,
 ) : GeneratorRngs {
     private val rngFactory = RngFactory(masterSeed)
 
@@ -16,7 +16,7 @@ internal class TestGeneratorRngs(
 
     override val nullabilityDecisionsRng: Random = nullabilityDecisionsRng ?: rngFactory.createRng()
 
-    override val filterAcceptanceRng: Random = filterAcceptanceRng ?: rngFactory.createRng()
+    override val predicateOutcomeRng: Random = predicateOutcomeRng ?: rngFactory.createRng()
 
     override fun createNewRng(): Random = rngFactory.createRng()
 }

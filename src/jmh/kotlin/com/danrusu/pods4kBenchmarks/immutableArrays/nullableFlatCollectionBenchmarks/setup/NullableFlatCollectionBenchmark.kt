@@ -38,7 +38,7 @@ abstract class NullableFlatCollectionBenchmark(
     /** Controls generated collection sizes. */
     private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
     /** Creates non-null boxed primitive element values. */
-    private val primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+    private val primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
     /** Creates non-null reference element values. */
     private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     /** Creates the policy that owns null placement for every data type. */

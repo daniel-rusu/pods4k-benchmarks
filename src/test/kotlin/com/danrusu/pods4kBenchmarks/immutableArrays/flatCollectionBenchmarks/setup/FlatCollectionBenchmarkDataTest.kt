@@ -5,17 +5,101 @@ import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isTrue
 import strikt.assertions.message
 
 class FlatCollectionBenchmarkDataTest {
+    @Test
+    fun `predicate decorated factories produce identical data across collection representations`() {
+        for (ratio in listOf(0.0, 0.35, 1.0)) {
+            for (dataType in DataType.entries) {
+                val expected = createPredicateData(CollectionType.LIST, dataType, ratio)
+                    .normalized(CollectionType.LIST, dataType)
+
+                for (collectionType in CollectionType.entries) {
+                    val actual = createPredicateData(collectionType, dataType, ratio)
+                        .normalized(collectionType, dataType)
+
+                    expectThat(actual)
+                        .describedAs("$collectionType with $dataType elements at match ratio $ratio")
+                        .isEqualTo(expected)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `data types share predicate outcomes and preserve collection sizes at every match ratio`() {
+        val expectedSizes = createData(CollectionType.LIST, DataType.REFERENCE)
+            .normalized(CollectionType.LIST, DataType.REFERENCE).map { it.size }
+
+        for (ratio in listOf(0.0, 0.35, 1.0)) {
+            val expectedOutcomes = createPredicateData(CollectionType.LIST, DataType.REFERENCE, ratio)
+                .normalized(CollectionType.LIST, DataType.REFERENCE)
+                .map { collection -> collection.map { matches(it) } }
+            val outcomes = expectedOutcomes.flatten()
+
+            expectThat(outcomes.isNotEmpty()).isTrue()
+            when (ratio) {
+                0.0 -> expectThat(outcomes.all { !it }).isTrue()
+                1.0 -> expectThat(outcomes.all { it }).isTrue()
+                else -> {
+                    expectThat(outcomes.any { it }).isTrue()
+                    expectThat(outcomes.any { !it }).isTrue()
+                }
+            }
+
+            for (dataType in DataType.entries) {
+                val actual = createPredicateData(CollectionType.LIST, dataType, ratio)
+                    .normalized(CollectionType.LIST, dataType)
+
+                expectThat(actual.map { it.size })
+                    .describedAs("collection sizes for $dataType at match ratio $ratio")
+                    .isEqualTo(expectedSizes)
+                expectThat(actual.map { collection -> collection.map { matches(it) } })
+                    .describedAs("predicate outcomes for $dataType at match ratio $ratio")
+                    .isEqualTo(expectedOutcomes)
+            }
+        }
+    }
+
+    private fun createPredicateData(
+        collectionType: CollectionType,
+        dataType: DataType,
+        ratio: Double,
+    ): FlatCollectionBenchmarkData = createData(
+        collectionType = collectionType,
+        dataType = dataType,
+        primitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues()
+            .withPredicateMatchRatio(ratio, MedianValuePredicate),
+        referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings()
+            .withPredicateMatchRatio(ratio, MedianValuePredicate::matches),
+    )
+
+    private fun matches(value: Any): Boolean = when (value) {
+        is String -> MedianValuePredicate.matches(value)
+        is Boolean -> MedianValuePredicate.matches(value)
+        is Byte -> MedianValuePredicate.matches(value)
+        is Char -> MedianValuePredicate.matches(value)
+        is Short -> MedianValuePredicate.matches(value)
+        is Int -> MedianValuePredicate.matches(value)
+        is Float -> MedianValuePredicate.matches(value)
+        is Long -> MedianValuePredicate.matches(value)
+        is Double -> MedianValuePredicate.matches(value)
+        else -> error("Unsupported element class: ${value.javaClass}")
+    }
+
     @Test
     fun `all collection types are mapped to appropriate classes`() {
         with(createData(CollectionType.LIST, DataType.BOOLEAN)) {
@@ -93,13 +177,15 @@ class FlatCollectionBenchmarkDataTest {
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
+        primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
+        referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     ): FlatCollectionBenchmarkData = FlatCollectionBenchmarkData.create(
         collectionType = collectionType,
         dataType = dataType,
         numCollections = 5,
         sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        primitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
-        referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
+        primitiveGeneratorFactory = primitiveGeneratorFactory,
+        referenceGeneratorFactory = referenceGeneratorFactory,
     )
 
     private fun FlatCollectionBenchmarkData.normalized(

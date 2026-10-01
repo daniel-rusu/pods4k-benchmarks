@@ -6,10 +6,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -17,6 +17,7 @@ import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isGreaterThan
+import strikt.assertions.isTrue
 import strikt.assertions.message
 
 private const val NULL_RATIO = 0.5
@@ -90,8 +91,9 @@ class NullableFlatCollectionBenchmarkDataTest {
             nullabilityPolicyFactory = NullabilityPolicyFactory { AlwaysNullPolicy },
         )
 
-        expectThat(data.lists<String>().flatMap { it }.all { it == null })
-            .isEqualTo(true)
+        expectThat(
+            data.lists<String>().flatMap { it }.all { it == null }
+        ).isTrue()
     }
 
     @Test
@@ -110,10 +112,10 @@ class NullableFlatCollectionBenchmarkDataTest {
 
             expectThat(alwaysNullValues.all { it == null })
                 .describedAs("always-null $dataType values")
-                .isEqualTo(true)
+                .isTrue()
             expectThat(neverNullValues.none { it == null })
                 .describedAs("never-null $dataType values")
-                .isEqualTo(true)
+                .isTrue()
         }
     }
 
@@ -156,7 +158,7 @@ class NullableFlatCollectionBenchmarkDataTest {
         collectionType: CollectionType,
         dataType: DataType,
         nullabilityPolicyFactory: NullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
-        primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+        primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
         referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     ): NullableFlatCollectionBenchmarkData = NullableFlatCollectionBenchmarkData.create(
         collectionType = collectionType,

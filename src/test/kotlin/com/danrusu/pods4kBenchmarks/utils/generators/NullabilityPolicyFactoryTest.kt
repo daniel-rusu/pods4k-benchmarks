@@ -24,11 +24,11 @@ class NullabilityPolicyFactoryTest {
     fun `random uses only the nullability decision rng`() {
         val dataGenerationRng = RecordingRandom(nextDoubleValues = sequenceOf(0.0))
         val nullabilityDecisionsRng = RecordingRandom(nextDoubleValues = sequenceOf(0.25, 0.75))
-        val filterAcceptanceRng = RecordingRandom(nextDoubleValues = sequenceOf(0.0))
+        val predicateOutcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.0))
         val generatorRngs = TestGeneratorRngs(
             dataGenerationRng = dataGenerationRng,
             nullabilityDecisionsRng = nullabilityDecisionsRng,
-            filterAcceptanceRng = filterAcceptanceRng,
+            predicateOutcomeRng = predicateOutcomeRng,
         )
         val policy = NullabilityPolicyFactory.random(nullRatio = 0.5).create(generatorRngs)
 
@@ -38,7 +38,7 @@ class NullabilityPolicyFactoryTest {
             .isEqualTo(2)
         expectThat(dataGenerationRng.numNextDoubleCalls)
             .isEqualTo(0)
-        expectThat(filterAcceptanceRng.numNextDoubleCalls)
+        expectThat(predicateOutcomeRng.numNextDoubleCalls)
             .isEqualTo(0)
     }
 

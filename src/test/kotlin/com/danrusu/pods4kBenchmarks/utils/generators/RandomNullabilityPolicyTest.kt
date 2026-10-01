@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
+import strikt.assertions.isFalse
+import strikt.assertions.isTrue
 import strikt.assertions.message
 import kotlin.random.Random
 
@@ -25,10 +27,12 @@ class RandomNullabilityPolicyTest {
     fun `null ratio boundaries choose expected nullability`() {
         val random = Random.Default
 
-        expectThat(RandomNullabilityPolicy(nullRatio = 0.0, random = random).shouldGenerateNull())
-            .isEqualTo(false)
+        expectThat(
+            RandomNullabilityPolicy(nullRatio = 0.0, random = random).shouldGenerateNull()
+        ).isFalse()
 
-        expectThat(RandomNullabilityPolicy(nullRatio = 1.0, random = random).shouldGenerateNull())
-            .isEqualTo(true)
+        expectThat(
+            RandomNullabilityPolicy(nullRatio = 1.0, random = random).shouldGenerateNull()
+        ).isTrue()
     }
 }

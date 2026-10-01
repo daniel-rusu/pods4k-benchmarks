@@ -46,7 +46,7 @@
 
 - Preserve deterministic setup data unless intentionally changing benchmark scenarios: data builders use a constant
   `RngFactory` master seed and purpose-specific streams so value generation does not also change collection sizes,
-  null placement, or filter acceptance.
+  null placement, or predicate outcomes.
 - Consume benchmark results with JMH `Blackhole`.
 - Start with the shared batch defaults in
   [`BenchmarkBatchSize`](src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/BenchmarkBatchSize.kt).

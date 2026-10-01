@@ -110,10 +110,10 @@ Benchmarks that deal with nullable elements produce `null` according to a config
 
 ### Predicate Handling
 
-Benchmarks that deal with predicates generate elements that pass according to a configured acceptance ratio.
-
-They use `FlatDataFilter` to preselect whether each value should match, then generate a value on the required side of
-the data-type's median. This controls acceptance ratios without adding RNG overhead to the measurement.
+Benchmarks that deal with predicates decorate their ordinary primitive and reference generator factories with a
+configured match ratio. A dedicated RNG stream independently selects the required predicate outcome for each emitted
+value, then the adapter rejection-samples the source until it finds a value on the required side of the data-type's
+median. The measured operation invokes the same concrete midpoint predicate without RNG or generator overhead.
 
 ## Fair-Comparison Safeguards
 
@@ -123,7 +123,7 @@ the data-type's median. This controls acceptance ratios without adding RNG overh
     - Same sequence of collection sizes is used across all `CollectionType` & `DataType` combinations.
     - A `DataType` has the same sequence of values across all `CollectionType` representations.
     - Nullable elements have the same sequence of null positions across all `CollectionType` & `DataType` combinations.
-    - Predicates have the same sequence of predicate acceptance across all `CollectionType` & `DataType` combinations.
+    - Predicates have the same sequence of predicate outcomes across all `CollectionType` & `DataType` combinations.
 - **Isolated setup:** `@Setup(Level.Trial)` excludes construction from timed work and materializes only the active
   representation, avoiding cross-representation cache pressure.
 - **Batched work:** each invocation processes hundreds of prebuilt collections instead of one repeatedly hot input.

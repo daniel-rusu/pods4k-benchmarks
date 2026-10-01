@@ -11,7 +11,11 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.FlatDataFilter
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -28,7 +32,7 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
 // Drops 0.98 / (1 - 0.98) = 49 elements on average.
 // The median is 34 elements dropped because 1 - (0.98)^35 = ~50.7%.
-private const val ACCEPT_RATIO = 0.98
+private const val MATCH_RATIO = 0.98
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -38,56 +42,60 @@ private const val ACCEPT_RATIO = 0.98
 @Fork(2)
 open class DropWhileBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    primitiveGeneratorFactory = FlatDataFilter.createPrimitiveGeneratorFactory(acceptRatio = ACCEPT_RATIO),
-    referenceGeneratorFactory = FlatDataFilter.createStringGeneratorFactory(acceptRatio = ACCEPT_RATIO),
+    primitiveGeneratorFactory = PrimitiveGeneratorFactory
+        .randomValues()
+        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate),
+    referenceGeneratorFactory = ObjectGeneratorFactory
+        .randomStrings()
+        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate::matches),
 ) {
     @Benchmark
     fun dropWhile(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Boolean> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Byte> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Char> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Short> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Int> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Float> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Long> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: List<Double> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: List<String> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Boolean> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Byte> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Char> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Short> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Int> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Float> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Long> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<Double> -> list.dropWhile { MedianValuePredicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Boolean> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Byte> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Char> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Short> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Int> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Float> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Long> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { list: PersistentList<Double> -> list.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { list: PersistentList<String> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Char> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Short> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Int> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Float> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Long> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<Double> -> list.dropWhile { MedianValuePredicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: BooleanArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ByteArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: CharArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ShortArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: IntArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: FloatArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: LongArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: DoubleArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: Array<String> -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: BooleanArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ByteArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: CharArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ShortArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: IntArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: FloatArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: LongArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: DoubleArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableBooleanArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableByteArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableCharArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableShortArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableIntArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableFloatArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableLongArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
-            { array: ImmutableDoubleArray -> array.dropWhile { FlatDataFilter.shouldAccept(it) } },
+            { array: ImmutableArray<String> -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableByteArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableCharArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableShortArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableIntArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableLongArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
         )
     }
 }

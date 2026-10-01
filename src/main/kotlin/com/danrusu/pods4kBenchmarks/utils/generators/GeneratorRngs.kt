@@ -5,7 +5,7 @@ import kotlin.random.Random
 /**
  * Groups the deterministic random streams used by generator factories.
  *
- * Streams are separated by purpose so data values, nullability decisions, and filter acceptance choices can evolve
+ * Streams are separated by purpose so data values, nullability decisions, and predicate outcome choices can evolve
  * independently while still being created from one benchmark seed.
  */
 interface GeneratorRngs {
@@ -15,8 +15,8 @@ interface GeneratorRngs {
     /** Shared stream for deciding whether primitive values, references, or objects should be null. */
     val nullabilityDecisionsRng: Random
 
-    /** Shared stream for deciding whether generated values should satisfy benchmark filter predicates. */
-    val filterAcceptanceRng: Random
+    /** Shared stream for deciding whether generated values should satisfy benchmark predicates. */
+    val predicateOutcomeRng: Random
 
     /** Creates a new independent RNG stream split from the benchmark's master RNG. */
     fun createNewRng(): Random

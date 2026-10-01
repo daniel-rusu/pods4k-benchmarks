@@ -35,7 +35,7 @@ private const val NULL_RATIO = 0.5
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
     objectGeneratorFactory = NullableCompoundElementFactory(
-        primitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+        primitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
         stringGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
         nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
     ),

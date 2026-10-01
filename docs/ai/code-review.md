@@ -26,7 +26,7 @@ Use this checklist when reviewing Codex-generated changes in this repo.
 - Benchmark methods use JMH annotations consistent with neighboring benchmarks.
 - `Blackhole` consumes measured results.
 - Data setup happens in `@Setup(Level.Trial)` unless construction cost is the benchmark target.
-- Constant master seeds and purpose-specific RNG streams keep sizes, values, null placement, and filter decisions
+- Constant master seeds and purpose-specific RNG streams keep sizes, values, null placement, and predicate outcomes
   independent where required.
 - Batch size uses the shared tier matching the bytes actually fetched or written while processing collections and their
   elements; benchmark-local overrides explain the unusual access or allocation pattern.

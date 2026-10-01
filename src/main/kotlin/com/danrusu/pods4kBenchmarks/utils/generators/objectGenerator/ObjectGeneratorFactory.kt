@@ -12,7 +12,7 @@ abstract class ObjectGeneratorFactory<T> {
     companion object {
         /** Creates a factory for objects initialized from primitive and reference generators. */
         inline fun <reified T : Any, R> of(
-            primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+            primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
             referenceGeneratorFactory: ObjectGeneratorFactory<R>,
             noinline initializer: (primitiveGenerator: PrimitiveGenerator, referenceGenerator: ObjectGenerator<R>) -> T,
         ): ObjectGeneratorFactory<T> = object : ObjectGeneratorFactory<T>() {
@@ -28,7 +28,7 @@ abstract class ObjectGeneratorFactory<T> {
 
         /** Creates a factory for the common case where [String] is used for reference values. */
         inline fun <reified T : Any> of(
-            primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.withRandomValues(),
+            primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
             noinline initializer: (primitiveGenerator: PrimitiveGenerator, referenceGenerator: ObjectGenerator<String>) -> T,
         ): ObjectGeneratorFactory<T> = of(
             primitiveGeneratorFactory = primitiveGeneratorFactory,
@@ -48,5 +48,22 @@ abstract class ObjectGeneratorFactory<T> {
                     maxLength = maxLength,
                 )
         }
+    }
+}
+
+/** Decorates this factory so each generated value matches [predicate] with probability [matchRatio]. */
+fun <T> ObjectGeneratorFactory<T>.withPredicateMatchRatio(
+    matchRatio: Double,
+    predicate: (T) -> Boolean,
+): ObjectGeneratorFactory<T> {
+    require(matchRatio in 0.0..1.0) { "matchRatio ($matchRatio) must be between 0.0 and 1.0" }
+
+    return object : ObjectGeneratorFactory<T>() {
+        override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T> = PredicateMatchingObjectGenerator(
+            source = this@withPredicateMatchRatio.create(generatorRngs),
+            predicate = predicate,
+            matchRatio = matchRatio,
+            predicateOutcomeRng = generatorRngs.predicateOutcomeRng,
+        )
     }
 }
