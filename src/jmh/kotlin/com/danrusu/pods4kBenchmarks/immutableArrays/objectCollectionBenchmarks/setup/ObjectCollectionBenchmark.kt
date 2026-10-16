@@ -52,10 +52,10 @@ abstract class ObjectCollectionBenchmark<T>(
         transformImmutableArray: (ImmutableArray<T>) -> Any?,
     ) {
         when (collectionType) {
-            LIST -> data.lists.forEach { bh.consume(transformList(it)) }
-            PERSISTENT_LIST -> data.persistentLists.forEach { bh.consume(transformPersistentList(it)) }
-            ARRAY -> data.arrays.forEach { bh.consume(transformArray(it)) }
-            IMMUTABLE_ARRAY -> data.immutableArrays.forEach { bh.consume(transformImmutableArray(it)) }
+            LIST -> for (collection in data.lists) bh.consume(transformList(collection))
+            PERSISTENT_LIST -> for (collection in data.persistentLists) bh.consume(transformPersistentList(collection))
+            ARRAY -> for (collection in data.arrays) bh.consume(transformArray(collection))
+            IMMUTABLE_ARRAY -> for (collection in data.immutableArrays) bh.consume(transformImmutableArray(collection))
         }
     }
 }

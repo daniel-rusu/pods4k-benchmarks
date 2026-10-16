@@ -110,51 +110,51 @@ abstract class FlatCollectionBenchmark(
     ) {
         when (collectionType) {
             LIST -> when (dataType) {
-                REFERENCE -> data.lists<String>().forEach { bh.consume(transformList(it)) }
-                BOOLEAN -> data.lists<Boolean>().forEach { bh.consume(transformBooleanList(it)) }
-                BYTE -> data.lists<Byte>().forEach { bh.consume(transformByteList(it)) }
-                CHAR -> data.lists<Char>().forEach { bh.consume(transformCharList(it)) }
-                SHORT -> data.lists<Short>().forEach { bh.consume(transformShortList(it)) }
-                INT -> data.lists<Int>().forEach { bh.consume(transformIntList(it)) }
-                FLOAT -> data.lists<Float>().forEach { bh.consume(transformFloatList(it)) }
-                LONG -> data.lists<Long>().forEach { bh.consume(transformLongList(it)) }
-                DOUBLE -> data.lists<Double>().forEach { bh.consume(transformDoubleList(it)) }
+                REFERENCE -> for (collection in data.lists<String>()) bh.consume(transformList(collection))
+                BOOLEAN -> for (collection in data.lists<Boolean>()) bh.consume(transformBooleanList(collection))
+                BYTE -> for (collection in data.lists<Byte>()) bh.consume(transformByteList(collection))
+                CHAR -> for (collection in data.lists<Char>()) bh.consume(transformCharList(collection))
+                SHORT -> for (collection in data.lists<Short>()) bh.consume(transformShortList(collection))
+                INT -> for (collection in data.lists<Int>()) bh.consume(transformIntList(collection))
+                FLOAT -> for (collection in data.lists<Float>()) bh.consume(transformFloatList(collection))
+                LONG -> for (collection in data.lists<Long>()) bh.consume(transformLongList(collection))
+                DOUBLE -> for (collection in data.lists<Double>()) bh.consume(transformDoubleList(collection))
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> data.persistentLists<String>().forEach { bh.consume(transformPersistentList(it)) }
-                BOOLEAN -> data.persistentLists<Boolean>().forEach { bh.consume(transformPersistentBooleanList(it)) }
-                BYTE -> data.persistentLists<Byte>().forEach { bh.consume(transformPersistentByteList(it)) }
-                CHAR -> data.persistentLists<Char>().forEach { bh.consume(transformPersistentCharList(it)) }
-                SHORT -> data.persistentLists<Short>().forEach { bh.consume(transformPersistentShortList(it)) }
-                INT -> data.persistentLists<Int>().forEach { bh.consume(transformPersistentIntList(it)) }
-                FLOAT -> data.persistentLists<Float>().forEach { bh.consume(transformPersistentFloatList(it)) }
-                LONG -> data.persistentLists<Long>().forEach { bh.consume(transformPersistentLongList(it)) }
-                DOUBLE -> data.persistentLists<Double>().forEach { bh.consume(transformPersistentDoubleList(it)) }
+                REFERENCE -> for (collection in data.persistentLists<String>()) bh.consume(transformPersistentList(collection))
+                BOOLEAN -> for (collection in data.persistentLists<Boolean>()) bh.consume(transformPersistentBooleanList(collection))
+                BYTE -> for (collection in data.persistentLists<Byte>()) bh.consume(transformPersistentByteList(collection))
+                CHAR -> for (collection in data.persistentLists<Char>()) bh.consume(transformPersistentCharList(collection))
+                SHORT -> for (collection in data.persistentLists<Short>()) bh.consume(transformPersistentShortList(collection))
+                INT -> for (collection in data.persistentLists<Int>()) bh.consume(transformPersistentIntList(collection))
+                FLOAT -> for (collection in data.persistentLists<Float>()) bh.consume(transformPersistentFloatList(collection))
+                LONG -> for (collection in data.persistentLists<Long>()) bh.consume(transformPersistentLongList(collection))
+                DOUBLE -> for (collection in data.persistentLists<Double>()) bh.consume(transformPersistentDoubleList(collection))
             }
 
             ARRAY -> when (dataType) {
-                REFERENCE -> data.referenceArrays.forEach { bh.consume(transformArray(it)) }
-                BOOLEAN -> data.booleanArrays.forEach { bh.consume(transformBooleanArray(it)) }
-                BYTE -> data.byteArrays.forEach { bh.consume(transformByteArray(it)) }
-                CHAR -> data.charArrays.forEach { bh.consume(transformCharArray(it)) }
-                SHORT -> data.shortArrays.forEach { bh.consume(transformShortArray(it)) }
-                INT -> data.intArrays.forEach { bh.consume(transformIntArray(it)) }
-                FLOAT -> data.floatArrays.forEach { bh.consume(transformFloatArray(it)) }
-                LONG -> data.longArrays.forEach { bh.consume(transformLongArray(it)) }
-                DOUBLE -> data.doubleArrays.forEach { bh.consume(transformDoubleArray(it)) }
+                REFERENCE -> for (collection in data.referenceArrays) bh.consume(transformArray(collection))
+                BOOLEAN -> for (collection in data.booleanArrays) bh.consume(transformBooleanArray(collection))
+                BYTE -> for (collection in data.byteArrays) bh.consume(transformByteArray(collection))
+                CHAR -> for (collection in data.charArrays) bh.consume(transformCharArray(collection))
+                SHORT -> for (collection in data.shortArrays) bh.consume(transformShortArray(collection))
+                INT -> for (collection in data.intArrays) bh.consume(transformIntArray(collection))
+                FLOAT -> for (collection in data.floatArrays) bh.consume(transformFloatArray(collection))
+                LONG -> for (collection in data.longArrays) bh.consume(transformLongArray(collection))
+                DOUBLE -> for (collection in data.doubleArrays) bh.consume(transformDoubleArray(collection))
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> data.immutableReferenceArrays.forEach { bh.consume(transformImmutableArray(it)) }
-                BOOLEAN -> data.immutableBooleanArrays.forEach { bh.consume(transformImmutableBooleanArray(it)) }
-                BYTE -> data.immutableByteArrays.forEach { bh.consume(transformImmutableByteArray(it)) }
-                CHAR -> data.immutableCharArrays.forEach { bh.consume(transformImmutableCharArray(it)) }
-                SHORT -> data.immutableShortArrays.forEach { bh.consume(transformImmutableShortArray(it)) }
-                INT -> data.immutableIntArrays.forEach { bh.consume(transformImmutableIntArray(it)) }
-                FLOAT -> data.immutableFloatArrays.forEach { bh.consume(transformImmutableFloatArray(it)) }
-                LONG -> data.immutableLongArrays.forEach { bh.consume(transformImmutableLongArray(it)) }
-                DOUBLE -> data.immutableDoubleArrays.forEach { bh.consume(transformImmutableDoubleArray(it)) }
+                REFERENCE -> for (collection in data.immutableReferenceArrays) bh.consume(transformImmutableArray(collection))
+                BOOLEAN -> for (collection in data.immutableBooleanArrays) bh.consume(transformImmutableBooleanArray(collection))
+                BYTE -> for (collection in data.immutableByteArrays) bh.consume(transformImmutableByteArray(collection))
+                CHAR -> for (collection in data.immutableCharArrays) bh.consume(transformImmutableCharArray(collection))
+                SHORT -> for (collection in data.immutableShortArrays) bh.consume(transformImmutableShortArray(collection))
+                INT -> for (collection in data.immutableIntArrays) bh.consume(transformImmutableIntArray(collection))
+                FLOAT -> for (collection in data.immutableFloatArrays) bh.consume(transformImmutableFloatArray(collection))
+                LONG -> for (collection in data.immutableLongArrays) bh.consume(transformImmutableLongArray(collection))
+                DOUBLE -> for (collection in data.immutableDoubleArrays) bh.consume(transformImmutableDoubleArray(collection))
             }
         }
     }
