@@ -5,11 +5,19 @@
 This project uses JMH to compare [Immutable Arrays][immutable-arrays-url] with equivalent operations on regular arrays,
 `ArrayList`, and lists from  [kotlinx.collections.immutable][persistent-list-url].
 
+## Code Organization
+
+| Source set        | Responsibility                                                             |
+|-------------------|----------------------------------------------------------------------------|
+| `src/main/kotlin` | Reusable generators, collection factories, and deterministic data builders |
+| `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, and measured operations           |
+| `src/test/kotlin` | Validation tests for `src/main` utilities and data builders                |
+
 ## Benchmark Matrix
 
 `CollectionBenchmark` defines two JMH parameters:
 
-| CollectionType    |                                                                                      |
+| CollectionType    | Representation                                                                       |
 |-------------------|--------------------------------------------------------------------------------------|
 | `LIST`            | `ArrayList` stored as `List<T>`                                                      |
 | `PERSISTENT_LIST` | `PersistentList<T>` from `kotlinx.collections.immutable`                             |
@@ -21,62 +29,47 @@ and
 | DataType | `BOOLEAN`, `BYTE`, `CHAR`, `SHORT`, `INT`, `FLOAT`, `LONG`, `DOUBLE`, & `REFERENCE` |
 |----------|-------------------------------------------------------------------------------------|
 
-Together, these axes produce **36 independent trials** per benchmark method.
+Together, these produce **36 independent trials** per benchmark method.
 
 ## Benchmark Categories
 
 Benchmarks are categorized based on the shape of data being consumed:
 
-| Category     | Input Shape Examples                                                        | Example Benchmark         |
-|--------------|-----------------------------------------------------------------------------|---------------------------|
-| Flat         | `List<Float>` <br/> `FloatArray`                                            | `FilterBenchmarks`        |
-| NullableFlat | `List<Double?>` <br/> `Array<Double?>`                                      | `FilterNotNullBenchmarks` |
-| Nested       | `List<CollectionOwner<List<Int>>>` <br/> `Array<CollectionOwner<IntArray>>` | `FlatMapBenchmarks`       |
-| Object       | `List<CustomType>` <br/>  `Array<CustomType>`                               | `MapBenchmarks`           |
+| Category     | Base Class                        | Input Shape Examples                                                        | Example Benchmark         |
+|--------------|-----------------------------------|-----------------------------------------------------------------------------|---------------------------|
+| Flat         | `FlatCollectionBenchmark`         | `List<Float>` <br/> `FloatArray`                                            | `FilterBenchmarks`        |
+| NullableFlat | `NullableFlatCollectionBenchmark` | `List<Double?>` <br/> `Array<Double?>`                                      | `FilterNotNullBenchmarks` |
+| Nested       | `NestedCollectionBenchmark`       | `List<CollectionOwner<List<Int>>>` <br/> `Array<CollectionOwner<IntArray>>` | `FlatMapBenchmarks`       |
+| Object       | `ObjectCollectionBenchmark`       | `List<CustomType>` <br/>  `Array<CustomType>`                               | `MapBenchmarks`           |
 
 Together, the benchmark category and benchmark matrix define the type of data being consumed:
 
-* `FilterBenchmarks` is in the Flat category
-    * Trial for `(ARRAY, LONG)` consumes `LongArray` instances.
-* `FilterNotNullBenchmarks` is in the NullableFlat category
-    * Trial for `(IMMUTABLE_ARRAY, INT)` consumes `ImmutableArray<Int?>` instances.
-
-## Code Organization
-
-| Source set        | Responsibility                                                                            |
-|-------------------|-------------------------------------------------------------------------------------------|
-| `src/main/kotlin` | Reusable generators, collection factories, and deterministic data builders                |
-| `src/jmh/kotlin`  | JMH lifecycle, typed operation dispatch, benchmark-only fixtures, and measured operations |
-| `src/test/kotlin` | Validation tests for utilities and data builders from `src/main`                          |
-
-Each benchmark follows the same structure:
-
-- `<Operation>Benchmarks` extends `<Category>CollectionBenchmark` based on the shape of the data being consumed
-- `<Category>CollectionBenchmark` uses `<Category>CollectionBenchmarkData` to create the trial data
-
-For example, `FilterBenchmarks` extends `FlatCollectionBenchmark` which uses `FlatCollectionBenchmarkData`.
+* `FilterBenchmarks` extends `FlatCollectionBenchmark`
+    * Trial for `(ARRAY, LONG)` measures `LongArray.filter { ... }`
+* `FilterNotNullBenchmarks` extends `NullableFlatCollectionBenchmark`
+    * Trial for `(LIST, INT)` measures `List<Int?>.filterNotNull()`
 
 ## Runtime Flow
 
 1. A benchmark class defines:
     - Equivalent operations for each collection representation.
-    - Data-generation recipe for populating collections.
+    - Data-generation recipe for creating collections.
 2. JMH selects one `CollectionType` and `DataType` combination.
-3. `@Setup(Level.Trial)` in the superclass builds a deterministic batch of collections for only that combination.
+3. `@Setup(Level.Trial)` in the base class builds a deterministic batch of collections for only that combination.
 4. The benchmark invokes the operation on every collection in the batch consuming the result with `Blackhole`.
 5. The throughput is normalized based on `@OperationsPerInvocation` (usually batch size).
 
-## Data Recipes
+## Data Generation Recipe
 
 Benchmark classes define the data-generation recipe:
 
-| Ingredient                 | Explanation                                                                                                                                                                                                                           |
-|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Batch Size                 | Controls how many collections will be created for the current `(CollectionType, DataType)`  combination.                                                                                                                              |
-| `DistributionFactory`      | - Creates `Distribution` to control collection sizes.<br/>- Batch will contain collections of varying sizes sampled from this distribution.<br/>- Nested collections use a separate `DistributionFactory` for inner collection sizes. |
-| `PrimitiveGeneratorFactory`    | Creates `PrimitiveGenerator` for generating primitive values.                                                                                                                                                                             |
-| `ObjectGeneratorFactory`   | Creates `ObjectGenerator` for generating object values.                                                                                                                                                                               |
-| `NullabilityPolicyFactory` | Creates `NullabilityPolicy` for deciding when values should be null.                                                                                                                                                                  |
+| Ingredient                  | Explanation                                                                                                                                                                                                                             |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Batch Size                  | Controls how many collections will be created for the current `(CollectionType, DataType)`  combination.                                                                                                                                |
+| `DistributionFactory`       | - Creates a `Distribution` to control collection sizes.<br/>- Batch will contain collections of varying sizes sampled from this distribution.<br/>- Nested collections use a separate `DistributionFactory` for inner collection sizes. |
+| `PrimitiveGeneratorFactory` | - Creates a `PrimitiveGenerator` for generating primitive values.<br/>- Calling `withPredicateMatchRatio(ratio, predicate)` wraps the factory so that `ratio` proportion of values pass the predicate.                                  |
+| `ObjectGeneratorFactory`    | - Creates a `ObjectGenerator` for generating object values.<br/>- Calling `withPredicateMatchRatio(ratio, predicate)` wraps the factory so that `ratio` proportion of values pass the predicate.                                        |
+| `NullabilityPolicyFactory`  | Creates a `NullabilityPolicy` for deciding when values should be null.                                                                                                                                                                  |
 
 ## Data Construction
 
@@ -93,7 +86,8 @@ categories follow the same general pattern:
     * Creates an `RngFactory` from a constant seed
     * Splits independent RNG streams for sizes, values, null placement, and predicate decisions.
     * Uses `CollectionFactory` to materialize a `CollectionBatch` containing an array of `NUM_COLLECTIONS` collections.
-        * Collection are populated with elements generated from the `PrimitiveGenerator` or `ObjectGenerator` depending on
+        * Collection are populated with elements generated from the `PrimitiveGenerator` or `ObjectGenerator` depending
+          on
           the `DataType`
 
 Although a benchmark has 36 parameter combinations, a `CollectionBatch` stores only the current combination. For
