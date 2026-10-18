@@ -22,13 +22,13 @@ class PredicateMatchingObjectGeneratorTest {
                 return candidates.next()
             }
         }
-        val matchRatio = 0.5
+        val matchProbability = 0.5
         // require the first value to pass the predicate and the second value to fail
         val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.25, 0.6))
         val generator = PredicateMatchingObjectGenerator(
             source = source,
             predicate = { it == "yes" },
-            matchRatio = matchRatio,
+            matchProbability = matchProbability,
             predicateOutcomeRng = outcomeRng
         )
 
@@ -53,13 +53,13 @@ class PredicateMatchingObjectGeneratorTest {
                 return candidates.next()
             }
         }
-        val matchRatio = 0.5
+        val matchProbability = 0.5
         // require first value to pass the fail the predicate and second value to pass
         val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.6, 0.4))
         val generator = PredicateMatchingObjectGenerator(
             source = source,
             predicate = { it == null },
-            matchRatio = matchRatio,
+            matchProbability = matchProbability,
             predicateOutcomeRng = outcomeRng
         )
 
@@ -81,7 +81,7 @@ class PredicateMatchingObjectGeneratorTest {
                 predicateCalls++
                 false
             },
-            matchRatio = 1.0,
+            matchProbability = 1.0,
             predicateOutcomeRng = outcomeRng,
         )
 
@@ -95,16 +95,16 @@ class PredicateMatchingObjectGeneratorTest {
     }
 
     @Test
-    fun `rejects invalid match ratios`() {
-        for (ratio in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
+    fun `rejects invalid match probabilities`() {
+        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
             expectThrows<IllegalArgumentException> {
                 PredicateMatchingObjectGenerator(
                     source = FixedStringGenerator(value = "value"),
                     predicate = { true },
-                    matchRatio = ratio,
+                    matchProbability = probability,
                     predicateOutcomeRng = RecordingRandom()
                 )
-            }.message.isEqualTo("matchRatio ($ratio) must be between 0.0 and 1.0")
+            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
         }
     }
 }

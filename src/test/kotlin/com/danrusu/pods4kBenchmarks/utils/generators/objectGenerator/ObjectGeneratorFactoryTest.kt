@@ -26,7 +26,7 @@ class ObjectGeneratorFactoryTest {
                     override fun next(): String = generatorRngs.dataGenerationRng.nextInt().toString()
                 }
             }
-        }.withPredicateMatchRatio(1.0) { it.startsWith("-") }
+        }.withPredicateMatchProbability(1.0) { it.startsWith("-") }
 
         repeat(2) {
             val dataRng = RecordingRandom(nextIntValues = sequenceOf(1, -2, -3, 4))
@@ -43,7 +43,7 @@ class ObjectGeneratorFactoryTest {
             expectThat(List(2) { generator.next() }).isEqualTo(listOf("-2", "-3"))
             // 2 outcome decisions required to produce 2 values
             expectThat(outcomeRng.numNextDoubleCalls).isEqualTo(2)
-            // 3 nextInt() calls required to find 2 values that meets the predicate at the specified match ratio
+            // 3 nextInt() calls required to find 2 values that meets the predicate at the specified match probability
             expectThat(dataRng.numNextIntCalls).isEqualTo(3)
             // 0 nullable decisions
             expectThat(nullRng.numNextDoubleCalls).isEqualTo(0)
@@ -52,11 +52,11 @@ class ObjectGeneratorFactoryTest {
     }
 
     @Test
-    fun `predicate decorator rejects invalid ratios`() {
-        for (ratio in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
+    fun `predicate decorator rejects invalid probabilities`() {
+        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
             expectThrows<IllegalArgumentException> {
-                ObjectGeneratorFactory.randomStrings().withPredicateMatchRatio(ratio) { true }
-            }.message.isEqualTo("matchRatio ($ratio) must be between 0.0 and 1.0")
+                ObjectGeneratorFactory.randomStrings().withPredicateMatchProbability(probability) { true }
+            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
         }
     }
 

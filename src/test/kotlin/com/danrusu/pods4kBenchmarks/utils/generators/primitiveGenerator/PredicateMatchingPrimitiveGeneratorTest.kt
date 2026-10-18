@@ -15,13 +15,13 @@ class PredicateMatchingPrimitiveGeneratorTest {
     fun `rejected candidates do not consume additional predicate decisions`() {
         val valueRng = RecordingRandom(nextIntValues = sequenceOf(1, 2, -3, -4, 5, 6, -1))
 
-        val matchRatio = 0.5
+        val matchProbability = 0.5
         // require the first value to be less than the 0 and the second value greater or equal to 0
         val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.25, 0.75))
         val generator = PredicateMatchingPrimitiveGenerator(
             source = RandomPrimitiveGenerator(valueRng),
             predicates = MedianValuePredicate,
-            matchRatio = matchRatio,
+            matchProbability = matchProbability,
             predicateOutcomeRng = outcomeRng,
         )
 
@@ -42,7 +42,7 @@ class PredicateMatchingPrimitiveGeneratorTest {
         val generator = PredicateMatchingPrimitiveGenerator(
             source = RandomPrimitiveGenerator(valueRng),
             predicates = MedianValuePredicate,
-            matchRatio = 1.0, // Require 100% of values to pass the predicate
+            matchProbability = 1.0, // Require 100% of values to pass the predicate
             predicateOutcomeRng = outcomeRng,
         )
 
@@ -57,16 +57,16 @@ class PredicateMatchingPrimitiveGeneratorTest {
     }
 
     @Test
-    fun `rejects invalid match ratios`() {
-        for (ratio in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
+    fun `rejects invalid match probabilities`() {
+        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
             expectThrows<IllegalArgumentException> {
                 PredicateMatchingPrimitiveGenerator(
                     source = RandomPrimitiveGenerator(Random(123)),
                     predicates = MedianValuePredicate,
-                    matchRatio = ratio,
+                    matchProbability = probability,
                     predicateOutcomeRng = RecordingRandom(),
                 )
-            }.message.isEqualTo("matchRatio ($ratio) must be between 0.0 and 1.0")
+            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
         }
     }
 }

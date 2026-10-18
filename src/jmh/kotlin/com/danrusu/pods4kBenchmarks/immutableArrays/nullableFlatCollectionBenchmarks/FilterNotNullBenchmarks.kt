@@ -18,7 +18,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
-private const val NULL_RATIO = 0.5
+private const val NULL_PROBABILITY = 0.5
 
 /** Benchmarks `filterNotNull` across nullable reference and boxed primitive elements. */
 @BenchmarkMode(Mode.Throughput)
@@ -29,7 +29,7 @@ private const val NULL_RATIO = 0.5
 @Fork(2)
 open class FilterNotNullBenchmarks : NullableFlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
+    nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_PROBABILITY),
 ) {
     @Benchmark
     fun filterNotNull(bh: Blackhole) {

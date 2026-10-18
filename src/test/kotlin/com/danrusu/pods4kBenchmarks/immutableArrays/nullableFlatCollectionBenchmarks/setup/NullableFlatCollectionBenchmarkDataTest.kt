@@ -20,7 +20,7 @@ import strikt.assertions.isGreaterThan
 import strikt.assertions.isTrue
 import strikt.assertions.message
 
-private const val NULL_RATIO = 0.5
+private const val NULL_PROBABILITY = 0.5
 
 class NullableFlatCollectionBenchmarkDataTest {
     @Test
@@ -157,7 +157,7 @@ class NullableFlatCollectionBenchmarkDataTest {
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
-        nullabilityPolicyFactory: NullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
+        nullabilityPolicyFactory: NullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_PROBABILITY),
         primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
         referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
     ): NullableFlatCollectionBenchmarkData = NullableFlatCollectionBenchmarkData.create(

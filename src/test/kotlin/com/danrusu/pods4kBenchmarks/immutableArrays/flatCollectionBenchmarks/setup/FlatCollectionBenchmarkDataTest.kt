@@ -6,9 +6,9 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
@@ -22,17 +22,17 @@ import strikt.assertions.message
 class FlatCollectionBenchmarkDataTest {
     @Test
     fun `predicate decorated factories produce identical data across collection representations`() {
-        for (ratio in listOf(0.0, 0.35, 1.0)) {
+        for (probability in listOf(0.0, 0.35, 1.0)) {
             for (dataType in DataType.entries) {
-                val expected = createPredicateData(CollectionType.LIST, dataType, ratio)
+                val expected = createPredicateData(CollectionType.LIST, dataType, probability)
                     .normalized(CollectionType.LIST, dataType)
 
                 for (collectionType in CollectionType.entries) {
-                    val actual = createPredicateData(collectionType, dataType, ratio)
+                    val actual = createPredicateData(collectionType, dataType, probability)
                         .normalized(collectionType, dataType)
 
                     expectThat(actual)
-                        .describedAs("$collectionType with $dataType elements at match ratio $ratio")
+                        .describedAs("$collectionType with $dataType elements at match probability $probability")
                         .isEqualTo(expected)
                 }
             }
@@ -40,18 +40,18 @@ class FlatCollectionBenchmarkDataTest {
     }
 
     @Test
-    fun `data types share predicate outcomes and preserve collection sizes at every match ratio`() {
+    fun `data types share predicate outcomes and preserve collection sizes at every match probability`() {
         val expectedSizes = createData(CollectionType.LIST, DataType.REFERENCE)
             .normalized(CollectionType.LIST, DataType.REFERENCE).map { it.size }
 
-        for (ratio in listOf(0.0, 0.35, 1.0)) {
-            val expectedOutcomes = createPredicateData(CollectionType.LIST, DataType.REFERENCE, ratio)
+        for (probability in listOf(0.0, 0.35, 1.0)) {
+            val expectedOutcomes = createPredicateData(CollectionType.LIST, DataType.REFERENCE, probability)
                 .normalized(CollectionType.LIST, DataType.REFERENCE)
                 .map { collection -> collection.map { matches(it) } }
             val outcomes = expectedOutcomes.flatten()
 
             expectThat(outcomes.isNotEmpty()).isTrue()
-            when (ratio) {
+            when (probability) {
                 0.0 -> expectThat(outcomes.all { !it }).isTrue()
                 1.0 -> expectThat(outcomes.all { it }).isTrue()
                 else -> {
@@ -61,14 +61,14 @@ class FlatCollectionBenchmarkDataTest {
             }
 
             for (dataType in DataType.entries) {
-                val actual = createPredicateData(CollectionType.LIST, dataType, ratio)
+                val actual = createPredicateData(CollectionType.LIST, dataType, probability)
                     .normalized(CollectionType.LIST, dataType)
 
                 expectThat(actual.map { it.size })
-                    .describedAs("collection sizes for $dataType at match ratio $ratio")
+                    .describedAs("collection sizes for $dataType at match probability $probability")
                     .isEqualTo(expectedSizes)
                 expectThat(actual.map { collection -> collection.map { matches(it) } })
-                    .describedAs("predicate outcomes for $dataType at match ratio $ratio")
+                    .describedAs("predicate outcomes for $dataType at match probability $probability")
                     .isEqualTo(expectedOutcomes)
             }
         }
@@ -77,14 +77,14 @@ class FlatCollectionBenchmarkDataTest {
     private fun createPredicateData(
         collectionType: CollectionType,
         dataType: DataType,
-        ratio: Double,
+        probability: Double,
     ): FlatCollectionBenchmarkData = createData(
         collectionType = collectionType,
         dataType = dataType,
         primitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues()
-            .withPredicateMatchRatio(ratio, MedianValuePredicate),
+            .withPredicateMatchProbability(probability, MedianValuePredicate),
         referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings()
-            .withPredicateMatchRatio(ratio, MedianValuePredicate::matches),
+            .withPredicateMatchProbability(probability, MedianValuePredicate::matches),
     )
 
     private fun matches(value: Any): Boolean = when (value) {

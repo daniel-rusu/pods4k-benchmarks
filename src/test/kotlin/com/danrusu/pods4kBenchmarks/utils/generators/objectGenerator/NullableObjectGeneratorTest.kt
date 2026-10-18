@@ -55,10 +55,10 @@ class NullableObjectGeneratorTest {
     @Test
     fun `nullable string generator is deterministic with fixed rng factory seed`() {
         val firstGenerator = ObjectGeneratorFactory.randomStrings()
-            .nullable(nullRatio = 0.5)
+            .nullable(nullProbability = 0.5)
             .create(TestGeneratorRngs(masterSeed = 123))
         val secondGenerator = ObjectGeneratorFactory.randomStrings()
-            .nullable(nullRatio = 0.5)
+            .nullable(nullProbability = 0.5)
             .create(TestGeneratorRngs(masterSeed = 123))
 
         val firstValues = List(20) { firstGenerator.next() }

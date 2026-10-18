@@ -51,18 +51,21 @@ abstract class ObjectGeneratorFactory<T> {
     }
 }
 
-/** Decorates this factory so each generated value matches [predicate] with probability [matchRatio]. */
-fun <T> ObjectGeneratorFactory<T>.withPredicateMatchRatio(
-    matchRatio: Double,
+/**
+ * Decorates this factory so each generated value independently matches [predicate] with probability [matchProbability].
+ * The proportion of matching values in a collection is not fixed.
+ */
+fun <T> ObjectGeneratorFactory<T>.withPredicateMatchProbability(
+    matchProbability: Double,
     predicate: (T) -> Boolean,
 ): ObjectGeneratorFactory<T> {
-    require(matchRatio in 0.0..1.0) { "matchRatio ($matchRatio) must be between 0.0 and 1.0" }
+    require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
 
     return object : ObjectGeneratorFactory<T>() {
         override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T> = PredicateMatchingObjectGenerator(
-            source = this@withPredicateMatchRatio.create(generatorRngs),
+            source = this@withPredicateMatchProbability.create(generatorRngs),
             predicate = predicate,
-            matchRatio = matchRatio,
+            matchProbability = matchProbability,
             predicateOutcomeRng = generatorRngs.predicateOutcomeRng,
         )
     }

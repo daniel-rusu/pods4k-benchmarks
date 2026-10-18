@@ -24,7 +24,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
-private const val NULL_RATIO = 0.5
+private const val NULL_PROBABILITY = 0.5
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -37,7 +37,7 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
     objectGeneratorFactory = NullableCompoundElementFactory(
         primitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
         stringGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
-        nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_RATIO),
+        nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_PROBABILITY),
     ),
 ) {
     @Benchmark

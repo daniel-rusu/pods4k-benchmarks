@@ -11,28 +11,28 @@ import kotlin.random.Random
 
 class RandomNullabilityPolicyTest {
     @Test
-    fun `validates null ratio`() {
+    fun `validates null probability`() {
         val random = Random.Default
 
         expectThrows<IllegalArgumentException> {
-            RandomNullabilityPolicy(nullRatio = -0.1, random = random)
-        }.message.isEqualTo("nullRatio (-0.1) must be between 0.0 and 1.0")
+            RandomNullabilityPolicy(nullProbability = -0.1, random = random)
+        }.message.isEqualTo("nullProbability (-0.1) must be between 0.0 and 1.0")
 
         expectThrows<IllegalArgumentException> {
-            RandomNullabilityPolicy(nullRatio = 1.1, random = random)
-        }.message.isEqualTo("nullRatio (1.1) must be between 0.0 and 1.0")
+            RandomNullabilityPolicy(nullProbability = 1.1, random = random)
+        }.message.isEqualTo("nullProbability (1.1) must be between 0.0 and 1.0")
     }
 
     @Test
-    fun `null ratio boundaries choose expected nullability`() {
+    fun `null probability boundaries choose expected nullability`() {
         val random = Random.Default
 
         expectThat(
-            RandomNullabilityPolicy(nullRatio = 0.0, random = random).shouldGenerateNull()
+            RandomNullabilityPolicy(nullProbability = 0.0, random = random).shouldGenerateNull()
         ).isFalse()
 
         expectThat(
-            RandomNullabilityPolicy(nullRatio = 1.0, random = random).shouldGenerateNull()
+            RandomNullabilityPolicy(nullProbability = 1.0, random = random).shouldGenerateNull()
         ).isTrue()
     }
 }

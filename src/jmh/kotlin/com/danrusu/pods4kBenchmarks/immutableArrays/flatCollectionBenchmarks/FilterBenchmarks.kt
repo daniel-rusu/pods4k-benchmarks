@@ -12,9 +12,9 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
 // Statistically, this will filter half of the values on average.
-private const val MATCH_RATIO = 0.5
+private const val MATCH_PROBABILITY = 0.5
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -43,10 +43,10 @@ open class FilterBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     primitiveGeneratorFactory = PrimitiveGeneratorFactory
         .randomValues()
-        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
     referenceGeneratorFactory = ObjectGeneratorFactory
         .randomStrings()
-        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate::matches),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
 ) {
     @Benchmark
     fun filter(bh: Blackhole) {

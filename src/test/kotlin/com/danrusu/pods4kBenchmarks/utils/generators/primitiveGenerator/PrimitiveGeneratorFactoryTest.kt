@@ -20,7 +20,7 @@ class PrimitiveGeneratorFactoryTest {
         val factory = PrimitiveGeneratorFactory { rngs ->
             sourceCreations++
             RandomPrimitiveGenerator(rngs.dataGenerationRng)
-        }.withPredicateMatchRatio(0.5, predicates)
+        }.withPredicateMatchProbability(0.5, predicates)
 
         repeat(2) {
             val dataRng = RecordingRandom(nextIntValues = sequenceOf(1, 2, 4, 3, 5))
@@ -48,11 +48,11 @@ class PrimitiveGeneratorFactoryTest {
     }
 
     @Test
-    fun `predicate decorator rejects invalid ratios`() {
-        for (ratio in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
+    fun `predicate decorator rejects invalid probabilities`() {
+        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
             expectThrows<IllegalArgumentException> {
-                PrimitiveGeneratorFactory.randomValues().withPredicateMatchRatio(ratio, MedianValuePredicate)
-            }.message.isEqualTo("matchRatio ($ratio) must be between 0.0 and 1.0")
+                PrimitiveGeneratorFactory.randomValues().withPredicateMatchProbability(probability, MedianValuePredicate)
+            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
         }
     }
 

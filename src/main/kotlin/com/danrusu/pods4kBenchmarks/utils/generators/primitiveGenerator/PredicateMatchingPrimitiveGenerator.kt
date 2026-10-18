@@ -8,11 +8,11 @@ import kotlin.random.Random
 internal class PredicateMatchingPrimitiveGenerator(
     private val source: PrimitiveGenerator,
     private val predicates: PrimitivePredicate,
-    private val matchRatio: Double,
+    private val matchProbability: Double,
     private val predicateOutcomeRng: Random,
 ) : PrimitiveGenerator {
     init {
-        require(matchRatio in 0.0..1.0) { "matchRatio ($matchRatio) must be between 0.0 and 1.0" }
+        require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
     }
 
     override fun nextBoolean(): Boolean = next(source::nextBoolean, predicates::matches)
@@ -35,7 +35,7 @@ internal class PredicateMatchingPrimitiveGenerator(
         generateCandidate: () -> T,
         predicate: (T) -> Boolean,
     ): T {
-        val expectedOutcome = predicateOutcomeRng.nextDouble() < matchRatio
+        val expectedOutcome = predicateOutcomeRng.nextDouble() < matchProbability
         return PredicateUtils.generateMatching(expectedOutcome, generateCandidate, predicate)
     }
 }

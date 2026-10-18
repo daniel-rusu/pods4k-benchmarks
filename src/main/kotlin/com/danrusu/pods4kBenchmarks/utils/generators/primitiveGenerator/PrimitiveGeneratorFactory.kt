@@ -18,18 +18,21 @@ fun interface PrimitiveGeneratorFactory {
     }
 }
 
-/** Decorates this factory so each generated value matches [predicates] with probability [matchRatio]. */
-fun PrimitiveGeneratorFactory.withPredicateMatchRatio(
-    matchRatio: Double,
+/**
+ * Decorates this factory so each generated value independently matches [predicates] with probability [matchProbability].
+ * The proportion of matching values in a collection is not fixed.
+ */
+fun PrimitiveGeneratorFactory.withPredicateMatchProbability(
+    matchProbability: Double,
     predicates: PrimitivePredicate,
 ): PrimitiveGeneratorFactory {
-    require(matchRatio in 0.0..1.0) { "matchRatio ($matchRatio) must be between 0.0 and 1.0" }
+    require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
 
     return PrimitiveGeneratorFactory { generatorRngs ->
         PredicateMatchingPrimitiveGenerator(
             source = create(generatorRngs),
             predicates = predicates,
-            matchRatio = matchRatio,
+            matchProbability = matchProbability,
             predicateOutcomeRng = generatorRngs.predicateOutcomeRng,
         )
     }

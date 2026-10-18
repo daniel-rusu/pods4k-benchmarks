@@ -26,7 +26,10 @@ fun <T : Any> ObjectGeneratorFactory<T>.nullable(
     }
 }
 
-/** Creates a factory that returns null according to [nullRatio]. */
+/**
+ * Creates a factory that independently returns null for each value with probability [nullProbability].
+ * The proportion of null values in a collection is not fixed.
+ */
 fun <T : Any> ObjectGeneratorFactory<T>.nullable(
-    nullRatio: Double,
-): ObjectGeneratorFactory<T?> = nullable(NullabilityPolicyFactory.random(nullRatio))
+    nullProbability: Double,
+): ObjectGeneratorFactory<T?> = nullable(NullabilityPolicyFactory.random(nullProbability))

@@ -12,9 +12,9 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchRatio
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -32,7 +32,7 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.SPARSE_ACCESS
 
 // Takes 0.98 / (1 - 0.98) = 49 elements on average.
 // The median result contains 34 elements because 1 - (0.98)^35 = ~50.7%.
-private const val MATCH_RATIO = 0.98
+private const val MATCH_PROBABILITY = 0.98
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -44,10 +44,10 @@ open class TakeLastWhileBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     primitiveGeneratorFactory = PrimitiveGeneratorFactory
         .randomValues()
-        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
     referenceGeneratorFactory = ObjectGeneratorFactory
         .randomStrings()
-        .withPredicateMatchRatio(MATCH_RATIO, MedianValuePredicate::matches),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
 ) {
     @Benchmark
     fun takeLastWhile(bh: Blackhole) {

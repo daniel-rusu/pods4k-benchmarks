@@ -21,13 +21,16 @@ fun interface NullabilityPolicyFactory {
     fun create(generatorRngs: GeneratorRngs): NullabilityPolicy
 
     companion object {
-        /** Creates policies that choose null values according to [nullRatio]. */
-        fun random(nullRatio: Double): NullabilityPolicyFactory {
-            require(nullRatio in 0.0..1.0) { "nullRatio ($nullRatio) must be between 0.0 and 1.0" }
+        /**
+         * Creates policies that independently choose null for each value with probability [nullProbability].
+         * The proportion of null values in a collection is not fixed.
+         */
+        fun random(nullProbability: Double): NullabilityPolicyFactory {
+            require(nullProbability in 0.0..1.0) { "nullProbability ($nullProbability) must be between 0.0 and 1.0" }
 
             return NullabilityPolicyFactory { generatorRngs ->
                 RandomNullabilityPolicy(
-                    nullRatio = nullRatio,
+                    nullProbability = nullProbability,
                     random = generatorRngs.nullabilityDecisionsRng,
                 )
             }
@@ -36,15 +39,16 @@ fun interface NullabilityPolicyFactory {
 }
 
 /**
- * Randomly chooses null values according to [nullRatio].
+ * Independently chooses null for each value with probability [nullProbability].
+ * The proportion of null values in a collection is not fixed.
  */
 class RandomNullabilityPolicy(
-    private val nullRatio: Double,
+    private val nullProbability: Double,
     private val random: Random,
 ) : NullabilityPolicy() {
     init {
-        require(nullRatio in 0.0..1.0) { "nullRatio ($nullRatio) must be between 0.0 and 1.0" }
+        require(nullProbability in 0.0..1.0) { "nullProbability ($nullProbability) must be between 0.0 and 1.0" }
     }
 
-    override fun shouldGenerateNull(): Boolean = random.nextDouble() < nullRatio
+    override fun shouldGenerateNull(): Boolean = random.nextDouble() < nullProbability
 }

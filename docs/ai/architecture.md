@@ -44,10 +44,12 @@ exposed to its benchmarks.
 - `DistributionFactory`: flat and nested collection-size models.
 - `PrimitiveGeneratorFactory` and `ObjectGeneratorFactory`: configurable non-null element generation.
 - `PredicateMatchingPrimitiveGenerator` and `PredicateMatchingObjectGenerator`: reusable adapters that independently
-  choose a required predicate outcome, then rejection-sample the decorated source until a matching value is found.
+  choose a required predicate outcome with `matchProbability`, then rejection-sample the decorated source until a
+  matching value is found. Factories expose this as `withPredicateMatchProbability`; collection match proportions vary.
 - `MedianValuePredicate`: the scenario predicate shared by predicate benchmark setup and measured operations.
 - `NullabilityPolicyFactory`: creates fresh policies from the dedicated nullability RNG stream. Nullable benchmark-data
-  builders own these policies and apply them uniformly to primitive and reference sources.
+  builders own these policies and apply them uniformly to primitive and reference sources. Its `random(nullProbability)`
+  factory independently chooses null for each element; collection null proportions vary.
 - `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
 - `BenchmarkBatchSize`: shared collection-count defaults chosen by the data each operation fetches or writes, rather
   than the total trial dataset size.
