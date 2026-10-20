@@ -1,5 +1,7 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
+import com.danrusu.pods4kBenchmarks.utils.Percent
+import com.danrusu.pods4kBenchmarks.utils.nextBoolean
 import com.danrusu.pods4kBenchmarks.utils.predicates.PredicateUtils
 import kotlin.random.Random
 
@@ -7,17 +9,13 @@ import kotlin.random.Random
 class PredicateMatchingObjectGenerator<T>(
     private val source: ObjectGenerator<T>,
     private val predicate: (T) -> Boolean,
-    private val matchProbability: Double,
+    private val matchProbability: Percent,
     private val predicateOutcomeRng: Random,
 ) : ObjectGenerator<T> {
-    init {
-        require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
-    }
-
     override val objectClass: Class<T & Any> = source.objectClass
 
     override fun next(): T {
-        val expectedOutcome = predicateOutcomeRng.nextDouble() < matchProbability
+        val expectedOutcome = predicateOutcomeRng.nextBoolean(trueProbability = matchProbability)
         return PredicateUtils.generateMatching(expectedOutcome, source::next, predicate)
     }
 }

@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.FixedStringGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.RecordingRandom
+import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.PredicateUtils.MAX_GENERATION_ATTEMPTS
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -22,9 +23,9 @@ class PredicateMatchingObjectGeneratorTest {
                 return candidates.next()
             }
         }
-        val matchProbability = 0.5
+        val matchProbability = 50.percent()
         // require the first value to pass the predicate and the second value to fail
-        val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.25, 0.6))
+        val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.25, 0.75))
         val generator = PredicateMatchingObjectGenerator(
             source = source,
             predicate = { it == "yes" },
@@ -53,7 +54,7 @@ class PredicateMatchingObjectGeneratorTest {
                 return candidates.next()
             }
         }
-        val matchProbability = 0.5
+        val matchProbability = 50.percent()
         // require first value to pass the fail the predicate and second value to pass
         val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.6, 0.4))
         val generator = PredicateMatchingObjectGenerator(
@@ -74,14 +75,14 @@ class PredicateMatchingObjectGeneratorTest {
     @Test
     fun `impossible object outcome propagates bounded generation failure`() {
         var predicateCalls = 0
-        val outcomeRng = RecordingRandom()
+        val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.5))
         val generator = PredicateMatchingObjectGenerator(
             source = FixedStringGenerator("value"),
             predicate = {
                 predicateCalls++
                 false
             },
-            matchProbability = 1.0,
+            matchProbability = 100.percent(),
             predicateOutcomeRng = outcomeRng,
         )
 
@@ -92,19 +93,5 @@ class PredicateMatchingObjectGeneratorTest {
         )
         expectThat(predicateCalls).isEqualTo(MAX_GENERATION_ATTEMPTS)
         expectThat(outcomeRng.numNextDoubleCalls).isEqualTo(1)
-    }
-
-    @Test
-    fun `rejects invalid match probabilities`() {
-        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
-            expectThrows<IllegalArgumentException> {
-                PredicateMatchingObjectGenerator(
-                    source = FixedStringGenerator(value = "value"),
-                    predicate = { true },
-                    matchProbability = probability,
-                    predicateOutcomeRng = RecordingRandom()
-                )
-            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
-        }
     }
 }

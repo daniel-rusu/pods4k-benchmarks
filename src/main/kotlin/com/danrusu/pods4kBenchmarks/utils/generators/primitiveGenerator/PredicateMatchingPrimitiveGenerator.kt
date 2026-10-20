@@ -1,5 +1,7 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator
 
+import com.danrusu.pods4kBenchmarks.utils.Percent
+import com.danrusu.pods4kBenchmarks.utils.nextBoolean
 import com.danrusu.pods4kBenchmarks.utils.predicates.PredicateUtils
 import com.danrusu.pods4kBenchmarks.utils.predicates.PrimitivePredicate
 import kotlin.random.Random
@@ -8,13 +10,9 @@ import kotlin.random.Random
 internal class PredicateMatchingPrimitiveGenerator(
     private val source: PrimitiveGenerator,
     private val predicates: PrimitivePredicate,
-    private val matchProbability: Double,
+    private val matchProbability: Percent,
     private val predicateOutcomeRng: Random,
 ) : PrimitiveGenerator {
-    init {
-        require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
-    }
-
     override fun nextBoolean(): Boolean = next(source::nextBoolean, predicates::matches)
 
     override fun nextByte(): Byte = next(source::nextByte, predicates::matches)
@@ -35,7 +33,7 @@ internal class PredicateMatchingPrimitiveGenerator(
         generateCandidate: () -> T,
         predicate: (T) -> Boolean,
     ): T {
-        val expectedOutcome = predicateOutcomeRng.nextDouble() < matchProbability
+        val expectedOutcome = predicateOutcomeRng.nextBoolean(trueProbability = matchProbability)
         return PredicateUtils.generateMatching(expectedOutcome, generateCandidate, predicate)
     }
 }

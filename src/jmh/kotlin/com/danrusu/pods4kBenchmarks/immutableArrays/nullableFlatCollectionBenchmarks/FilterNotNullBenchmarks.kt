@@ -5,6 +5,7 @@ import com.danrusu.pods4k.immutableArrays.filterNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup.NullableFlatCollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
+import com.danrusu.pods4kBenchmarks.utils.percent
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -18,7 +19,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
-private const val NULL_PROBABILITY = 0.5
+private val NULL_PROBABILITY = 50.percent()
 
 /** Benchmarks `filterNotNull` across nullable reference and boxed primitive elements. */
 @BenchmarkMode(Mode.Throughput)

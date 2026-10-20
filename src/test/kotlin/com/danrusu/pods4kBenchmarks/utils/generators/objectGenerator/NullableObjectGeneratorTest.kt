@@ -1,9 +1,10 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
+import com.danrusu.pods4kBenchmarks.utils.percent
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -55,10 +56,10 @@ class NullableObjectGeneratorTest {
     @Test
     fun `nullable string generator is deterministic with fixed rng factory seed`() {
         val firstGenerator = ObjectGeneratorFactory.randomStrings()
-            .nullable(nullProbability = 0.5)
+            .nullable(nullProbability = 50.percent())
             .create(TestGeneratorRngs(masterSeed = 123))
         val secondGenerator = ObjectGeneratorFactory.randomStrings()
-            .nullable(nullProbability = 0.5)
+            .nullable(nullProbability = 50.percent())
             .create(TestGeneratorRngs(masterSeed = 123))
 
         val firstValues = List(20) { firstGenerator.next() }

@@ -2,13 +2,12 @@ package com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.RecordingRandom
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
+import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import com.danrusu.pods4kBenchmarks.utils.predicates.PrimitivePredicate
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
-import strikt.assertions.message
 
 class PrimitiveGeneratorFactoryTest {
     @Test
@@ -20,7 +19,7 @@ class PrimitiveGeneratorFactoryTest {
         val factory = PrimitiveGeneratorFactory { rngs ->
             sourceCreations++
             RandomPrimitiveGenerator(rngs.dataGenerationRng)
-        }.withPredicateMatchProbability(0.5, predicates)
+        }.withPredicateMatchProbability(50.percent(), predicates)
 
         repeat(2) {
             val dataRng = RecordingRandom(nextIntValues = sequenceOf(1, 2, 4, 3, 5))
@@ -45,15 +44,6 @@ class PrimitiveGeneratorFactoryTest {
             expectThat(nullRng.numNextDoubleCalls).isEqualTo(0)
         }
         expectThat(sourceCreations).isEqualTo(2)
-    }
-
-    @Test
-    fun `predicate decorator rejects invalid probabilities`() {
-        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
-            expectThrows<IllegalArgumentException> {
-                PrimitiveGeneratorFactory.randomValues().withPredicateMatchProbability(probability, MedianValuePredicate)
-            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
-        }
     }
 
     @Test

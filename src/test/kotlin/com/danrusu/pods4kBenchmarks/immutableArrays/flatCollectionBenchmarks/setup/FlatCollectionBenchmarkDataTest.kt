@@ -5,10 +5,12 @@ import com.danrusu.pods4k.immutableArrays.toList
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.utils.Percent
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
+import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
@@ -22,7 +24,7 @@ import strikt.assertions.message
 class FlatCollectionBenchmarkDataTest {
     @Test
     fun `predicate decorated factories produce identical data across collection representations`() {
-        for (probability in listOf(0.0, 0.35, 1.0)) {
+        for (probability in listOf(0.percent(), 35.percent(), 100.percent())) {
             for (dataType in DataType.entries) {
                 val expected = createPredicateData(CollectionType.LIST, dataType, probability)
                     .normalized(CollectionType.LIST, dataType)
@@ -44,7 +46,7 @@ class FlatCollectionBenchmarkDataTest {
         val expectedSizes = createData(CollectionType.LIST, DataType.REFERENCE)
             .normalized(CollectionType.LIST, DataType.REFERENCE).map { it.size }
 
-        for (probability in listOf(0.0, 0.35, 1.0)) {
+        for (probability in listOf(0.percent(), 35.percent(), 100.percent())) {
             val expectedOutcomes = createPredicateData(CollectionType.LIST, DataType.REFERENCE, probability)
                 .normalized(CollectionType.LIST, DataType.REFERENCE)
                 .map { collection -> collection.map { matches(it) } }
@@ -52,8 +54,8 @@ class FlatCollectionBenchmarkDataTest {
 
             expectThat(outcomes.isNotEmpty()).isTrue()
             when (probability) {
-                0.0 -> expectThat(outcomes.all { !it }).isTrue()
-                1.0 -> expectThat(outcomes.all { it }).isTrue()
+                0.percent() -> expectThat(outcomes.all { !it }).isTrue()
+                100.percent() -> expectThat(outcomes.all { it }).isTrue()
                 else -> {
                     expectThat(outcomes.any { it }).isTrue()
                     expectThat(outcomes.any { !it }).isTrue()
@@ -77,7 +79,7 @@ class FlatCollectionBenchmarkDataTest {
     private fun createPredicateData(
         collectionType: CollectionType,
         dataType: DataType,
-        probability: Double,
+        probability: Percent,
     ): FlatCollectionBenchmarkData = createData(
         collectionType = collectionType,
         dataType = dataType,

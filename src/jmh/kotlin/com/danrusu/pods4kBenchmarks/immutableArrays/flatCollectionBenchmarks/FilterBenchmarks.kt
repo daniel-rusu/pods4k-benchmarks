@@ -15,6 +15,7 @@ import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGener
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
+import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
 // Statistically, this will filter half of the values on average.
-private const val MATCH_PROBABILITY = 0.5
+private val MATCH_PROBABILITY = 50.percent()
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)

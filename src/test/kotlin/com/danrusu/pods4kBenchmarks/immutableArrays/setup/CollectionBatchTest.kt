@@ -2,6 +2,7 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
 import com.danrusu.pods4kBenchmarks.utils.Distribution
 import com.danrusu.pods4kBenchmarks.utils.RngFactory
+import com.danrusu.pods4kBenchmarks.utils.inRange
 import com.danrusu.pods4kBenchmarks.utils.percent
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -97,7 +98,7 @@ class CollectionBatchTest {
     private fun fixedSizeDistribution(): Distribution {
         return Distribution(
             RngFactory(),
-            100.percent inRange 1..1,
+            100.percent() inRange 1..1,
         )
     }
 }

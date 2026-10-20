@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
+import com.danrusu.pods4kBenchmarks.utils.Percent
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
@@ -31,5 +32,5 @@ fun <T : Any> ObjectGeneratorFactory<T>.nullable(
  * The proportion of null values in a collection is not fixed.
  */
 fun <T : Any> ObjectGeneratorFactory<T>.nullable(
-    nullProbability: Double,
+    nullProbability: Percent,
 ): ObjectGeneratorFactory<T?> = nullable(NullabilityPolicyFactory.random(nullProbability))

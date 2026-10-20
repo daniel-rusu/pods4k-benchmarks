@@ -39,9 +39,16 @@ exposed to its benchmarks.
 - `CollectionType`: `LIST`, `PERSISTENT_LIST`, `ARRAY`, and `IMMUTABLE_ARRAY`.
 - `DataType`: `REFERENCE` plus the eight Kotlin primitive families.
 - `RngFactory` and `BenchmarkGeneratorRngs`: deterministic, purpose-specific random streams.
+- `Percent`: a validated fixed-point value from 0% to 100% with two decimal places. `Int.percent()` and
+  `Double.percent()` interpret inputs as percentages, so `50.percent()` means 50%. It owns exact addition, ordering,
+  and numeric weighting through `scale`; consumers cannot access its representation.
+- `Random.nextBoolean(trueProbability: Percent)` in `utils/RandomExtensions.kt`: probability decisions using
+  `nextDouble() < trueProbability.scale(1.0)`, with ordinary Double precision.
 - `CollectionBatch`: shared outer-array materialization, erased storage, and runtime validation for one trial-data
   representation.
-- `DistributionFactory`: flat and nested collection-size models.
+- `Distribution` and `DistributionFactory`: collection-size models using positive `Percent` bucket weights with an
+  exact 100% total. Each value uses one Double threshold compared with scaled cumulative percentages to select its
+  bucket, then an inclusive range draw.
 - `PrimitiveGeneratorFactory` and `ObjectGeneratorFactory`: configurable non-null element generation.
 - `PredicateMatchingPrimitiveGenerator` and `PredicateMatchingObjectGenerator`: reusable adapters that independently
   choose a required predicate outcome with `matchProbability`, then rejection-sample the decorated source until a
@@ -50,6 +57,8 @@ exposed to its benchmarks.
 - `NullabilityPolicyFactory`: creates fresh policies from the dedicated nullability RNG stream. Nullable benchmark-data
   builders own these policies and apply them uniformly to primitive and reference sources. Its `random(nullProbability)`
   factory independently chooses null for each element; collection null proportions vary.
+- Nullability and predicate-match probabilities accept `Percent`. Each decision consumes one `nextDouble()` call,
+  including at 0% and 100%; rejected predicate candidates do not consume further outcome decisions.
 - `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
 - `BenchmarkBatchSize`: shared collection-count defaults chosen by the data each operation fetches or writes, rather
   than the total trial dataset size.

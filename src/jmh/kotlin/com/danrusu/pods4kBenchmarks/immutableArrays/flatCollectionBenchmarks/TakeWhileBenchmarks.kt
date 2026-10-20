@@ -15,6 +15,7 @@ import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGener
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
+import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -32,7 +33,7 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.SPARSE_ACCESS
 
 // Takes 0.98 / (1 - 0.98) = 49 elements on average.
 // The median result contains 34 elements because 1 - (0.98)^35 = ~50.7%.
-private const val MATCH_PROBABILITY = 0.98
+private val MATCH_PROBABILITY = 98.percent()
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)

@@ -41,6 +41,9 @@
 
 ## Reporting Benchmark Changes
 
+- Percentage decisions use `Random.nextBoolean(trueProbability: Percent)`, which consumes one `nextDouble()` call even
+  at 0% and 100%. Distribution also selects buckets with a Double threshold. Percentage arithmetic and total
+  validation remain exact, while sampling uses ordinary Double precision.
 - Say whether you ran tests, compiled benchmarks, or executed JMH.
 - If only compile checks ran, say "benchmarks were compiled but not run."
 - If JMH ran, report the command, include filter, JVM/JDK if known, and result file path.

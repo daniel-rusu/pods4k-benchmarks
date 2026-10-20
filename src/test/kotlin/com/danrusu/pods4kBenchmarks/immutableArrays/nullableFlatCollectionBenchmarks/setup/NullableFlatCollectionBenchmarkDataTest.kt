@@ -10,6 +10,7 @@ import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.percent
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -20,7 +21,7 @@ import strikt.assertions.isGreaterThan
 import strikt.assertions.isTrue
 import strikt.assertions.message
 
-private const val NULL_PROBABILITY = 0.5
+private val NULL_PROBABILITY = 50.percent()
 
 class NullableFlatCollectionBenchmarkDataTest {
     @Test

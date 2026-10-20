@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
+import com.danrusu.pods4kBenchmarks.utils.Percent
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
@@ -56,11 +57,9 @@ abstract class ObjectGeneratorFactory<T> {
  * The proportion of matching values in a collection is not fixed.
  */
 fun <T> ObjectGeneratorFactory<T>.withPredicateMatchProbability(
-    matchProbability: Double,
+    matchProbability: Percent,
     predicate: (T) -> Boolean,
 ): ObjectGeneratorFactory<T> {
-    require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
-
     return object : ObjectGeneratorFactory<T>() {
         override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T> = PredicateMatchingObjectGenerator(
             source = this@withPredicateMatchProbability.create(generatorRngs),

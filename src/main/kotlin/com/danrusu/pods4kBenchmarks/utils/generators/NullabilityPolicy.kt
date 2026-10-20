@@ -1,5 +1,7 @@
 package com.danrusu.pods4kBenchmarks.utils.generators
 
+import com.danrusu.pods4kBenchmarks.utils.Percent
+import com.danrusu.pods4kBenchmarks.utils.nextBoolean
 import kotlin.random.Random
 
 /**
@@ -25,9 +27,7 @@ fun interface NullabilityPolicyFactory {
          * Creates policies that independently choose null for each value with probability [nullProbability].
          * The proportion of null values in a collection is not fixed.
          */
-        fun random(nullProbability: Double): NullabilityPolicyFactory {
-            require(nullProbability in 0.0..1.0) { "nullProbability ($nullProbability) must be between 0.0 and 1.0" }
-
+        fun random(nullProbability: Percent): NullabilityPolicyFactory {
             return NullabilityPolicyFactory { generatorRngs ->
                 RandomNullabilityPolicy(
                     nullProbability = nullProbability,
@@ -43,12 +43,8 @@ fun interface NullabilityPolicyFactory {
  * The proportion of null values in a collection is not fixed.
  */
 class RandomNullabilityPolicy(
-    private val nullProbability: Double,
+    private val nullProbability: Percent,
     private val random: Random,
 ) : NullabilityPolicy() {
-    init {
-        require(nullProbability in 0.0..1.0) { "nullProbability ($nullProbability) must be between 0.0 and 1.0" }
-    }
-
-    override fun shouldGenerateNull(): Boolean = random.nextDouble() < nullProbability
+    override fun shouldGenerateNull(): Boolean = random.nextBoolean(trueProbability = nullProbability)
 }

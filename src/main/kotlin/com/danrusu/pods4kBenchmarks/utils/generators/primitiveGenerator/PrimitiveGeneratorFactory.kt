@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator
 
+import com.danrusu.pods4kBenchmarks.utils.Percent
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.predicates.PrimitivePredicate
 
@@ -23,11 +24,9 @@ fun interface PrimitiveGeneratorFactory {
  * The proportion of matching values in a collection is not fixed.
  */
 fun PrimitiveGeneratorFactory.withPredicateMatchProbability(
-    matchProbability: Double,
+    matchProbability: Percent,
     predicates: PrimitivePredicate,
 ): PrimitiveGeneratorFactory {
-    require(matchProbability in 0.0..1.0) { "matchProbability ($matchProbability) must be between 0.0 and 1.0" }
-
     return PrimitiveGeneratorFactory { generatorRngs ->
         PredicateMatchingPrimitiveGenerator(
             source = create(generatorRngs),

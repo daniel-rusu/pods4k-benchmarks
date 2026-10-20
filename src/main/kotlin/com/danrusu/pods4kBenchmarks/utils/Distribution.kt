@@ -1,5 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils
 
+import kotlin.random.Random
 import kotlin.random.nextInt
 
 /**
@@ -10,13 +11,14 @@ import kotlin.random.nextInt
  *
  * Distribution(
  *     rngFactory,
- *     80.percent inRange 0..10,
- *     20.percent inRange 100..120,
+ *     80.percent() inRange 0..10,
+ *     20.percent() inRange 100..120,
  * )
  */
-class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
-    private val random = rngFactory.createRng()
-    private val cumulativePercentages: IntArray
+class Distribution internal constructor(private val random: Random, vararg buckets: Bucket) {
+    constructor(rngFactory: RngFactory, vararg buckets: Bucket) : this(rngFactory.createRng(), *buckets)
+
+    private val cumulativePercentages: Array<Percent>
     private val valueRanges = Array(buckets.size) { buckets[it].values }
 
     /**
@@ -26,42 +28,37 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
     val averageValue: Double
 
     init {
-        var accumulatedPercentage = 0
+        require(buckets.isNotEmpty()) { "Distribution must contain at least one bucket" }
+        var accumulatedPercentage = 0.percent()
         var weightedAverage = 0.0
-        cumulativePercentages = IntArray(buckets.size)
+        cumulativePercentages = Array(buckets.size) { index ->
+            val (weight, values) = buckets[index]
 
-        for (index in buckets.indices) {
-            val (percentage, values) = buckets[index]
-            require(percentage > 0) { "The percentage ($percentage) must be positive" }
-
-            weightedAverage += percentage * values.computeAverageValue() / 100
-            accumulatedPercentage += percentage
-            cumulativePercentages[index] = accumulatedPercentage
+            weightedAverage += weight.scale(values.computeAverageValue())
+            accumulatedPercentage += weight
+            accumulatedPercentage
         }
-        require(accumulatedPercentage == 100) {
-            "The percentages must add up to 100 (found $accumulatedPercentage)"
+        require(accumulatedPercentage == 100.percent()) {
+            "Bucket weights must add up to 100% (found $accumulatedPercentage)"
         }
 
         averageValue = weightedAverage
     }
 
     fun nextValue(): Int {
-        val bucketSelection = random.nextInt(100)
+        val bucketSelection = random.nextDouble()
         // The configured distributions have few buckets, so a linear scan is cheaper than a binary search.
-        val bucketIndex = cumulativePercentages.indexOfFirst { bucketSelection < it }
+        val bucketIndex = cumulativePercentages.indexOfFirst { bucketSelection < it.scale(1.0) }
         return random.nextInt(valueRanges[bucketIndex])
     }
 
-    data class Bucket(val percentage: Int, val values: IntRange) {
+    data class Bucket(val weight: Percent, val values: IntRange) {
         init {
+            require(weight > 0.percent()) { "Bucket weight ($weight) must be positive" }
             require(!values.isEmpty()) {
                 "values range (${values.first}..${values.last}) cannot be empty"
             }
         }
-    }
-
-    class Percentage internal constructor(private val value: Int) {
-        infix fun inRange(values: IntRange): Bucket = Bucket(percentage = value, values = values)
     }
 
     private fun IntRange.computeAverageValue(): Double {
@@ -69,8 +66,7 @@ class Distribution(rngFactory: RngFactory, vararg buckets: Bucket) {
     }
 }
 
-val Int.percent: Distribution.Percentage
-    get() = Distribution.Percentage(this)
+infix fun Percent.inRange(values: IntRange): Distribution.Bucket = Distribution.Bucket(weight = this, values = values)
 
 interface DistributionFactory {
 
@@ -81,11 +77,11 @@ interface DistributionFactory {
     object ListSizeDistribution : DistributionFactory {
         override fun create(rngFactory: RngFactory): Distribution = Distribution(
             rngFactory,
-            35.percent inRange 0..10,
-            30.percent inRange 11..50,
-            20.percent inRange 51..200,
-            10.percent inRange 201..1_000,
-            5.percent inRange 1_001..10_000,
+            35.percent() inRange 0..10,
+            30.percent() inRange 11..50,
+            20.percent() inRange 51..200,
+            10.percent() inRange 201..1_000,
+            5.percent() inRange 1_001..10_000,
         )
     }
 
@@ -100,11 +96,11 @@ interface DistributionFactory {
     object NestedListSizeDistribution : DistributionFactory {
         override fun create(rngFactory: RngFactory): Distribution = Distribution(
             rngFactory,
-            30.percent inRange 0..1,
-            35.percent inRange 2..3,
-            25.percent inRange 4..7,
-            7.percent inRange 8..15,
-            3.percent inRange 16..25,
+            30.percent() inRange 0..1,
+            35.percent() inRange 2..3,
+            25.percent() inRange 4..7,
+            7.percent() inRange 8..15,
+            3.percent() inRange 16..25,
         )
     }
 }

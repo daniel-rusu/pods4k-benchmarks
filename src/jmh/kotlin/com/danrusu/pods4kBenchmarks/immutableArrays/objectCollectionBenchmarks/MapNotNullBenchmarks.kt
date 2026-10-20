@@ -8,9 +8,10 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.percent
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -24,7 +25,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
-private const val NULL_PROBABILITY = 0.5
+private val NULL_PROBABILITY = 50.percent()
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)

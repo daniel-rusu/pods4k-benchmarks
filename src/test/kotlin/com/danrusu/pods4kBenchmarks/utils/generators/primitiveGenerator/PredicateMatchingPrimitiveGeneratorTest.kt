@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator
 
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.RecordingRandom
+import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import com.danrusu.pods4kBenchmarks.utils.predicates.PredicateUtils.MAX_GENERATION_ATTEMPTS
 import org.junit.jupiter.api.Test
@@ -8,14 +9,13 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
-import kotlin.random.Random
 
 class PredicateMatchingPrimitiveGeneratorTest {
     @Test
     fun `rejected candidates do not consume additional predicate decisions`() {
         val valueRng = RecordingRandom(nextIntValues = sequenceOf(1, 2, -3, -4, 5, 6, -1))
 
-        val matchProbability = 0.5
+        val matchProbability = 50.percent()
         // require the first value to be less than the 0 and the second value greater or equal to 0
         val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.25, 0.75))
         val generator = PredicateMatchingPrimitiveGenerator(
@@ -38,11 +38,11 @@ class PredicateMatchingPrimitiveGeneratorTest {
         val valueRng = RecordingRandom(
             nextIntValues = generateSequence { 1 } // always return 1 failing the median value predicate
         )
-        val outcomeRng = RecordingRandom()
+        val outcomeRng = RecordingRandom(nextDoubleValues = sequenceOf(0.5))
         val generator = PredicateMatchingPrimitiveGenerator(
             source = RandomPrimitiveGenerator(valueRng),
             predicates = MedianValuePredicate,
-            matchProbability = 1.0, // Require 100% of values to pass the predicate
+            matchProbability = 100.percent(), // Require 100% of values to pass the predicate
             predicateOutcomeRng = outcomeRng,
         )
 
@@ -54,19 +54,5 @@ class PredicateMatchingPrimitiveGeneratorTest {
         expectThat(outcomeRng.numNextDoubleCalls).isEqualTo(1)
         // stopped looking for acceptable values after the cutoff
         expectThat(valueRng.numNextIntCalls).isEqualTo(MAX_GENERATION_ATTEMPTS)
-    }
-
-    @Test
-    fun `rejects invalid match probabilities`() {
-        for (probability in listOf(-0.1, 1.1, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)) {
-            expectThrows<IllegalArgumentException> {
-                PredicateMatchingPrimitiveGenerator(
-                    source = RandomPrimitiveGenerator(Random(123)),
-                    predicates = MedianValuePredicate,
-                    matchProbability = probability,
-                    predicateOutcomeRng = RecordingRandom(),
-                )
-            }.message.isEqualTo("matchProbability ($probability) must be between 0.0 and 1.0")
-        }
     }
 }
