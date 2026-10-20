@@ -31,9 +31,11 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.SPARSE_ACCESS
 
+private val predicate = MedianValuePredicate
+
 // Takes 0.98 / (1 - 0.98) = 49 elements on average.
 // The median result contains 34 elements because 1 - (0.98)^35 = ~50.7%.
-private val MATCH_PROBABILITY = 98.percent()
+private val MATCH_PROBABILITY = 98.percent() // probability of matching the predicate
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -45,58 +47,58 @@ open class TakeWhileBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     primitiveGeneratorFactory = PrimitiveGeneratorFactory
         .randomValues()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate),
     referenceGeneratorFactory = ObjectGeneratorFactory
         .randomStrings()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate::matches),
 ) {
     @Benchmark
     fun takeWhile(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Boolean> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Byte> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Char> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Short> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Int> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Float> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Long> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Double> -> list.takeWhile { MedianValuePredicate.matches(it) } },
+            { list: List<String> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Boolean> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Byte> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Char> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Short> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Int> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Float> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Long> -> list.takeWhile { predicate.matches(it) } },
+            { list: List<Double> -> list.takeWhile { predicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Boolean> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Byte> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Char> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Short> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Int> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Float> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Long> -> list.takeWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Double> -> list.takeWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<String> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Char> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Short> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Int> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Float> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Long> -> list.takeWhile { predicate.matches(it) } },
+            { list: PersistentList<Double> -> list.takeWhile { predicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: BooleanArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ByteArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: CharArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ShortArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: IntArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: FloatArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: LongArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: DoubleArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
+            { array: Array<String> -> array.takeWhile { predicate.matches(it) } },
+            { array: BooleanArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ByteArray -> array.takeWhile { predicate.matches(it) } },
+            { array: CharArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ShortArray -> array.takeWhile { predicate.matches(it) } },
+            { array: IntArray -> array.takeWhile { predicate.matches(it) } },
+            { array: FloatArray -> array.takeWhile { predicate.matches(it) } },
+            { array: LongArray -> array.takeWhile { predicate.matches(it) } },
+            { array: DoubleArray -> array.takeWhile { predicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableBooleanArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableByteArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableCharArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableShortArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableIntArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableFloatArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableLongArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableDoubleArray -> array.takeWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableArray<String> -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableByteArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableCharArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableShortArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableIntArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableLongArray -> array.takeWhile { predicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.takeWhile { predicate.matches(it) } },
         )
     }
 }

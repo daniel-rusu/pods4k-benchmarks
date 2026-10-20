@@ -31,8 +31,10 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
+private val predicate = MedianValuePredicate
+
 // Statistically, about half of the values will be on the left and the other half on the right on average.
-private val MATCH_PROBABILITY = 50.percent()
+private val MATCH_PROBABILITY = 50.percent() // probability of matching the predicate
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -44,58 +46,58 @@ open class PartitionBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     primitiveGeneratorFactory = PrimitiveGeneratorFactory
         .randomValues()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate),
     referenceGeneratorFactory = ObjectGeneratorFactory
         .randomStrings()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate::matches),
 ) {
     @Benchmark
     fun partition(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Boolean> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Byte> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Char> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Short> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Int> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Float> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Long> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: List<Double> -> list.partition { MedianValuePredicate.matches(it) } },
+            { list: List<String> -> list.partition { predicate.matches(it) } },
+            { list: List<Boolean> -> list.partition { predicate.matches(it) } },
+            { list: List<Byte> -> list.partition { predicate.matches(it) } },
+            { list: List<Char> -> list.partition { predicate.matches(it) } },
+            { list: List<Short> -> list.partition { predicate.matches(it) } },
+            { list: List<Int> -> list.partition { predicate.matches(it) } },
+            { list: List<Float> -> list.partition { predicate.matches(it) } },
+            { list: List<Long> -> list.partition { predicate.matches(it) } },
+            { list: List<Double> -> list.partition { predicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Boolean> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Byte> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Char> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Short> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Int> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Float> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Long> -> list.partition { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Double> -> list.partition { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<String> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Char> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Short> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Int> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Float> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Long> -> list.partition { predicate.matches(it) } },
+            { list: PersistentList<Double> -> list.partition { predicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: BooleanArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ByteArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: CharArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ShortArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: IntArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: FloatArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: LongArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: DoubleArray -> array.partition { MedianValuePredicate.matches(it) } },
+            { array: Array<String> -> array.partition { predicate.matches(it) } },
+            { array: BooleanArray -> array.partition { predicate.matches(it) } },
+            { array: ByteArray -> array.partition { predicate.matches(it) } },
+            { array: CharArray -> array.partition { predicate.matches(it) } },
+            { array: ShortArray -> array.partition { predicate.matches(it) } },
+            { array: IntArray -> array.partition { predicate.matches(it) } },
+            { array: FloatArray -> array.partition { predicate.matches(it) } },
+            { array: LongArray -> array.partition { predicate.matches(it) } },
+            { array: DoubleArray -> array.partition { predicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableBooleanArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableByteArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableCharArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableShortArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableIntArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableFloatArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableLongArray -> array.partition { MedianValuePredicate.matches(it) } },
-            { array: ImmutableDoubleArray -> array.partition { MedianValuePredicate.matches(it) } },
+            { array: ImmutableArray<String> -> array.partition { predicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableByteArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableCharArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableShortArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableIntArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableLongArray -> array.partition { predicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.partition { predicate.matches(it) } },
         )
     }
 }

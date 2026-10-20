@@ -31,9 +31,11 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
+private val predicate = MedianValuePredicate
+
 // Drops 0.98 / (1 - 0.98) = 49 elements on average.
 // The median is 34 elements dropped because 1 - (0.98)^35 = ~50.7%.
-private val MATCH_PROBABILITY = 98.percent()
+private val MATCH_PROBABILITY = 98.percent() // probability of matching the predicate
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -45,58 +47,58 @@ open class DropWhileBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     primitiveGeneratorFactory = PrimitiveGeneratorFactory
         .randomValues()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate),
     referenceGeneratorFactory = ObjectGeneratorFactory
         .randomStrings()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate::matches),
 ) {
     @Benchmark
     fun dropWhile(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Boolean> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Byte> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Char> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Short> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Int> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Float> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Long> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: List<Double> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: List<String> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Boolean> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Byte> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Char> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Short> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Int> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Float> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Long> -> list.dropWhile { predicate.matches(it) } },
+            { list: List<Double> -> list.dropWhile { predicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Boolean> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Byte> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Char> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Short> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Int> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Float> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Long> -> list.dropWhile { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Double> -> list.dropWhile { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<String> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Char> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Short> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Int> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Float> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Long> -> list.dropWhile { predicate.matches(it) } },
+            { list: PersistentList<Double> -> list.dropWhile { predicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: BooleanArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ByteArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: CharArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ShortArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: IntArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: FloatArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: LongArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: DoubleArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: Array<String> -> array.dropWhile { predicate.matches(it) } },
+            { array: BooleanArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ByteArray -> array.dropWhile { predicate.matches(it) } },
+            { array: CharArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ShortArray -> array.dropWhile { predicate.matches(it) } },
+            { array: IntArray -> array.dropWhile { predicate.matches(it) } },
+            { array: FloatArray -> array.dropWhile { predicate.matches(it) } },
+            { array: LongArray -> array.dropWhile { predicate.matches(it) } },
+            { array: DoubleArray -> array.dropWhile { predicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableBooleanArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableByteArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableCharArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableShortArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableIntArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableFloatArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableLongArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
-            { array: ImmutableDoubleArray -> array.dropWhile { MedianValuePredicate.matches(it) } },
+            { array: ImmutableArray<String> -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableByteArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableCharArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableShortArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableIntArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableLongArray -> array.dropWhile { predicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.dropWhile { predicate.matches(it) } },
         )
     }
 }

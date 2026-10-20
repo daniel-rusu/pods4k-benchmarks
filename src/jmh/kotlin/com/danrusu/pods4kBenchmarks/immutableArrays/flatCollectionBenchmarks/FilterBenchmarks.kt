@@ -31,8 +31,10 @@ import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 
+private val predicate = MedianValuePredicate
+
 // Statistically, this will filter half of the values on average.
-private val MATCH_PROBABILITY = 50.percent()
+private val MATCH_PROBABILITY = 50.percent() // probability of matching the predicate
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -44,58 +46,58 @@ open class FilterBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
     primitiveGeneratorFactory = PrimitiveGeneratorFactory
         .randomValues()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate),
     referenceGeneratorFactory = ObjectGeneratorFactory
         .randomStrings()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
+        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate::matches),
 ) {
     @Benchmark
     fun filter(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Boolean> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Byte> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Char> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Short> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Int> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Float> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Long> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: List<Double> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: List<String> -> list.filter { predicate.matches(it) } },
+            { list: List<Boolean> -> list.filter { predicate.matches(it) } },
+            { list: List<Byte> -> list.filter { predicate.matches(it) } },
+            { list: List<Char> -> list.filter { predicate.matches(it) } },
+            { list: List<Short> -> list.filter { predicate.matches(it) } },
+            { list: List<Int> -> list.filter { predicate.matches(it) } },
+            { list: List<Float> -> list.filter { predicate.matches(it) } },
+            { list: List<Long> -> list.filter { predicate.matches(it) } },
+            { list: List<Double> -> list.filter { predicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Boolean> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Byte> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Char> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Short> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Int> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Float> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Long> -> list.filter { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Double> -> list.filter { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<String> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Char> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Short> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Int> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Float> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Long> -> list.filter { predicate.matches(it) } },
+            { list: PersistentList<Double> -> list.filter { predicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: BooleanArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ByteArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: CharArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ShortArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: IntArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: FloatArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: LongArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: DoubleArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: Array<String> -> array.filter { predicate.matches(it) } },
+            { array: BooleanArray -> array.filter { predicate.matches(it) } },
+            { array: ByteArray -> array.filter { predicate.matches(it) } },
+            { array: CharArray -> array.filter { predicate.matches(it) } },
+            { array: ShortArray -> array.filter { predicate.matches(it) } },
+            { array: IntArray -> array.filter { predicate.matches(it) } },
+            { array: FloatArray -> array.filter { predicate.matches(it) } },
+            { array: LongArray -> array.filter { predicate.matches(it) } },
+            { array: DoubleArray -> array.filter { predicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableBooleanArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableByteArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableCharArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableShortArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableIntArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableFloatArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableLongArray -> array.filter { MedianValuePredicate.matches(it) } },
-            { array: ImmutableDoubleArray -> array.filter { MedianValuePredicate.matches(it) } },
+            { array: ImmutableArray<String> -> array.filter { predicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableByteArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableCharArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableShortArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableIntArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableLongArray -> array.filter { predicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.filter { predicate.matches(it) } },
         )
     }
 }
