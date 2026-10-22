@@ -10,14 +10,12 @@ import kotlin.random.nextInt
  * For example:
  *
  * Distribution(
- *     rngFactory,
+ *     rng,
  *     80.percent() inRange 0..10,
  *     20.percent() inRange 100..120,
  * )
  */
 class Distribution internal constructor(private val random: Random, vararg buckets: Bucket) {
-    constructor(rngFactory: RngFactory, vararg buckets: Bucket) : this(rngFactory.createRng(), *buckets)
-
     private val cumulativePercentages: Array<Percent>
     private val valueRanges = Array(buckets.size) { buckets[it].values }
 
@@ -70,13 +68,16 @@ infix fun Percent.inRange(values: IntRange): Distribution.Bucket = Distribution.
 
 interface DistributionFactory {
 
-    /** Creates a distribution with an independent random stream from [rngFactory]. */
-    fun create(rngFactory: RngFactory): Distribution
+    /**
+     * Creates a distribution that draws directly from [rng]. The caller supplies a separate stream when independence
+     * from other random decisions is required.
+     */
+    fun create(rng: Random): Distribution
 
     /** Size distribution for top-level collections. */
     object ListSizeDistribution : DistributionFactory {
-        override fun create(rngFactory: RngFactory): Distribution = Distribution(
-            rngFactory,
+        override fun create(rng: Random): Distribution = Distribution(
+            rng,
             35.percent() inRange 0..10,
             30.percent() inRange 11..50,
             20.percent() inRange 51..200,
@@ -94,8 +95,8 @@ interface DistributionFactory {
      * - List of cities with each city containing a list of attractions.
      */
     object NestedListSizeDistribution : DistributionFactory {
-        override fun create(rngFactory: RngFactory): Distribution = Distribution(
-            rngFactory,
+        override fun create(rng: Random): Distribution = Distribution(
+            rng,
             30.percent() inRange 0..1,
             35.percent() inRange 2..3,
             25.percent() inRange 4..7,

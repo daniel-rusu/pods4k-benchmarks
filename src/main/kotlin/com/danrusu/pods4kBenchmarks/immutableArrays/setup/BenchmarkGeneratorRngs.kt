@@ -13,21 +13,24 @@ import kotlin.random.Random
  *
  * Streams should be shared when multiple generators are doing the same kind of work in one benchmark setup. Simple
  * primitive values, references, and object properties all draw from [dataGenerationRng] so they represent one
- * deterministic sequence
- * of generated values; null placement uses [nullabilityDecisionsRng]; predicate scenarios use [predicateOutcomeRng].
+ * deterministic sequence of generated values; null placement uses [nullabilityDecisionsRng]; predicate scenarios use
+ * [predicateOutcomeRng]; outer collection sizes use [outerCollectionSizeRng]; inner collection sizes use
+ * [nestedCollectionSizeRng].
  */
-class BenchmarkGeneratorRngs(
-    private val rngFactory: RngFactory,
-) : GeneratorRngs {
-    /** Shared stream for generated element values, whether primitives, references, or object properties. */
-    override val dataGenerationRng: Random = rngFactory.createRng()
+class BenchmarkGeneratorRngs(masterSeed: Long = 0L) : GeneratorRngs {
+    override val dataGenerationRng: Random
+    override val nullabilityDecisionsRng: Random
+    override val predicateOutcomeRng: Random
+    override val outerCollectionSizeRng: Random
+    override val nestedCollectionSizeRng: Random
 
-    /** Shared stream for deciding whether primitive values, references, or objects should be null. */
-    override val nullabilityDecisionsRng: Random = rngFactory.createRng()
-
-    /** Shared stream for deciding whether generated values should satisfy benchmark predicates. */
-    override val predicateOutcomeRng: Random = rngFactory.createRng()
-
-    /** Creates a new independent RNG stream split from the benchmark's master RNG. */
-    override fun createNewRng(): Random = rngFactory.createRng()
+    init {
+        val rngFactory = RngFactory(masterSeed)
+        // Preserve this allocation order to keep existing datasets stable. Append new streams at the end.
+        dataGenerationRng = rngFactory.createRng()
+        nullabilityDecisionsRng = rngFactory.createRng()
+        predicateOutcomeRng = rngFactory.createRng()
+        outerCollectionSizeRng = rngFactory.createRng()
+        nestedCollectionSizeRng = rngFactory.createRng()
+    }
 }

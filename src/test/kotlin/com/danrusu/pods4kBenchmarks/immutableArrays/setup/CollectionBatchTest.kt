@@ -97,7 +97,7 @@ class CollectionBatchTest {
 
     private fun fixedSizeDistribution(): Distribution {
         return Distribution(
-            RngFactory(),
+            RngFactory().createRng(),
             100.percent() inRange 1..1,
         )
     }

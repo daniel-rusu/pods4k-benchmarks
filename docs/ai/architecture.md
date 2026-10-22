@@ -22,8 +22,9 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
 2. A specialized benchmark base receives a fixed `numCollections` plus the generator and distribution factories for
    its data shape.
 3. Its `@Setup(Level.Trial)` method calls the matching `*BenchmarkData.create` factory.
-4. The data builder creates a constant-seed `RngFactory`, separates size/value/null/predicate-outcome streams, and passes its
-   single-collection construction logic to `CollectionBatch`, which materializes only the selected representation.
+4. The data builder creates `BenchmarkGeneratorRngs` with its default master seed (`0L`), supplies its purpose-specific
+   streams to generator and distribution factories, and passes single-collection construction logic to `CollectionBatch`,
+   which materializes only the selected representation.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
 
 All benchmark-data holders delegate erased storage to a `CollectionBatch`, which retains the active `CollectionType`,
@@ -38,7 +39,9 @@ exposed to its benchmarks.
 
 - `CollectionType`: `LIST`, `PERSISTENT_LIST`, `ARRAY`, and `IMMUTABLE_ARRAY`.
 - `DataType`: `REFERENCE` plus the eight Kotlin primitive families.
-- `RngFactory` and `BenchmarkGeneratorRngs`: deterministic, purpose-specific random streams.
+- `RngFactory`: splits deterministic RNG streams from a master seed.
+- `BenchmarkGeneratorRngs`: eagerly allocates value, nullability, predicate-outcome, outer-size, and nested-size streams
+  from one `RngFactory`, exposing them through `GeneratorRngs` independently of setup order.
 - `Percent`: a validated fixed-point value from 0% to 100% with two decimal places. `Int.percent()` and
   `Double.percent()` interpret inputs as percentages, so `50.percent()` means 50%. It owns exact addition, ordering,
   and numeric weighting through `scale`; consumers cannot access its representation.
@@ -48,7 +51,8 @@ exposed to its benchmarks.
   representation.
 - `Distribution` and `DistributionFactory`: collection-size models using positive `Percent` bucket weights with an
   exact 100% total. Each value uses one Double threshold compared with scaled cumulative percentages to select its
-  bucket, then an inclusive range draw.
+  bucket, then an inclusive range draw. `DistributionFactory.create(rng)` uses the caller's RNG directly; it does not
+  allocate a new stream.
 - `PrimitiveGeneratorFactory` and `ObjectGeneratorFactory`: configurable non-null element generation.
 - `PredicateMatchingPrimitiveGenerator` and `PredicateMatchingObjectGenerator`: reusable adapters that independently
   choose a required predicate outcome with `matchProbability`, then rejection-sample the decorated source until a
@@ -71,6 +75,9 @@ exposed to its benchmarks.
 ## Invariants
 
 - Changing value generation for one data type must not also change sizes, null positions, or predicate outcomes.
+- Keep stream allocation in `BenchmarkGeneratorRngs` append-only. `BenchmarkGeneratorRngsTest` checks seed handling,
+  stream independence, size-distribution setup order, and fixed sequence samples. Reordering setup across different
+  purposes preserves stream sequences; changing draws within a stream can still change its generated data.
 - Each invocation processes distinct prebuilt collections; setup cost is excluded unless construction is the scenario.
 - Benchmarks use the shared `BenchmarkBatchSize` tier matching their access and result pattern unless a documented
   benchmark-local override is warranted.

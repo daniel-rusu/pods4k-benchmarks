@@ -44,9 +44,11 @@
 
 ## Performance Constraints
 
-- Preserve deterministic setup data unless intentionally changing benchmark scenarios: data builders use a constant
-  `RngFactory` master seed and purpose-specific streams so value generation does not also change collection sizes,
-  null placement, or predicate outcomes.
+- Preserve deterministic setup data unless intentionally changing benchmark scenarios: data builders create
+  `BenchmarkGeneratorRngs` with its default master seed (`0L`) for separate value, nullability, predicate-outcome,
+  outer-size, and nested-size streams.
+- Keep stream allocation centralized in `BenchmarkGeneratorRngs` and append new streams at the end. Its fixed-sequence
+  regression test guards existing stream assignments; changes to draws within a stream can still change its data.
 - Consume benchmark results with JMH `Blackhole`.
 - Start with the shared batch defaults in
   [`BenchmarkBatchSize`](src/jmh/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/setup/BenchmarkBatchSize.kt).

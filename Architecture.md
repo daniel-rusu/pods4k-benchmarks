@@ -85,11 +85,10 @@ categories follow the same general pattern:
 2. JMH iterates through every `CollectionType` & `DataType`, and creates `DropBenchmarks` with the current combination.
 3. JMH calls `FlatCollectionBenchmark.setupBenchmarkData()` to begin data construction.
 4. Data creation is delegated to `FlatCollectionBenchmarkData.create(...)` which performs the following:
-    * Creates an `RngFactory` from a constant seed
-    * Splits independent RNG streams for sizes, values, null placement, and predicate decisions.
+    * Creates `BenchmarkGeneratorRngs` which splits separate RNG streams for values, null placement, predicate
+      decisions, outer collection sizes, and nested collection sizes.
+    * Uses generator factories and RNG streams to initialize data generators and collection-size distribution.
     * Uses `CollectionFactory` to materialize a `CollectionBatch` containing an array of collections.
-        * Collection are populated with elements generated from the `PrimitiveGenerator` or `ObjectGenerator` depending
-          on the `DataType`
 
 Although a benchmark has 36 parameter combinations, a `CollectionBatch` stores only the current combination. For
 example, the `LIST`/`BOOLEAN` trial contains an array of `List<Boolean>` collections.
@@ -99,12 +98,12 @@ example, the `LIST`/`BOOLEAN` trial contains an array of `List<Boolean>` collect
 - **Public APIs:** every representation uses an equivalent, statically typed operation through its published API.
 - **Specialization:** JVM arrays and Immutable Arrays retain primitive-specialized forms when storing primitives to
   represent real-world usage.
-- **Comparable trials:** The RNG stream is initialized from a constant seed ensuring a deterministic and repeatable
+- **Comparable trials:** RNG streams are initialized from a constant master seed ensuring a deterministic and repeatable
   dataset across trials.
 - **Batched work:** each invocation processes hundreds of prebuilt collections instead of one repeatedly hot input.
-- **Equivalent data characteristics:** Independent RNG streams for data generation, size distribution, predicate
-  decisions, and nullability decisions to ensure fair comparisons for all data combinations:
-    - Same sequence of collection sizes across all `CollectionType` & `DataType` combinations.
+- **Equivalent data characteristics:** Independent RNG streams for data generation, outer and nested size
+  distributions, predicate decisions, and nullability decisions ensure fair comparisons for all data combinations:
+    - Same sequences of outer and nested collection sizes across all `CollectionType` & `DataType` combinations.
     - Same sequence of values across all `CollectionType` representations for a given `DataType`.
     - Same sequence of null positions across all `CollectionType` & `DataType` combinations.
     - Same sequence of predicate outcomes across all `CollectionType` & `DataType` combinations.

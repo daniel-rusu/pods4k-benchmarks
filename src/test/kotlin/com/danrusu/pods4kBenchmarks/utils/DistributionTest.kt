@@ -19,7 +19,7 @@ class DistributionTest {
     fun `range average does not overflow`() {
         with(
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 100.percent() inRange Int.MAX_VALUE - 8..Int.MAX_VALUE,
             )
         ) {
@@ -31,7 +31,7 @@ class DistributionTest {
     @Test
     fun `accepts a range ending at Int MAX_VALUE`() {
         val range = Int.MAX_VALUE - 8..Int.MAX_VALUE
-        val distribution = Distribution(RngFactory(), 100.percent() inRange range)
+        val distribution = Distribution(RngFactory().createRng(), 100.percent() inRange range)
 
         repeat(100) {
             expectThat(distribution.nextValue()).isIn(range)
@@ -41,7 +41,7 @@ class DistributionTest {
     @Test
     fun `percentages must be positive`() {
         expectThrows<IllegalArgumentException> {
-            Distribution(RngFactory(), 0.percent() inRange 1..10)
+            Distribution(RngFactory().createRng(), 0.percent() inRange 1..10)
         }.message.isEqualTo("Bucket weight (0%) must be positive")
     }
 
@@ -49,7 +49,7 @@ class DistributionTest {
     fun `percentages must add up to 100`() {
         expectThrows<IllegalArgumentException> {
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 50.percent() inRange 1..10,
                 49.percent() inRange 11..100,
             )
@@ -57,7 +57,7 @@ class DistributionTest {
 
         expectThrows<IllegalArgumentException> {
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 50.percent() inRange 1..10,
                 30.percent() inRange 11..100,
                 21.percent() inRange 101..1000,
@@ -67,7 +67,7 @@ class DistributionTest {
 
     @Test
     fun `rejects an empty distribution`() {
-        expectThrows<IllegalArgumentException> { Distribution(RngFactory()) }
+        expectThrows<IllegalArgumentException> { Distribution(RngFactory().createRng()) }
             .message.isEqualTo("Distribution must contain at least one bucket")
     }
 
@@ -82,14 +82,14 @@ class DistributionTest {
     @Test
     fun `fractional bucket totals must equal 100 percent exactly`() {
         val distribution = Distribution(
-            RngFactory(),
+            RngFactory().createRng(),
             33.33.percent() inRange 1..1,
             33.33.percent() inRange 2..2,
             33.34.percent() inRange 3..3,
         )
         expectThrows<IllegalArgumentException> {
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 33.33.percent() inRange 1..1,
                 33.33.percent() inRange 2..2,
                 33.33.percent() inRange 3..3,
@@ -97,7 +97,7 @@ class DistributionTest {
         }.message.isEqualTo("Bucket weights must add up to 100% (found 99.99%)")
         expectThrows<IllegalArgumentException> {
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 50.percent() inRange 1..1,
                 50.01.percent() inRange 2..2
             )
@@ -106,7 +106,7 @@ class DistributionTest {
 
     @Test
     fun `single bucket always selects its range`() {
-        val distribution = Distribution(RngFactory(), 100.percent() inRange -5..-5)
+        val distribution = Distribution(RngFactory().createRng(), 100.percent() inRange -5..-5)
         expectThat(List(20) { distribution.nextValue() }).isEqualTo(List(20) { -5 })
         expectThat(distribution.averageValue).isEqualTo(-5.0)
     }
@@ -115,7 +115,7 @@ class DistributionTest {
     fun `average value is weighted by bucket percentage`() {
         with(
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 80.percent() inRange 10..10,
                 20.percent() inRange 100..100,
             )
@@ -126,7 +126,7 @@ class DistributionTest {
 
         with(
             Distribution(
-                RngFactory(),
+                RngFactory().createRng(),
                 80.percent() inRange 0..10,
                 20.percent() inRange 100..120,
             )
@@ -138,8 +138,8 @@ class DistributionTest {
 
     @Test
     fun `distribution produces deterministic output for a fixed master seed`() {
-        val firstDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory())
-        val secondDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory())
+        val firstDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory().createRng())
+        val secondDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory().createRng())
 
         val firstValues = List(100) { firstDistribution.nextValue() }
         val secondValues = List(100) { secondDistribution.nextValue() }

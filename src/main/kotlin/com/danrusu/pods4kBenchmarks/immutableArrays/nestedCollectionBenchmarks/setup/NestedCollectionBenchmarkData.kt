@@ -16,9 +16,8 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.RngFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
@@ -104,10 +103,10 @@ class NestedCollectionBenchmarkData private constructor(
             nestedPrimitiveGeneratorFactory: PrimitiveGeneratorFactory,
             nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>,
         ): NestedCollectionBenchmarkData {
-            val rngFactory = RngFactory()
-            val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
-            val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(rngFactory)
-            val nestedSizeDistribution = nestedCollectionSizeDistributionFactory.create(rngFactory)
+            val generatorRngs = BenchmarkGeneratorRngs()
+            val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(generatorRngs.outerCollectionSizeRng)
+            val nestedSizeDistribution =
+                nestedCollectionSizeDistributionFactory.create(generatorRngs.nestedCollectionSizeRng)
             val nestedPrimitiveGenerator = nestedPrimitiveGeneratorFactory.create(generatorRngs)
             val nestedReferenceGenerator = nestedReferenceGeneratorFactory.create(generatorRngs)
 

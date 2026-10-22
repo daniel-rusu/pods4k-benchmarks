@@ -7,7 +7,6 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
@@ -41,9 +40,8 @@ class ObjectCollectionBenchmarkData<T> private constructor(
             sizeDistributionFactory: DistributionFactory,
             objectGeneratorFactory: ObjectGeneratorFactory<T>,
         ): ObjectCollectionBenchmarkData<T> {
-            val rngFactory = RngFactory()
-            val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
-            val sizeDistribution = sizeDistributionFactory.create(rngFactory)
+            val generatorRngs = BenchmarkGeneratorRngs()
+            val sizeDistribution = sizeDistributionFactory.create(generatorRngs.outerCollectionSizeRng)
             val objectGenerator = objectGeneratorFactory.create(generatorRngs)
             val elementClass = objectGenerator.objectClass
             val collectionClass = CollectionFactory.resolveCollectionClass(

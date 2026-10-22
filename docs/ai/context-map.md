@@ -20,10 +20,12 @@ Use this map to locate the smallest relevant area before making a change.
   `NullableFlatCollectionBenchmarkData` for boxed nullable elements.
 - Preserve purpose-specific RNG streams and runtime element-type checks; both protect comparability across parameter
   combinations.
+- `immutableArrays/setup/BenchmarkGeneratorRngs.kt` owns eager, append-only stream allocation, including separate outer
+  and nested collection sizes. Its matching test checks seeds, independence, setup order, and fixed sequence samples.
 - `utils/Percent.kt` owns validated percentage declarations (`50.percent()`), exact addition, and numeric weighting.
   Random decisions belong to `Random.nextBoolean(trueProbability: Percent)` in `utils/RandomExtensions.kt`.
   `utils/Distribution.kt` owns positive bucket weights, exact 100% totals, and selection using one Double threshold;
-  `inRange` is a top-level extension there.
+  `inRange` is a top-level extension there. Distribution factories use the supplied RNG directly.
 
 ## JMH Benchmarks
 
@@ -46,5 +48,5 @@ Use this map to locate the smallest relevant area before making a change.
 - Manual source: `src/main`, `src/test`, and `src/jmh`.
 - Generated/local output: `build/`, `.gradle/`, `.kotlin/`, generated JMH classes, and result CSVs; never edit these as
   source.
-- Documentation: `README.md`, `AGENTS.md`, and `docs/ai/*.md`. Keep guidance focused on stable boundaries and commands
-  rather than copying implementation details.
+- Documentation: `README.md`, `Architecture.md`, `AGENTS.md`, and `docs/ai/*.md`. Keep guidance focused on stable
+  boundaries and commands rather than copying implementation details.

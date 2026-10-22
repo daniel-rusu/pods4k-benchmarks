@@ -8,10 +8,9 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
 import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.RngFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
@@ -51,9 +50,8 @@ class NullableFlatCollectionBenchmarkData private constructor(
             referenceGeneratorFactory: ObjectGeneratorFactory<String>,
             nullabilityPolicyFactory: NullabilityPolicyFactory,
         ): NullableFlatCollectionBenchmarkData {
-            val rngFactory = RngFactory()
-            val generatorRngs = BenchmarkGeneratorRngs(rngFactory)
-            val sizeDistribution = sizeDistributionFactory.create(rngFactory)
+            val generatorRngs = BenchmarkGeneratorRngs()
+            val sizeDistribution = sizeDistributionFactory.create(generatorRngs.outerCollectionSizeRng)
             val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
             val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
             val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)

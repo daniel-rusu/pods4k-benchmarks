@@ -7,6 +7,8 @@ import kotlin.random.Random
 internal class TestGeneratorRngs(
     masterSeed: Long = 0L,
     dataGenerationRng: Random? = null,
+    outerCollectionSizeRng: Random? = null,
+    nestedCollectionSizeRng: Random? = null,
     nullabilityDecisionsRng: Random? = null,
     predicateOutcomeRng: Random? = null,
 ) : GeneratorRngs {
@@ -14,11 +16,13 @@ internal class TestGeneratorRngs(
 
     override val dataGenerationRng: Random = dataGenerationRng ?: rngFactory.createRng()
 
+    override val outerCollectionSizeRng: Random = outerCollectionSizeRng ?: rngFactory.createRng()
+
+    override val nestedCollectionSizeRng: Random = nestedCollectionSizeRng ?: rngFactory.createRng()
+
     override val nullabilityDecisionsRng: Random = nullabilityDecisionsRng ?: rngFactory.createRng()
 
     override val predicateOutcomeRng: Random = predicateOutcomeRng ?: rngFactory.createRng()
-
-    override fun createNewRng(): Random = rngFactory.createRng()
 }
 
 internal class RecordingRandom(
