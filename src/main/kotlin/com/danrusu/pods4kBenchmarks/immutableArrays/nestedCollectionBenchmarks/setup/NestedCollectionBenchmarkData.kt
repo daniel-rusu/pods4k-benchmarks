@@ -9,15 +9,11 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
@@ -93,23 +89,13 @@ class NestedCollectionBenchmarkData private constructor(
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, Double::class.javaObjectType)
 
     companion object {
-        /** Creates deterministic data for one nested benchmark parameter combination. */
+        /** Materializes data from the supplied recipe for one nested benchmark parameter combination. */
         fun create(
             collectionType: CollectionType,
             dataType: DataType,
             numCollections: Int,
-            topLevelSizeDistributionFactory: DistributionFactory,
-            nestedCollectionSizeDistributionFactory: DistributionFactory,
-            nestedPrimitiveGeneratorFactory: PrimitiveGeneratorFactory,
-            nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String>,
+            recipe: NestedCollectionRecipe,
         ): NestedCollectionBenchmarkData {
-            val generatorRngs = BenchmarkGeneratorRngs()
-            val topLevelSizeDistribution = topLevelSizeDistributionFactory.create(generatorRngs.outerCollectionSizeRng)
-            val nestedSizeDistribution =
-                nestedCollectionSizeDistributionFactory.create(generatorRngs.nestedCollectionSizeRng)
-            val nestedPrimitiveGenerator = nestedPrimitiveGeneratorFactory.create(generatorRngs)
-            val nestedReferenceGenerator = nestedReferenceGeneratorFactory.create(generatorRngs)
-
             val topLevelCollectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
                 dataType = DataType.REFERENCE,
@@ -118,19 +104,19 @@ class NestedCollectionBenchmarkData private constructor(
 
             val batch = CollectionBatch.create(
                 collectionType = collectionType,
-                logicalElementClass = dataType.resolveElementClass(nestedReferenceGenerator.objectClass),
+                logicalElementClass = dataType.resolveElementClass(recipe.referenceGenerator.objectClass),
                 collectionClass = topLevelCollectionClass,
                 numCollections = numCollections,
-                sizeDistribution = topLevelSizeDistribution,
+                sizeDistribution = recipe.outerSizeDistribution,
             ) { topLevelSize ->
                 CollectionFactory.createCollection(topLevelSize, collectionType, CollectionOwner::class.java) {
                     CollectionOwner(
                         CollectionFactory.createCollection(
-                            size = nestedSizeDistribution.nextValue(),
+                            size = recipe.nestedSizeDistribution.nextValue(),
                             collectionType = collectionType,
                             dataType = dataType,
-                            primitiveGenerator = nestedPrimitiveGenerator,
-                            referenceGenerator = nestedReferenceGenerator,
+                            primitiveGenerator = recipe.primitiveGenerator,
+                            referenceGenerator = recipe.referenceGenerator,
                         )
                     )
                 }

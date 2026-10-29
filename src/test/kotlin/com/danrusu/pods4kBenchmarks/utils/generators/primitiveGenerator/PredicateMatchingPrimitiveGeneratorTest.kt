@@ -25,6 +25,8 @@ class PredicateMatchingPrimitiveGeneratorTest {
             predicateOutcomeRng = outcomeRng,
         )
 
+        expectThat(valueRng.numNextIntCalls).isEqualTo(0)
+        expectThat(outcomeRng.numNextDoubleCalls).isEqualTo(0)
         expectThat(generator.nextInt()).isEqualTo(-3)
         expectThat(generator.nextInt()).isEqualTo(5)
         // only 2 outcomes decides since we only called generator.nextInt() twice

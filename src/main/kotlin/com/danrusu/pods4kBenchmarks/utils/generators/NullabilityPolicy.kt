@@ -17,27 +17,6 @@ abstract class NullabilityPolicy {
     }
 }
 
-/** Creates fresh nullability policies from benchmark RNG streams. */
-fun interface NullabilityPolicyFactory {
-    /** Creates a policy using the provided RNG streams. */
-    fun create(generatorRngs: GeneratorRngs): NullabilityPolicy
-
-    companion object {
-        /**
-         * Creates policies that independently choose null for each value with probability [nullProbability].
-         * The proportion of null values in a collection is not fixed.
-         */
-        fun random(nullProbability: Percent): NullabilityPolicyFactory {
-            return NullabilityPolicyFactory { generatorRngs ->
-                RandomNullabilityPolicy(
-                    nullProbability = nullProbability,
-                    random = generatorRngs.nullabilityDecisionsRng,
-                )
-            }
-        }
-    }
-}
-
 /**
  * Independently chooses null for each value with probability [nullProbability].
  * The proportion of null values in a collection is not fixed.

@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
@@ -8,8 +9,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTAB
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.PERSISTENT_LIST
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Setup
@@ -25,21 +25,19 @@ import org.openjdk.jmh.infra.Blackhole
 abstract class ObjectCollectionBenchmark<T>(
     /** Number of distinct collections processed by each benchmark invocation. */
     private val numCollections: Int,
-    /** Controls generated collection sizes. */
-    private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
-    /** Creates the objects stored in each collection. */
-    private val objectGeneratorFactory: ObjectGeneratorFactory<T>,
+    /** Constructs fresh components once per trial from the supplied purpose-specific streams. */
+    private val createDataRecipe: (GeneratorRngs) -> ObjectCollectionRecipe<T>,
 ) : CollectionBenchmark() {
     @PublishedApi
     internal lateinit var data: ObjectCollectionBenchmarkData<T>
 
     @Setup(Level.Trial)
     fun setupBenchmarkData() {
+        val generatorRngs = BenchmarkGeneratorRngs()
         data = ObjectCollectionBenchmarkData.create(
             collectionType = collectionType,
             numCollections = numCollections,
-            sizeDistributionFactory = sizeDistributionFactory,
-            objectGeneratorFactory = objectGeneratorFactory,
+            recipe = createDataRecipe(generatorRngs),
         )
     }
 

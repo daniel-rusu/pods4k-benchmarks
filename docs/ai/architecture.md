@@ -19,12 +19,14 @@ testable; JMH lifecycle and scenario-specific code stays in `src/jmh`.
 
 1. `CollectionBenchmark` defines the shared `Scope.Benchmark` state and uses `@Param` to supply both a
    `CollectionType` and a `DataType`, producing 36 parameter combinations per benchmark method.
-2. A specialized benchmark base receives a fixed `numCollections` plus the generator and distribution factories for
-   its data shape.
-3. Its `@Setup(Level.Trial)` method calls the matching `*BenchmarkData.create` factory.
-4. The data builder creates `BenchmarkGeneratorRngs` with its default master seed (`0L`), supplies its purpose-specific
-   streams to generator and distribution factories, and passes single-collection construction logic to `CollectionBatch`,
-   which materializes only the selected representation.
+2. A specialized benchmark base receives a separate fixed `numCollections` and one `createDataRecipe` lambda for
+   flat, nullable-flat, object, or nested data.
+3. Its `@Setup(Level.Trial)` creates a fresh `BenchmarkGeneratorRngs` with the default master seed (`0L`) and invokes
+   the lambda exactly once, immediately before materialization. The lambda constructs all mutable generation components
+   from the supplied purpose-specific streams without sampling or creating additional RNG bundles.
+4. The matching `*BenchmarkData.create` accepts the actual recipe, separate batch count, `CollectionType`, and
+   `DataType` (except for object data). It uses those components directly without resetting or reconstructing them,
+   and delegates collection materialization to `CollectionBatch` and `CollectionFactory`.
 5. The benchmark helper dispatches to statically typed transforms and consumes every result with `Blackhole`.
 
 All benchmark-data holders delegate erased storage to a `CollectionBatch`, which retains the active `CollectionType`,
@@ -49,18 +51,23 @@ exposed to its benchmarks.
   `nextDouble() < trueProbability.scale(1.0)`, with ordinary Double precision.
 - `CollectionBatch`: shared outer-array materialization, erased storage, and runtime validation for one trial-data
   representation.
-- `Distribution` and `DistributionFactory`: collection-size models using positive `Percent` bucket weights with an
-  exact 100% total. Each value uses one Double threshold compared with scaled cumulative percentages to select its
-  bucket, then an inclusive range draw. `DistributionFactory.create(rng)` uses the caller's RNG directly; it does not
-  allocate a new stream.
-- `PrimitiveGeneratorFactory` and `ObjectGeneratorFactory`: configurable non-null element generation.
-- `PredicateMatchingPrimitiveGenerator` and `PredicateMatchingObjectGenerator`: reusable adapters that independently
-  choose a required predicate outcome with `matchProbability`, then rejection-sample the decorated source until a
-  matching value is found. Factories expose this as `withPredicateMatchProbability`; collection match proportions vary.
+- `Distribution`: generic RNG-bound size models using positive `Percent` bucket weights with an exact 100% total.
+  Each value uses one Double threshold and then an inclusive range draw. The public constructor binds the supplied
+  stream directly. Workload presets `outerCollectionSizes` and `nestedCollectionSizes` live in benchmark setup.
+- `FlatCollectionRecipe`, `NullableFlatCollectionRecipe`, `ObjectCollectionRecipe<T>`, and `NestedCollectionRecipe`:
+  independent containers with `val` references to actual distributions, generators, and policies. Their dependencies
+  may be stateful; a recipe serves one materialization and contains no batch count. Reproducible builds require fresh,
+  identically seeded recipes.
+- `RandomPrimitiveGenerator`, `StringGenerator`, and `objectGenerator { ... }`: direct element generation. The
+  initializer helper retains the runtime element class and invokes its supplied initializer only on `next()`.
+- `PredicateMatchingPrimitiveGenerator` and `PredicateMatchingObjectGenerator`: adapters exposed through actual-generator
+  `withPredicateMatchProbability` extensions taking an explicit outcome RNG. Each independently chooses the required
+  predicate outcome, then rejection-samples the source; collection match proportions vary.
 - `MedianValuePredicate`: the scenario predicate shared by predicate benchmark setup and measured operations.
-- `NullabilityPolicyFactory`: creates fresh policies from the dedicated nullability RNG stream. Nullable benchmark-data
-  builders own these policies and apply them uniformly to primitive and reference sources. Its `random(nullProbability)`
-  factory independently chooses null for each element; collection null proportions vary.
+- `RandomNullabilityPolicy`: constructed from the dedicated nullability stream in a recipe. Nullable-flat builders
+  apply the supplied policy uniformly to references and boxed primitives. `ObjectGenerator.nullable(policy)` adapts an
+  actual generator directly. Null choices suppress source generation. Nullable compound recipes draw one decision per
+  object and apply it to all properties, preserving property-generation order.
 - Nullability and predicate-match probabilities accept `Percent`. Each decision consumes one `nextDouble()` call,
   including at 0% and 100%; rejected predicate candidates do not consume further outcome decisions.
 - `CollectionBenchmark`: shared JMH benchmark state that defines the `CollectionType` and `DataType` parameter axes.
@@ -71,6 +78,12 @@ exposed to its benchmarks.
   and is used by `FilterNotNullBenchmarks`.
 - `FlatCollectionBenchmark`, `NullableFlatCollectionBenchmark`, `ObjectCollectionBenchmark`, and
   `NestedCollectionBenchmark`: specialized trial setup and statically typed dispatch helpers.
+
+Standard and repeated predicate flat configurations use `standardFlatCollectionRecipe` and
+`withPredicateMatchProbability` in JMH setup, called explicitly inside trial lambdas. Other specialized recipes stay
+in their JMH scenarios. Unit tests cover main-source builders, direct components, stateful test recipes, and datasets
+captured before migration. They do not import JMH configurations or validate the trial lifecycle and shared helpers;
+review that wiring and compile the generated harness with `build jmhJar --no-daemon`.
 
 ## Invariants
 

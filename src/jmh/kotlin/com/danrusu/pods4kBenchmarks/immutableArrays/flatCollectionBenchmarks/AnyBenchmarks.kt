@@ -10,11 +10,9 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.standardFlatCollectionRecipe
+import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
@@ -30,10 +28,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.SPARSE_ACCESS
-
-// Inspects (1 / 0.02) = 50 elements on average
-// The median is 35 elements because 1 - (1 - 0.02)^35 = ~50.7%.
-private val MATCH_PROBABILITY = 2.percent()
+private val predicate = MedianValuePredicate
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -43,60 +38,65 @@ private val MATCH_PROBABILITY = 2.percent()
 @Fork(2)
 open class AnyBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    primitiveGeneratorFactory = PrimitiveGeneratorFactory
-        .randomValues()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate),
-    referenceGeneratorFactory = ObjectGeneratorFactory
-        .randomStrings()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, MedianValuePredicate::matches),
+    createDataRecipe = { rngs ->
+        standardFlatCollectionRecipe(rngs).withPredicateMatchProbability(
+            predicateOutcomeRng = rngs.predicateOutcomeRng,
+
+            // Inspects (1 / 0.02) = 50 elements on average
+            // The median is 35 elements because 1 - (1 - 0.02)^35 = ~50.7%.
+            matchProbability = 2.percent(),
+            primitivePredicates = predicate,
+            referencePredicate = { value -> predicate.matches(value) },
+        )
+    },
 ) {
     @Benchmark
     fun any(bh: Blackhole) {
         transformEachCollection(
             bh,
             // lists
-            { list: List<String> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Boolean> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Byte> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Char> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Short> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Int> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Float> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Long> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: List<Double> -> list.any { MedianValuePredicate.matches(it) } },
+            { list: List<String> -> list.any { predicate.matches(it) } },
+            { list: List<Boolean> -> list.any { predicate.matches(it) } },
+            { list: List<Byte> -> list.any { predicate.matches(it) } },
+            { list: List<Char> -> list.any { predicate.matches(it) } },
+            { list: List<Short> -> list.any { predicate.matches(it) } },
+            { list: List<Int> -> list.any { predicate.matches(it) } },
+            { list: List<Float> -> list.any { predicate.matches(it) } },
+            { list: List<Long> -> list.any { predicate.matches(it) } },
+            { list: List<Double> -> list.any { predicate.matches(it) } },
 
             // persistent lists
-            { list: PersistentList<String> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Boolean> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Byte> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Char> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Short> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Int> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Float> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Long> -> list.any { MedianValuePredicate.matches(it) } },
-            { list: PersistentList<Double> -> list.any { MedianValuePredicate.matches(it) } },
+            { list: PersistentList<String> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Boolean> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Byte> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Char> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Short> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Int> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Float> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Long> -> list.any { predicate.matches(it) } },
+            { list: PersistentList<Double> -> list.any { predicate.matches(it) } },
 
             // arrays
-            { array: Array<String> -> array.any { MedianValuePredicate.matches(it) } },
-            { array: BooleanArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ByteArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: CharArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ShortArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: IntArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: FloatArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: LongArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: DoubleArray -> array.any { MedianValuePredicate.matches(it) } },
+            { array: Array<String> -> array.any { predicate.matches(it) } },
+            { array: BooleanArray -> array.any { predicate.matches(it) } },
+            { array: ByteArray -> array.any { predicate.matches(it) } },
+            { array: CharArray -> array.any { predicate.matches(it) } },
+            { array: ShortArray -> array.any { predicate.matches(it) } },
+            { array: IntArray -> array.any { predicate.matches(it) } },
+            { array: FloatArray -> array.any { predicate.matches(it) } },
+            { array: LongArray -> array.any { predicate.matches(it) } },
+            { array: DoubleArray -> array.any { predicate.matches(it) } },
 
             // immutable arrays
-            { array: ImmutableArray<String> -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableBooleanArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableByteArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableCharArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableShortArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableIntArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableFloatArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableLongArray -> array.any { MedianValuePredicate.matches(it) } },
-            { array: ImmutableDoubleArray -> array.any { MedianValuePredicate.matches(it) } },
+            { array: ImmutableArray<String> -> array.any { predicate.matches(it) } },
+            { array: ImmutableBooleanArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableByteArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableCharArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableShortArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableIntArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableFloatArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableLongArray -> array.any { predicate.matches(it) } },
+            { array: ImmutableDoubleArray -> array.any { predicate.matches(it) } },
         )
     }
 }

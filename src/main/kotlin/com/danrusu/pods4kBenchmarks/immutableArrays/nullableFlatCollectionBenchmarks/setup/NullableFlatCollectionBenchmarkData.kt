@@ -1,16 +1,11 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.resolveElementClass
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
@@ -39,22 +34,17 @@ class NullableFlatCollectionBenchmarkData private constructor(
     }
 
     companion object {
-        /** Creates deterministic nullable data for one flat benchmark parameter combination. */
+        /** Materializes data from the supplied recipe for one flat benchmark parameter combination. */
         @Suppress("UNCHECKED_CAST")
         fun create(
             collectionType: CollectionType,
             dataType: DataType,
             numCollections: Int,
-            sizeDistributionFactory: DistributionFactory,
-            primitiveGeneratorFactory: PrimitiveGeneratorFactory,
-            referenceGeneratorFactory: ObjectGeneratorFactory<String>,
-            nullabilityPolicyFactory: NullabilityPolicyFactory,
+            recipe: NullableFlatCollectionRecipe,
         ): NullableFlatCollectionBenchmarkData {
-            val generatorRngs = BenchmarkGeneratorRngs()
-            val sizeDistribution = sizeDistributionFactory.create(generatorRngs.outerCollectionSizeRng)
-            val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
-            val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
-            val referenceGenerator = referenceGeneratorFactory.create(generatorRngs)
+            val primitiveGenerator = recipe.primitiveGenerator
+            val referenceGenerator = recipe.referenceGenerator
+            val nullabilityPolicy = recipe.nullabilityPolicy
             val elementClass = dataType.resolveElementClass(referenceGenerator.objectClass) as Class<Any>
             val collectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
@@ -67,7 +57,7 @@ class NullableFlatCollectionBenchmarkData private constructor(
                 logicalElementClass = elementClass,
                 collectionClass = collectionClass,
                 numCollections = numCollections,
-                sizeDistribution = sizeDistribution,
+                sizeDistribution = recipe.sizeDistribution,
             ) { size ->
                 CollectionFactory.createCollection(size, collectionType, elementClass) {
                     when (dataType) {

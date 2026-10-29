@@ -15,7 +15,7 @@ import kotlin.random.nextInt
  *     20.percent() inRange 100..120,
  * )
  */
-class Distribution internal constructor(private val random: Random, vararg buckets: Bucket) {
+class Distribution(private val random: Random, vararg buckets: Bucket) {
     private val cumulativePercentages: Array<Percent>
     private val valueRanges = Array(buckets.size) { buckets[it].values }
 
@@ -65,43 +65,3 @@ class Distribution internal constructor(private val random: Random, vararg bucke
 }
 
 infix fun Percent.inRange(values: IntRange): Distribution.Bucket = Distribution.Bucket(weight = this, values = values)
-
-interface DistributionFactory {
-
-    /**
-     * Creates a distribution that draws directly from [rng]. The caller supplies a separate stream when independence
-     * from other random decisions is required.
-     */
-    fun create(rng: Random): Distribution
-
-    /** Size distribution for top-level collections. */
-    object ListSizeDistribution : DistributionFactory {
-        override fun create(rng: Random): Distribution = Distribution(
-            rng,
-            35.percent() inRange 0..10,
-            30.percent() inRange 11..50,
-            20.percent() inRange 51..200,
-            10.percent() inRange 201..1_000,
-            5.percent() inRange 1_001..10_000,
-        )
-    }
-
-    /**
-     * Represents the size distribution of nested lists.
-     *
-     * Example scenarios:
-     * - List of orders with each order containing a list of products.
-     * - List of people with each person containing a list of siblings.
-     * - List of cities with each city containing a list of attractions.
-     */
-    object NestedListSizeDistribution : DistributionFactory {
-        override fun create(rng: Random): Distribution = Distribution(
-            rng,
-            30.percent() inRange 0..1,
-            35.percent() inRange 2..3,
-            25.percent() inRange 4..7,
-            7.percent() inRange 8..15,
-            3.percent() inRange 16..25,
-        )
-    }
-}

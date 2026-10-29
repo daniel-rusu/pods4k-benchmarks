@@ -2,14 +2,13 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.se
 
 import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
 import com.danrusu.pods4k.immutableArrays.toList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
 import com.danrusu.pods4kBenchmarks.utils.Percent
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
@@ -23,7 +22,7 @@ import strikt.assertions.message
 
 class FlatCollectionBenchmarkDataTest {
     @Test
-    fun `predicate decorated factories produce identical data across collection representations`() {
+    fun `predicate decorated recipes produce identical data across collection representations`() {
         for (probability in listOf(0.percent(), 35.percent(), 100.percent())) {
             for (dataType in DataType.entries) {
                 val expected = createPredicateData(CollectionType.LIST, dataType, probability)
@@ -83,10 +82,7 @@ class FlatCollectionBenchmarkDataTest {
     ): FlatCollectionBenchmarkData = createData(
         collectionType = collectionType,
         dataType = dataType,
-        primitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues()
-            .withPredicateMatchProbability(probability, MedianValuePredicate),
-        referenceGeneratorFactory = ObjectGeneratorFactory.randomStrings()
-            .withPredicateMatchProbability(probability, MedianValuePredicate::matches),
+        matchProbability = probability,
     )
 
     private fun matches(value: Any): Boolean = when (value) {
@@ -179,16 +175,24 @@ class FlatCollectionBenchmarkDataTest {
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
-        primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
-        referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
-    ): FlatCollectionBenchmarkData = FlatCollectionBenchmarkData.create(
-        collectionType = collectionType,
-        dataType = dataType,
-        numCollections = 5,
-        sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        primitiveGeneratorFactory = primitiveGeneratorFactory,
-        referenceGeneratorFactory = referenceGeneratorFactory,
-    )
+        matchProbability: Percent? = null,
+    ): FlatCollectionBenchmarkData {
+        val rngs = BenchmarkGeneratorRngs()
+        var recipe = FlatCollectionRecipe(
+            sizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng),
+            referenceGenerator = StringGenerator(rngs.dataGenerationRng),
+        )
+        if (matchProbability != null) {
+            recipe = recipe.withPredicateMatchProbability(
+                predicateOutcomeRng = rngs.predicateOutcomeRng,
+                matchProbability = matchProbability,
+                primitivePredicates = MedianValuePredicate,
+                referencePredicate = MedianValuePredicate::matches
+            )
+        }
+        return FlatCollectionBenchmarkData.create(collectionType, dataType, numCollections = 5, recipe = recipe)
+    }
 
     private fun FlatCollectionBenchmarkData.normalized(
         collectionType: CollectionType,

@@ -11,6 +11,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.plus
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.standardFlatCollectionRecipe
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -42,7 +43,10 @@ const val DOUBLE_ELEMENT = 0.0
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class PlusElementBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
+open class PlusElementBenchmarks : FlatCollectionBenchmark(
+    numCollections = NUM_COLLECTIONS,
+    createDataRecipe = { rngs -> standardFlatCollectionRecipe(rngs) },
+) {
     @Benchmark
     fun plusElement(bh: Blackhole) {
         transformEachCollection(

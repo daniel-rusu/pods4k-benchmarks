@@ -1,13 +1,10 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
-import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBatch
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionFactory
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
 import kotlinx.collections.immutable.PersistentList
 
 /**
@@ -33,16 +30,13 @@ class ObjectCollectionBenchmarkData<T> private constructor(
         get() = batch.getCollections(CollectionType.IMMUTABLE_ARRAY, elementClass)
 
     companion object {
-        /** Creates deterministic data for one object benchmark parameter combination. */
+        /** Materializes data from the supplied recipe for one object benchmark parameter combination. */
         fun <T> create(
             collectionType: CollectionType,
             numCollections: Int,
-            sizeDistributionFactory: DistributionFactory,
-            objectGeneratorFactory: ObjectGeneratorFactory<T>,
+            recipe: ObjectCollectionRecipe<T>,
         ): ObjectCollectionBenchmarkData<T> {
-            val generatorRngs = BenchmarkGeneratorRngs()
-            val sizeDistribution = sizeDistributionFactory.create(generatorRngs.outerCollectionSizeRng)
-            val objectGenerator = objectGeneratorFactory.create(generatorRngs)
+            val objectGenerator = recipe.objectGenerator
             val elementClass = objectGenerator.objectClass
             val collectionClass = CollectionFactory.resolveCollectionClass(
                 collectionType = collectionType,
@@ -55,7 +49,7 @@ class ObjectCollectionBenchmarkData<T> private constructor(
                 logicalElementClass = elementClass,
                 collectionClass = collectionClass,
                 numCollections = numCollections,
-                sizeDistribution = sizeDistribution,
+                sizeDistribution = recipe.sizeDistribution,
             ) { size ->
                 CollectionFactory.createCollection(size, collectionType, elementClass) {
                     objectGenerator.next()

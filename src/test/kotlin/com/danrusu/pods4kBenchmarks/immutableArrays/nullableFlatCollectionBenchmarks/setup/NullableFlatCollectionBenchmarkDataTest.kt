@@ -2,14 +2,16 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBench
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.toList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomNullabilityPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.percent
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
@@ -85,11 +87,11 @@ class NullableFlatCollectionBenchmarkDataTest {
     }
 
     @Test
-    fun `framework policy makes values from a non-null reference factory nullable`() {
+    fun `framework policy makes values from a non-null reference generator nullable`() {
         val data = createData(
             collectionType = CollectionType.LIST,
             dataType = DataType.REFERENCE,
-            nullabilityPolicyFactory = NullabilityPolicyFactory { AlwaysNullPolicy },
+            nullabilityPolicy = AlwaysNullPolicy,
         )
 
         expectThat(
@@ -103,12 +105,12 @@ class NullableFlatCollectionBenchmarkDataTest {
             val alwaysNullValues = createData(
                 collectionType = CollectionType.LIST,
                 dataType = dataType,
-                nullabilityPolicyFactory = NullabilityPolicyFactory { AlwaysNullPolicy },
+                nullabilityPolicy = AlwaysNullPolicy,
             ).normalized(CollectionType.LIST, dataType).flatten()
             val neverNullValues = createData(
                 collectionType = CollectionType.LIST,
                 dataType = dataType,
-                nullabilityPolicyFactory = NullabilityPolicyFactory { NeverNullPolicy },
+                nullabilityPolicy = NeverNullPolicy,
             ).normalized(CollectionType.LIST, dataType).flatten()
 
             expectThat(alwaysNullValues.all { it == null })
@@ -158,18 +160,20 @@ class NullableFlatCollectionBenchmarkDataTest {
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
-        nullabilityPolicyFactory: NullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_PROBABILITY),
-        primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
-        referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
-    ): NullableFlatCollectionBenchmarkData = NullableFlatCollectionBenchmarkData.create(
-        collectionType = collectionType,
-        dataType = dataType,
-        numCollections = 5,
-        sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        primitiveGeneratorFactory = primitiveGeneratorFactory,
-        referenceGeneratorFactory = referenceGeneratorFactory,
-        nullabilityPolicyFactory = nullabilityPolicyFactory,
-    )
+        nullabilityPolicy: NullabilityPolicy? = null,
+    ): NullableFlatCollectionBenchmarkData {
+        val rngs = BenchmarkGeneratorRngs()
+        val recipe = NullableFlatCollectionRecipe(
+            sizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng),
+            referenceGenerator = StringGenerator(rngs.dataGenerationRng),
+            nullabilityPolicy = nullabilityPolicy ?: RandomNullabilityPolicy(
+                NULL_PROBABILITY,
+                rngs.nullabilityDecisionsRng,
+            ),
+        )
+        return NullableFlatCollectionBenchmarkData.create(collectionType, dataType, numCollections = 5, recipe = recipe)
+    }
 
     private fun NullableFlatCollectionBenchmarkData.normalized(
         collectionType: CollectionType,

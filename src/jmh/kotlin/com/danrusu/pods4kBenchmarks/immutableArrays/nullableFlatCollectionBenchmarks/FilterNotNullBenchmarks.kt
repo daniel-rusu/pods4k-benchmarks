@@ -3,8 +3,12 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBench
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.filterNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup.NullableFlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup.NullableFlatCollectionRecipe
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomNullabilityPolicy
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.percent
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -30,7 +34,14 @@ private val NULL_PROBABILITY = 50.percent()
 @Fork(2)
 open class FilterNotNullBenchmarks : NullableFlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_PROBABILITY),
+    createDataRecipe = { rngs ->
+        NullableFlatCollectionRecipe(
+            sizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng),
+            referenceGenerator = StringGenerator(rngs.dataGenerationRng),
+            nullabilityPolicy = RandomNullabilityPolicy(NULL_PROBABILITY, rngs.nullabilityDecisionsRng),
+        )
+    },
 ) {
     @Benchmark
     fun filterNotNull(bh: Blackhole) {

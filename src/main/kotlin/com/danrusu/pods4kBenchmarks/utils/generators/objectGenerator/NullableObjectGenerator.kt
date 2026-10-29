@@ -1,9 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
-import com.danrusu.pods4kBenchmarks.utils.Percent
-import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicy
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
 
 /** Uses [nullabilityPolicy] to decide whether to return null or ask [delegate] for the next object */
 class NullableObjectGenerator<T : Any>(
@@ -15,22 +12,7 @@ class NullableObjectGenerator<T : Any>(
     override fun next(): T? = nullabilityPolicy.nullable { delegate.next() }
 }
 
-/** Creates a factory that uses a fresh policy to decide whether to return null or generate a non-null value. */
-fun <T : Any> ObjectGeneratorFactory<T>.nullable(
-    nullabilityPolicyFactory: NullabilityPolicyFactory,
-): ObjectGeneratorFactory<T?> = object : ObjectGeneratorFactory<T?>() {
-    override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<T?> {
-        return NullableObjectGenerator(
-            delegate = this@nullable.create(generatorRngs),
-            nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs),
-        )
-    }
-}
-
-/**
- * Creates a factory that independently returns null for each value with probability [nullProbability].
- * The proportion of null values in a collection is not fixed.
- */
-fun <T : Any> ObjectGeneratorFactory<T>.nullable(
-    nullProbability: Percent,
-): ObjectGeneratorFactory<T?> = nullable(NullabilityPolicyFactory.random(nullProbability))
+/** Uses the supplied policy to adapt this actual generator immediately. */
+fun <T : Any> ObjectGenerator<T>.nullable(
+    nullabilityPolicy: NullabilityPolicy,
+): ObjectGenerator<T?> = NullableObjectGenerator(this, nullabilityPolicy)

@@ -1,6 +1,7 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.nullableFlatCollectionBenchmarks.setup
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
@@ -17,10 +18,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Setup
@@ -35,28 +33,20 @@ import org.openjdk.jmh.infra.Blackhole
 abstract class NullableFlatCollectionBenchmark(
     /** Number of distinct collections processed by each benchmark invocation. */
     private val numCollections: Int,
-    /** Controls generated collection sizes. */
-    private val sizeDistributionFactory: DistributionFactory = DistributionFactory.ListSizeDistribution,
-    /** Creates non-null boxed primitive element values. */
-    private val primitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
-    /** Creates non-null reference element values. */
-    private val referenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
-    /** Creates the policy that owns null placement for every data type. */
-    private val nullabilityPolicyFactory: NullabilityPolicyFactory,
+    /** Constructs fresh components once per trial from the supplied purpose-specific streams. */
+    private val createDataRecipe: (GeneratorRngs) -> NullableFlatCollectionRecipe,
 ) : CollectionBenchmark() {
     @PublishedApi
     internal lateinit var data: NullableFlatCollectionBenchmarkData
 
     @Setup(Level.Trial)
     fun setupBenchmarkData() {
+        val generatorRngs = BenchmarkGeneratorRngs()
         data = NullableFlatCollectionBenchmarkData.create(
             collectionType = collectionType,
             dataType = dataType,
             numCollections = numCollections,
-            sizeDistributionFactory = sizeDistributionFactory,
-            primitiveGeneratorFactory = primitiveGeneratorFactory,
-            referenceGeneratorFactory = referenceGeneratorFactory,
-            nullabilityPolicyFactory = nullabilityPolicyFactory,
+            recipe = createDataRecipe(generatorRngs),
         )
     }
 
@@ -116,15 +106,41 @@ abstract class NullableFlatCollectionBenchmark(
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> for (collection in data.persistentLists<String>()) bh.consume(transformPersistentList(collection))
-                BOOLEAN -> for (collection in data.persistentLists<Boolean>()) bh.consume(transformPersistentBooleanList(collection))
-                BYTE -> for (collection in data.persistentLists<Byte>()) bh.consume(transformPersistentByteList(collection))
-                CHAR -> for (collection in data.persistentLists<Char>()) bh.consume(transformPersistentCharList(collection))
-                SHORT -> for (collection in data.persistentLists<Short>()) bh.consume(transformPersistentShortList(collection))
-                INT -> for (collection in data.persistentLists<Int>()) bh.consume(transformPersistentIntList(collection))
-                FLOAT -> for (collection in data.persistentLists<Float>()) bh.consume(transformPersistentFloatList(collection))
-                LONG -> for (collection in data.persistentLists<Long>()) bh.consume(transformPersistentLongList(collection))
-                DOUBLE -> for (collection in data.persistentLists<Double>()) bh.consume(transformPersistentDoubleList(collection))
+                REFERENCE -> for (collection in data.persistentLists<String>()) {
+                    bh.consume(transformPersistentList(collection))
+                }
+
+                BOOLEAN -> for (collection in data.persistentLists<Boolean>()) {
+                    bh.consume(transformPersistentBooleanList(collection))
+                }
+
+                BYTE -> for (collection in data.persistentLists<Byte>()) {
+                    bh.consume(transformPersistentByteList(collection))
+                }
+
+                CHAR -> for (collection in data.persistentLists<Char>()) {
+                    bh.consume(transformPersistentCharList(collection))
+                }
+
+                SHORT -> for (collection in data.persistentLists<Short>()) {
+                    bh.consume(transformPersistentShortList(collection))
+                }
+
+                INT -> for (collection in data.persistentLists<Int>()) {
+                    bh.consume(transformPersistentIntList(collection))
+                }
+
+                FLOAT -> for (collection in data.persistentLists<Float>()) {
+                    bh.consume(transformPersistentFloatList(collection))
+                }
+
+                LONG -> for (collection in data.persistentLists<Long>()) {
+                    bh.consume(transformPersistentLongList(collection))
+                }
+
+                DOUBLE -> for (collection in data.persistentLists<Double>()) {
+                    bh.consume(transformPersistentDoubleList(collection))
+                }
             }
 
             ARRAY -> when (dataType) {
@@ -140,15 +156,41 @@ abstract class NullableFlatCollectionBenchmark(
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> for (collection in data.immutableArrays<String>()) bh.consume(transformImmutableArray(collection))
-                BOOLEAN -> for (collection in data.immutableArrays<Boolean>()) bh.consume(transformImmutableBooleanArray(collection))
-                BYTE -> for (collection in data.immutableArrays<Byte>()) bh.consume(transformImmutableByteArray(collection))
-                CHAR -> for (collection in data.immutableArrays<Char>()) bh.consume(transformImmutableCharArray(collection))
-                SHORT -> for (collection in data.immutableArrays<Short>()) bh.consume(transformImmutableShortArray(collection))
-                INT -> for (collection in data.immutableArrays<Int>()) bh.consume(transformImmutableIntArray(collection))
-                FLOAT -> for (collection in data.immutableArrays<Float>()) bh.consume(transformImmutableFloatArray(collection))
-                LONG -> for (collection in data.immutableArrays<Long>()) bh.consume(transformImmutableLongArray(collection))
-                DOUBLE -> for (collection in data.immutableArrays<Double>()) bh.consume(transformImmutableDoubleArray(collection))
+                REFERENCE -> for (collection in data.immutableArrays<String>()) {
+                    bh.consume(transformImmutableArray(collection))
+                }
+
+                BOOLEAN -> for (collection in data.immutableArrays<Boolean>()) {
+                    bh.consume(transformImmutableBooleanArray(collection))
+                }
+
+                BYTE -> for (collection in data.immutableArrays<Byte>()) {
+                    bh.consume(transformImmutableByteArray(collection))
+                }
+
+                CHAR -> for (collection in data.immutableArrays<Char>()) {
+                    bh.consume(transformImmutableCharArray(collection))
+                }
+
+                SHORT -> for (collection in data.immutableArrays<Short>()) {
+                    bh.consume(transformImmutableShortArray(collection))
+                }
+
+                INT -> for (collection in data.immutableArrays<Int>()) {
+                    bh.consume(transformImmutableIntArray(collection))
+                }
+
+                FLOAT -> for (collection in data.immutableArrays<Float>()) {
+                    bh.consume(transformImmutableFloatArray(collection))
+                }
+
+                LONG -> for (collection in data.immutableArrays<Long>()) {
+                    bh.consume(transformImmutableLongArray(collection))
+                }
+
+                DOUBLE -> for (collection in data.immutableArrays<Double>()) {
+                    bh.consume(transformImmutableDoubleArray(collection))
+                }
             }
         }
     }

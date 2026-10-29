@@ -15,7 +15,7 @@ Use this map to locate the smallest relevant area before making a change.
 - General utilities: `src/main/kotlin/com/danrusu/pods4kBenchmarks/utils/`.
 - Immutable-array setup: `src/main/kotlin/com/danrusu/pods4kBenchmarks/immutableArrays/`.
 - Tests mirror both areas under `src/test/kotlin/com/danrusu/pods4kBenchmarks/`.
-- Key types: `Percent`, `RngFactory`, `DistributionFactory`, `GeneratorRngs`, `CollectionType`, `DataType`,
+- Key types: `Percent`, `RngFactory`, `Distribution`, `GeneratorRngs`, `CollectionType`, `DataType`,
   `BenchmarkGeneratorRngs`, `CollectionFactory`, `CollectionBatch`, and the four `*BenchmarkData` builders, including
   `NullableFlatCollectionBenchmarkData` for boxed nullable elements.
 - Preserve purpose-specific RNG streams and runtime element-type checks; both protect comparability across parameter
@@ -25,7 +25,10 @@ Use this map to locate the smallest relevant area before making a change.
 - `utils/Percent.kt` owns validated percentage declarations (`50.percent()`), exact addition, and numeric weighting.
   Random decisions belong to `Random.nextBoolean(trueProbability: Percent)` in `utils/RandomExtensions.kt`.
   `utils/Distribution.kt` owns positive bucket weights, exact 100% totals, and selection using one Double threshold;
-  `inRange` is a top-level extension there. Distribution factories use the supplied RNG directly.
+  `inRange` is a top-level extension there. The public constructor binds the supplied RNG directly.
+- `immutableArrays/setup/BenchmarkSizeDistributions.kt` owns `outerCollectionSizes` and `nestedCollectionSizes` presets.
+- Each data builder has a matching `*CollectionRecipe` in its setup package. Recipes hold actual generation components;
+  builders accept separate batch counts and parameter selections without allocating RNGs or resetting components.
 
 ## JMH Benchmarks
 
@@ -36,6 +39,9 @@ Use this map to locate the smallest relevant area before making a change.
   `setup/NullableFlatCollectionBenchmark.kt`.
 - Object: `objectCollectionBenchmarks/`; generic setup and dispatch in `setup/ObjectCollectionBenchmark.kt`.
 - Nested: `nestedCollectionBenchmarks/`; specialized setup and dispatch in `setup/NestedCollectionBenchmark.kt`.
+- Each specialized base creates one fresh RNG bundle and invokes `createDataRecipe` once per trial setup. Standard flat
+  and repeated predicate wiring live in `flatCollectionBenchmarks/setup/StandardFlatCollectionRecipe.kt`, called
+  explicitly inside trial lambdas. Other recipes remain scenario-local.
 - Shared batch-size defaults and cache-footprint guidance: `setup/BenchmarkBatchSize.kt`.
 - Reusable predicate conditioning: `utils/generators/primitiveGenerator/PredicateMatchingPrimitiveGenerator.kt` and
   `utils/generators/objectGenerator/PredicateMatchingObjectGenerator.kt` in `src/main`.

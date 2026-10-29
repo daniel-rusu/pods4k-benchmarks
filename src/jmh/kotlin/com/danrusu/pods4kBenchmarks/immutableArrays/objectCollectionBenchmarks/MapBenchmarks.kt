@@ -4,9 +4,13 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.map
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElement
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionRecipe
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.objectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -29,17 +33,25 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 @Fork(2)
 open class MapBenchmarks : ObjectCollectionBenchmark<CompoundElement>(
     numCollections = NUM_COLLECTIONS,
-    objectGeneratorFactory = ObjectGeneratorFactory.of<CompoundElement> { primitiveGenerator, referenceGenerator ->
-        CompoundElement(
-            referenceValue = referenceGenerator.next(),
-            booleanValue = primitiveGenerator.nextBoolean(),
-            byteValue = primitiveGenerator.nextByte(),
-            charValue = primitiveGenerator.nextChar(),
-            shortValue = primitiveGenerator.nextShort(),
-            intValue = primitiveGenerator.nextInt(),
-            floatValue = primitiveGenerator.nextFloat(),
-            longValue = primitiveGenerator.nextLong(),
-            doubleValue = primitiveGenerator.nextDouble(),
+    createDataRecipe = { rngs ->
+        val primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng)
+        val referenceGenerator = StringGenerator(rngs.dataGenerationRng)
+
+        ObjectCollectionRecipe(
+            sizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            objectGenerator = objectGenerator<CompoundElement> {
+                CompoundElement(
+                    referenceValue = referenceGenerator.next(),
+                    booleanValue = primitiveGenerator.nextBoolean(),
+                    byteValue = primitiveGenerator.nextByte(),
+                    charValue = primitiveGenerator.nextChar(),
+                    shortValue = primitiveGenerator.nextShort(),
+                    intValue = primitiveGenerator.nextInt(),
+                    floatValue = primitiveGenerator.nextFloat(),
+                    longValue = primitiveGenerator.nextLong(),
+                    doubleValue = primitiveGenerator.nextDouble(),
+                )
+            },
         )
     },
 ) {

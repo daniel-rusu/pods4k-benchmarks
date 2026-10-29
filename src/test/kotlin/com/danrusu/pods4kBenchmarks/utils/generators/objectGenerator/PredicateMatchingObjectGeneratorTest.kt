@@ -30,9 +30,12 @@ class PredicateMatchingObjectGeneratorTest {
             source = source,
             predicate = { it == "yes" },
             matchProbability = matchProbability,
-            predicateOutcomeRng = outcomeRng
+            predicateOutcomeRng = outcomeRng,
         )
 
+        expectThat(generator.objectClass).isEqualTo(String::class.java)
+        expectThat(sourceCalls).isEqualTo(0)
+        expectThat(outcomeRng.numNextDoubleCalls).isEqualTo(0)
         expectThat(generator.next()).isEqualTo("yes")
         expectThat(generator.next()).isEqualTo("no")
 
@@ -61,7 +64,7 @@ class PredicateMatchingObjectGeneratorTest {
             source = source,
             predicate = { it == null },
             matchProbability = matchProbability,
-            predicateOutcomeRng = outcomeRng
+            predicateOutcomeRng = outcomeRng,
         )
 
         expectThat(

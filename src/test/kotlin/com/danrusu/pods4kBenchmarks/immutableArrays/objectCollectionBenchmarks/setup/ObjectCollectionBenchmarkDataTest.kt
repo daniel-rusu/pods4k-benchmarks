@@ -2,9 +2,10 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.
 
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.toList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -75,11 +76,14 @@ class ObjectCollectionBenchmarkDataTest {
     }
 
     private fun createData(collectionType: CollectionType): ObjectCollectionBenchmarkData<String> {
+        val rngs = BenchmarkGeneratorRngs()
         return ObjectCollectionBenchmarkData.create(
             collectionType = collectionType,
             numCollections = 5,
-            sizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-            objectGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
+            recipe = ObjectCollectionRecipe(
+                sizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+                objectGenerator = StringGenerator(rngs.dataGenerationRng),
+            ),
         )
     }
 

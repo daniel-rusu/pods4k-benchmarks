@@ -3,11 +3,13 @@ package com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.
 import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.ImmutableBooleanArray
 import com.danrusu.pods4k.immutableArrays.toList
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.nestedCollectionSizes
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import kotlinx.collections.immutable.PersistentList
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -112,18 +114,36 @@ class NestedCollectionBenchmarkDataTest {
         }.message.isEqualTo("Requested ARRAY data, but the batch contains IMMUTABLE_ARRAY data")
     }
 
+    @Test
+    fun `outer and nested sizes are identical across data types`() {
+        val expected = createData(CollectionType.LIST, DataType.REFERENCE)
+            .normalized(CollectionType.LIST, DataType.REFERENCE).map { outerCollection ->
+                outerCollection.map { nestedCollection -> nestedCollection.size }
+            }
+
+        for (dataType in DataType.entries) {
+            val actual = createData(CollectionType.LIST, dataType).normalized(CollectionType.LIST, dataType)
+            expectThat(
+                actual.map { outerCollection ->
+                    outerCollection.map { nestedCollection -> nestedCollection.size }
+                }
+            ).isEqualTo(expected)
+        }
+    }
+
     private fun createData(
         collectionType: CollectionType,
         dataType: DataType,
-    ): NestedCollectionBenchmarkData = NestedCollectionBenchmarkData.create(
-        collectionType = collectionType,
-        dataType = dataType,
-        numCollections = 5,
-        topLevelSizeDistributionFactory = DistributionFactory.ListSizeDistribution,
-        nestedCollectionSizeDistributionFactory = DistributionFactory.NestedListSizeDistribution,
-        nestedPrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
-        nestedReferenceGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
-    )
+    ): NestedCollectionBenchmarkData {
+        val rngs = BenchmarkGeneratorRngs()
+        val recipe = NestedCollectionRecipe(
+            outerSizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            nestedSizeDistribution = nestedCollectionSizes(rngs.nestedCollectionSizeRng),
+            primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng),
+            referenceGenerator = StringGenerator(rngs.dataGenerationRng),
+        )
+        return NestedCollectionBenchmarkData.create(collectionType, dataType, numCollections = 5, recipe = recipe)
+    }
 
     private fun NestedCollectionBenchmarkData.normalized(
         collectionType: CollectionType,

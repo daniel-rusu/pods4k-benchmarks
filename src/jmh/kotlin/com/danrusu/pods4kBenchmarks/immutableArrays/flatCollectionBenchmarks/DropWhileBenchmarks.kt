@@ -10,11 +10,9 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.standardFlatCollectionRecipe
+import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.withPredicateMatchProbability
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.withPredicateMatchProbability
 import com.danrusu.pods4kBenchmarks.utils.percent
 import com.danrusu.pods4kBenchmarks.utils.predicates.MedianValuePredicate
 import kotlinx.collections.immutable.PersistentList
@@ -30,12 +28,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
-
 private val predicate = MedianValuePredicate
-
-// Drops 0.98 / (1 - 0.98) = 49 elements on average.
-// The median is 34 elements dropped because 1 - (0.98)^35 = ~50.7%.
-private val MATCH_PROBABILITY = 98.percent() // probability of matching the predicate
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -45,12 +38,17 @@ private val MATCH_PROBABILITY = 98.percent() // probability of matching the pred
 @Fork(2)
 open class DropWhileBenchmarks : FlatCollectionBenchmark(
     numCollections = NUM_COLLECTIONS,
-    primitiveGeneratorFactory = PrimitiveGeneratorFactory
-        .randomValues()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate),
-    referenceGeneratorFactory = ObjectGeneratorFactory
-        .randomStrings()
-        .withPredicateMatchProbability(MATCH_PROBABILITY, predicate::matches),
+    createDataRecipe = { rngs ->
+        standardFlatCollectionRecipe(rngs).withPredicateMatchProbability(
+            predicateOutcomeRng = rngs.predicateOutcomeRng,
+
+            // Drops 0.98 / (1 - 0.98) = 49 elements on average.
+            // The median is 34 elements dropped because 1 - (0.98)^35 = ~50.7%.
+            matchProbability = 98.percent(),
+            primitivePredicates = predicate,
+            referencePredicate = { value -> predicate.matches(value) },
+        )
+    },
 ) {
     @Benchmark
     fun dropWhile(bh: Blackhole) {

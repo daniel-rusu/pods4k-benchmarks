@@ -1,6 +1,6 @@
 package com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator
 
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomNullabilityPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.AlwaysNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.NeverNullPolicy
 import com.danrusu.pods4kBenchmarks.utils.generators.fixtures.TestGeneratorRngs
@@ -15,10 +15,7 @@ class NullableObjectGeneratorTest {
     @Test
     fun `returns null without advancing delegate when policy chooses null`() {
         val delegate = CountingObjectGenerator()
-        val generator = NullableObjectGenerator(
-            delegate = delegate,
-            nullabilityPolicy = AlwaysNullPolicy,
-        )
+        val generator = delegate.nullable(AlwaysNullPolicy)
 
         expectThat(generator.next())
             .isNull()
@@ -30,10 +27,7 @@ class NullableObjectGeneratorTest {
     @Test
     fun `returns delegate value when policy chooses non-null`() {
         val delegate = CountingObjectGenerator()
-        val generator = NullableObjectGenerator(
-            delegate = delegate,
-            nullabilityPolicy = NeverNullPolicy,
-        )
+        val generator = delegate.nullable(NeverNullPolicy)
 
         expectThat(generator.next())
             .isEqualTo(1)
@@ -44,23 +38,21 @@ class NullableObjectGeneratorTest {
 
     @Test
     fun `preserves the delegate value class`() {
-        val generator = NullableObjectGenerator(
-            delegate = CountingObjectGenerator(),
-            nullabilityPolicy = AlwaysNullPolicy,
-        )
+        val generator = CountingObjectGenerator().nullable(AlwaysNullPolicy)
 
         expectThat(generator.objectClass)
             .isEqualTo(Int::class.javaObjectType)
     }
 
     @Test
-    fun `nullable string generator is deterministic with fixed rng factory seed`() {
-        val firstGenerator = ObjectGeneratorFactory.randomStrings()
-            .nullable(nullProbability = 50.percent())
-            .create(TestGeneratorRngs(masterSeed = 123))
-        val secondGenerator = ObjectGeneratorFactory.randomStrings()
-            .nullable(nullProbability = 50.percent())
-            .create(TestGeneratorRngs(masterSeed = 123))
+    fun `nullable string generator is deterministic with fixed seed`() {
+        fun generator(): ObjectGenerator<String?> {
+            val rngs = TestGeneratorRngs(masterSeed = 123)
+            return StringGenerator(rngs.dataGenerationRng)
+                .nullable(RandomNullabilityPolicy(50.percent(), rngs.nullabilityDecisionsRng))
+        }
+        val firstGenerator = generator()
+        val secondGenerator = generator()
 
         val firstValues = List(20) { firstGenerator.next() }
         val secondValues = List(20) { secondGenerator.next() }
@@ -75,22 +67,6 @@ class NullableObjectGeneratorTest {
 
         expectThat(numNulls)
             .isIn(1..19)
-    }
-
-    @Test
-    fun `factory overload creates a fresh policy for each generator`() {
-        var numPoliciesCreated = 0
-        val policyFactory = NullabilityPolicyFactory {
-            numPoliciesCreated++
-            NeverNullPolicy
-        }
-        val nullableFactory = ObjectGeneratorFactory.randomStrings().nullable(policyFactory)
-
-        nullableFactory.create(TestGeneratorRngs())
-        nullableFactory.create(TestGeneratorRngs())
-
-        expectThat(numPoliciesCreated)
-            .isEqualTo(2)
     }
 }
 

@@ -8,3 +8,11 @@ interface ObjectGenerator<T> {
     /** Returns the next generated object value. */
     fun next(): T
 }
+
+inline fun <reified T : Any> objectGenerator(
+    noinline generate: () -> T,
+): ObjectGenerator<T> = object : ObjectGenerator<T> {
+    override val objectClass: Class<T> = T::class.java
+
+    override fun next(): T = generate()
+}

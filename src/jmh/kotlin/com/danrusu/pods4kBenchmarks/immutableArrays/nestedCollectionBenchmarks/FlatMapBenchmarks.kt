@@ -12,7 +12,12 @@ import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.flatMap
 import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.CollectionOwner
 import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.NestedCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.nestedCollectionBenchmarks.setup.NestedCollectionRecipe
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.nestedCollectionSizes
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -33,7 +38,17 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.NESTED_COLLECTIONS
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class FlatMapBenchmarks : NestedCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
+open class FlatMapBenchmarks : NestedCollectionBenchmark(
+    numCollections = NUM_COLLECTIONS,
+    createDataRecipe = { rngs ->
+        NestedCollectionRecipe(
+            outerSizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            nestedSizeDistribution = nestedCollectionSizes(rngs.nestedCollectionSizeRng),
+            primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng),
+            referenceGenerator = StringGenerator(rngs.dataGenerationRng),
+        )
+    },
+) {
     @Benchmark
     fun flatMap(bh: Blackhole) {
         transformEachCollection(

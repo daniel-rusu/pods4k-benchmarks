@@ -10,6 +10,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
 import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.FlatCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.flatCollectionBenchmarks.setup.standardFlatCollectionRecipe
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -31,7 +32,10 @@ private const val NUM_COLLECTIONS = BenchmarkBatchSize.DEFAULT
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 7, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(2)
-open class ForEachBenchmarks : FlatCollectionBenchmark(numCollections = NUM_COLLECTIONS) {
+open class ForEachBenchmarks : FlatCollectionBenchmark(
+    numCollections = NUM_COLLECTIONS,
+    createDataRecipe = { rngs -> standardFlatCollectionRecipe(rngs) },
+) {
     @Benchmark
     fun forEach(bh: Blackhole) {
         transformEachCollection(

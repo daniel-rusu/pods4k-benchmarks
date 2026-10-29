@@ -1,6 +1,5 @@
 package com.danrusu.pods4kBenchmarks.immutableArrays.setup
 
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -58,18 +57,18 @@ class BenchmarkGeneratorRngsTest {
     fun `size distributions can be created and sampled in either order`() {
         val outerFirstRngs = BenchmarkGeneratorRngs(123L)
         val firstOuterDistribution =
-            DistributionFactory.ListSizeDistribution.create(outerFirstRngs.outerCollectionSizeRng)
+            outerCollectionSizes(outerFirstRngs.outerCollectionSizeRng)
         val expectedOuterSizes = List(100) { firstOuterDistribution.nextValue() }
         val firstNestedDistribution =
-            DistributionFactory.NestedListSizeDistribution.create(outerFirstRngs.nestedCollectionSizeRng)
+            nestedCollectionSizes(outerFirstRngs.nestedCollectionSizeRng)
         val expectedNestedSizes = List(100) { firstNestedDistribution.nextValue() }
 
         val nestedFirstRngs = BenchmarkGeneratorRngs(123L)
         val secondNestedDistribution =
-            DistributionFactory.NestedListSizeDistribution.create(nestedFirstRngs.nestedCollectionSizeRng)
+            nestedCollectionSizes(nestedFirstRngs.nestedCollectionSizeRng)
         val actualNestedSizes = List(100) { secondNestedDistribution.nextValue() }
         val secondOuterDistribution =
-            DistributionFactory.ListSizeDistribution.create(nestedFirstRngs.outerCollectionSizeRng)
+            outerCollectionSizes(nestedFirstRngs.outerCollectionSizeRng)
         val actualOuterSizes = List(100) { secondOuterDistribution.nextValue() }
 
         expectThat(actualOuterSizes).isEqualTo(expectedOuterSizes)

@@ -138,8 +138,12 @@ class DistributionTest {
 
     @Test
     fun `distribution produces deterministic output for a fixed master seed`() {
-        val firstDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory().createRng())
-        val secondDistribution = DistributionFactory.ListSizeDistribution.create(RngFactory().createRng())
+        val buckets = arrayOf(
+            25.percent() inRange 0..10,
+            75.percent() inRange 20..50
+        )
+        val firstDistribution = Distribution(RngFactory().createRng(), *buckets)
+        val secondDistribution = Distribution(RngFactory().createRng(), *buckets)
 
         val firstValues = List(100) { firstDistribution.nextValue() }
         val secondValues = List(100) { secondDistribution.nextValue() }

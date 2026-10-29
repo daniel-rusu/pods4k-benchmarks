@@ -9,6 +9,7 @@ import com.danrusu.pods4k.immutableArrays.ImmutableFloatArray
 import com.danrusu.pods4k.immutableArrays.ImmutableIntArray
 import com.danrusu.pods4k.immutableArrays.ImmutableLongArray
 import com.danrusu.pods4k.immutableArrays.ImmutableShortArray
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkGeneratorRngs
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionBenchmark
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.ARRAY
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.CollectionType.IMMUTABLE_ARRAY
@@ -23,9 +24,7 @@ import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.INT
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.LONG
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.REFERENCE
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType.SHORT
-import com.danrusu.pods4kBenchmarks.utils.DistributionFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
+import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Level
 import org.openjdk.jmh.annotations.Setup
@@ -40,30 +39,20 @@ import org.openjdk.jmh.infra.Blackhole
 abstract class NestedCollectionBenchmark(
     /** Number of distinct top-level collections processed by each benchmark invocation. */
     private val numCollections: Int,
-    /** Controls the sizes of the parent collections that will be generated. */
-    private val topLevelSizeDistributionFactory: DistributionFactory =
-        DistributionFactory.ListSizeDistribution,
-    /** Controls the sizes of the nested collections that will be generated. */
-    private val nestedCollectionSizeDistributionFactory: DistributionFactory =
-        DistributionFactory.NestedListSizeDistribution,
-    /** Creates simple primitive generators for primitive nested collection elements. */
-    private val nestedPrimitiveGeneratorFactory: PrimitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
-    /** Creates reference generators for nested collection elements. */
-    private val nestedReferenceGeneratorFactory: ObjectGeneratorFactory<String> = ObjectGeneratorFactory.randomStrings(),
+    /** Constructs fresh components once per trial from the supplied purpose-specific streams. */
+    private val createDataRecipe: (GeneratorRngs) -> NestedCollectionRecipe,
 ) : CollectionBenchmark() {
     @PublishedApi
     internal lateinit var data: NestedCollectionBenchmarkData
 
     @Setup(Level.Trial)
     fun setupBenchmarkData() {
+        val generatorRngs = BenchmarkGeneratorRngs()
         data = NestedCollectionBenchmarkData.create(
             collectionType = collectionType,
             dataType = dataType,
             numCollections = numCollections,
-            topLevelSizeDistributionFactory = topLevelSizeDistributionFactory,
-            nestedCollectionSizeDistributionFactory = nestedCollectionSizeDistributionFactory,
-            nestedPrimitiveGeneratorFactory = nestedPrimitiveGeneratorFactory,
-            nestedReferenceGeneratorFactory = nestedReferenceGeneratorFactory,
+            recipe = createDataRecipe(generatorRngs),
         )
     }
 
@@ -129,15 +118,41 @@ abstract class NestedCollectionBenchmark(
             }
 
             PERSISTENT_LIST -> when (dataType) {
-                REFERENCE -> for (collection in data.persistentLists<String>()) bh.consume(transformNestedPersistentLists(collection))
-                BOOLEAN -> for (collection in data.persistentLists<Boolean>()) bh.consume(transformNestedPersistentBooleanLists(collection))
-                BYTE -> for (collection in data.persistentLists<Byte>()) bh.consume(transformNestedPersistentByteLists(collection))
-                CHAR -> for (collection in data.persistentLists<Char>()) bh.consume(transformNestedPersistentCharLists(collection))
-                SHORT -> for (collection in data.persistentLists<Short>()) bh.consume(transformNestedPersistentShortLists(collection))
-                INT -> for (collection in data.persistentLists<Int>()) bh.consume(transformNestedPersistentIntLists(collection))
-                FLOAT -> for (collection in data.persistentLists<Float>()) bh.consume(transformNestedPersistentFloatLists(collection))
-                LONG -> for (collection in data.persistentLists<Long>()) bh.consume(transformNestedPersistentLongLists(collection))
-                DOUBLE -> for (collection in data.persistentLists<Double>()) bh.consume(transformNestedPersistentDoubleLists(collection))
+                REFERENCE -> for (collection in data.persistentLists<String>()) {
+                    bh.consume(transformNestedPersistentLists(collection))
+                }
+
+                BOOLEAN -> for (collection in data.persistentLists<Boolean>()) {
+                    bh.consume(transformNestedPersistentBooleanLists(collection))
+                }
+
+                BYTE -> for (collection in data.persistentLists<Byte>()) {
+                    bh.consume(transformNestedPersistentByteLists(collection))
+                }
+
+                CHAR -> for (collection in data.persistentLists<Char>()) {
+                    bh.consume(transformNestedPersistentCharLists(collection))
+                }
+
+                SHORT -> for (collection in data.persistentLists<Short>()) {
+                    bh.consume(transformNestedPersistentShortLists(collection))
+                }
+
+                INT -> for (collection in data.persistentLists<Int>()) {
+                    bh.consume(transformNestedPersistentIntLists(collection))
+                }
+
+                FLOAT -> for (collection in data.persistentLists<Float>()) {
+                    bh.consume(transformNestedPersistentFloatLists(collection))
+                }
+
+                LONG -> for (collection in data.persistentLists<Long>()) {
+                    bh.consume(transformNestedPersistentLongLists(collection))
+                }
+
+                DOUBLE -> for (collection in data.persistentLists<Double>()) {
+                    bh.consume(transformNestedPersistentDoubleLists(collection))
+                }
             }
 
             ARRAY -> when (dataType) {
@@ -153,17 +168,42 @@ abstract class NestedCollectionBenchmark(
             }
 
             IMMUTABLE_ARRAY -> when (dataType) {
-                REFERENCE -> for (collection in data.immutableReferenceArrays) bh.consume(transformNestedImmutableArrays(collection))
-                BOOLEAN -> for (collection in data.immutableBooleanArrays) bh.consume(transformNestedImmutableBooleanArrays(collection))
-                BYTE -> for (collection in data.immutableByteArrays) bh.consume(transformNestedImmutableByteArrays(collection))
-                CHAR -> for (collection in data.immutableCharArrays) bh.consume(transformNestedImmutableCharArrays(collection))
-                SHORT -> for (collection in data.immutableShortArrays) bh.consume(transformNestedImmutableShortArrays(collection))
-                INT -> for (collection in data.immutableIntArrays) bh.consume(transformNestedImmutableIntArrays(collection))
-                FLOAT -> for (collection in data.immutableFloatArrays) bh.consume(transformNestedImmutableFloatArrays(collection))
-                LONG -> for (collection in data.immutableLongArrays) bh.consume(transformNestedImmutableLongArrays(collection))
-                DOUBLE -> for (collection in data.immutableDoubleArrays) bh.consume(transformNestedImmutableDoubleArrays(collection))
+                REFERENCE -> for (collection in data.immutableReferenceArrays) {
+                    bh.consume(transformNestedImmutableArrays(collection))
+                }
+
+                BOOLEAN -> for (collection in data.immutableBooleanArrays) {
+                    bh.consume(transformNestedImmutableBooleanArrays(collection))
+                }
+
+                BYTE -> for (collection in data.immutableByteArrays) {
+                    bh.consume(transformNestedImmutableByteArrays(collection))
+                }
+
+                CHAR -> for (collection in data.immutableCharArrays) {
+                    bh.consume(transformNestedImmutableCharArrays(collection))
+                }
+
+                SHORT -> for (collection in data.immutableShortArrays) {
+                    bh.consume(transformNestedImmutableShortArrays(collection))
+                }
+
+                INT -> for (collection in data.immutableIntArrays) {
+                    bh.consume(transformNestedImmutableIntArrays(collection))
+                }
+
+                FLOAT -> for (collection in data.immutableFloatArrays) {
+                    bh.consume(transformNestedImmutableFloatArrays(collection))
+                }
+
+                LONG -> for (collection in data.immutableLongArrays) {
+                    bh.consume(transformNestedImmutableLongArrays(collection))
+                }
+
+                DOUBLE -> for (collection in data.immutableDoubleArrays) {
+                    bh.consume(transformNestedImmutableDoubleArrays(collection))
+                }
             }
         }
     }
-
 }

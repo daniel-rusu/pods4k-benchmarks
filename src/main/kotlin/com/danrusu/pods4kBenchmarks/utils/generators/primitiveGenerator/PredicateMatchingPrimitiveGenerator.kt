@@ -6,11 +6,27 @@ import com.danrusu.pods4kBenchmarks.utils.predicates.PredicateUtils
 import com.danrusu.pods4kBenchmarks.utils.predicates.PrimitivePredicate
 import kotlin.random.Random
 
-/** Conditions every specialized primitive method on independently selected predicate outcomes. */
+/**
+ * Decorator that wraps a [PrimitiveGenerator] and rejection-samples the wrapped generator so the resulting values
+ * match the specified [predicates] with the specified [matchProbability].
+ */
 internal class PredicateMatchingPrimitiveGenerator(
+    /** The source generator that will be polled until an acceptable value is produced. */
     private val source: PrimitiveGenerator,
+
+    /** Predicate for evaluating primitive values. */
     private val predicates: PrimitivePredicate,
+
+    /** Each generated value will match the [predicates] with this probability. */
     private val matchProbability: Percent,
+
+    /**
+     * Used to determine whether the next value should pass or fail the predicate.
+     *
+     * IMPORTANT:
+     * This should be a separate RNG stream dedicated to predicate decisions so that other data types don't change
+     * predicate outcomes etc.
+     */
     private val predicateOutcomeRng: Random,
 ) : PrimitiveGenerator {
     override fun nextBoolean(): Boolean = next(source::nextBoolean, predicates::matches)

@@ -62,36 +62,36 @@ Together, the benchmark category and benchmark matrix define the type of data be
 
 ## Data Generation Recipe
 
-Benchmark classes define the data-generation recipe:
+Each benchmark specifies how many collections to create and a data-generation recipe containing a subset of the
+following ingredients:
 
-| Ingredient                                                                   | Explanation                                                                                                                                                                                                                                                     |
-|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Batch Size                                                                   | Controls how many collections will be created for the current `(CollectionType, DataType)`  combination.                                                                                                                                                        |
-| `DistributionFactory`                                                        | - Creates a `Distribution` to control collection sizes.<br/>- The batch will contain collections of varying sizes sampled from this distribution.<br/>- A separate `DistributionFactory` is specified for nested collections to control inner collection sizes. |
-| `PrimitiveGeneratorFactory`                                                  | - Creates a `PrimitiveGenerator` for generating primitive values.                                                                                                                                                                                               |
-| `ObjectGeneratorFactory`                                                     | - Creates a `ObjectGenerator` for generating object values.                                                                                                                                                                                                     |
-| `PredicateMatchingObjectGenerator`<br/>`PredicateMatchingPrimitiveGenerator` | Calling `withPredicateMatchProbability(matchProbability, predicate)` on a generator factory makes each generated element independently pass the predicate with the specified probability.                                                                       |
-| `NullabilityPolicyFactory`                                                   | Creates a `NullabilityPolicy` for deciding when values should be null.                                                                                                                                                                                          |
+| Ingredient                                                                   | Explanation                                                                                                                                                                                                                                                                |
+|------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Distribution`                                                               | - The batch will contain collections of varying sizes sampled from this distribution.<br/>- Nested scenarios, like `flatMap`, specify an additional `nestedSizeDistribution` for nested collection sizes.                                                                  |
+| `PrimitiveGenerator`                                                         | - Generates primitive values like `Byte`, `Boolean`, `Int`, etc.                                                                                                                                                                                                           |
+| `ObjectGenerator`                                                            | - Generates generic objects, such as `String` or custom compound elements.                                                                                                                                                                                                 |
+| `PredicateMatchingObjectGenerator`<br/>`PredicateMatchingPrimitiveGenerator` | - Decorators for benchmarking operations that use predicates, such as `elements.filter { predicate }`<br/>- Eg. `recipe.withPredicateMatchProbability(50.percent(), predicate,...)` results in collections with each element having a 50% chance of passing the predicate. |
+| `NullabilityPolicy`                                                          | - Decides which elements should be null.                                                                                                                                                                                                                                   |
 
 ## Data Construction
 
-This is the data generation flow for the `drop` operation. The nested, nullable-flat, and object-collection benchmark
-categories follow the same general pattern:
+This is the data generation flow for the `drop` operation. All four shapes follow a similar lifecycle:
 
-1. `DropBenchmarks` specifies the data generation recipe:
-    * `numCollections` to create
-    * Default `DistributionFactory` for sampling collection sizes
-    * Default `ObjectGeneratorFactory<String>` & `PrimitiveGeneratorFactory` for random string & primitive values
-2. JMH iterates through every `CollectionType` & `DataType`, and creates `DropBenchmarks` with the current combination.
-3. JMH calls `FlatCollectionBenchmark.setupBenchmarkData()` to begin data construction.
-4. Data creation is delegated to `FlatCollectionBenchmarkData.create(...)` which performs the following:
-    * Creates `BenchmarkGeneratorRngs` which splits separate RNG streams for values, null placement, predicate
-      decisions, outer collection sizes, and nested collection sizes.
-    * Uses generator factories and RNG streams to initialize data generators and collection-size distribution.
-    * Uses `CollectionFactory` to materialize a `CollectionBatch` containing an array of collections.
+1. `DropBenchmarks` specifies the trial batch size and standard flat-collection data recipe:
+    - Standard distribution of collection sizes.
+    - Populate the collections with random strings or random basic values depending on the `DataType`.
+2. JMH selects the `CollectionType` & `DataType` and creates a `DropBenchmarks` instance with that combination.
+3. `FlatCollectionBenchmark.setupBenchmarkData()` prepares data generation:
+    - Creates `BenchmarkGeneratorRngs` from a fixed master seed and splits off separate RNG streams for each attribute
+      of the data.
+    - Initializes the recipe with the RNG streams and delegates data creation to `FlatCollectionBenchmarkData`
+4. `FlatCollectionBenchmarkData.create(...)` creates a `CollectionBatch`
+    - The batch stores an array of collections (size = trial batch size)
+    - `CollectionFactory` creates each collection and populates it using the element generators
 
-Although a benchmark has 36 parameter combinations, a `CollectionBatch` stores only the current combination. For
-example, the `LIST`/`BOOLEAN` trial contains an array of `List<Boolean>` collections.
+Although a benchmark has 36 `CollectionType` & `DataType` parameter combinations, a `CollectionBatch` stores only the
+current combination. For example, the `LIST`/`BOOLEAN` trial operates on batch containing an array of `List<Boolean>`
+collections.
 
 ## Fair-Comparison Safeguards
 

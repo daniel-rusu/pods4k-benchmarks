@@ -4,13 +4,14 @@ import com.danrusu.pods4k.immutableArrays.ImmutableArray
 import com.danrusu.pods4k.immutableArrays.multiplicativeSpecializations.mapNotNull
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.CompoundElementOfNullableValues
 import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionBenchmark
+import com.danrusu.pods4kBenchmarks.immutableArrays.objectCollectionBenchmarks.setup.ObjectCollectionRecipe
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.BenchmarkBatchSize
 import com.danrusu.pods4kBenchmarks.immutableArrays.setup.DataType
-import com.danrusu.pods4kBenchmarks.utils.generators.GeneratorRngs
-import com.danrusu.pods4kBenchmarks.utils.generators.NullabilityPolicyFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGenerator
-import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.ObjectGeneratorFactory
-import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.PrimitiveGeneratorFactory
+import com.danrusu.pods4kBenchmarks.immutableArrays.setup.outerCollectionSizes
+import com.danrusu.pods4kBenchmarks.utils.generators.RandomNullabilityPolicy
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.StringGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.objectGenerator.objectGenerator
+import com.danrusu.pods4kBenchmarks.utils.generators.primitiveGenerator.RandomPrimitiveGenerator
 import com.danrusu.pods4kBenchmarks.utils.percent
 import kotlinx.collections.immutable.PersistentList
 import org.openjdk.jmh.annotations.Benchmark
@@ -35,11 +36,30 @@ private val NULL_PROBABILITY = 50.percent()
 @Fork(2)
 open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNullableValues>(
     numCollections = NUM_COLLECTIONS,
-    objectGeneratorFactory = NullableCompoundElementFactory(
-        primitiveGeneratorFactory = PrimitiveGeneratorFactory.randomValues(),
-        stringGeneratorFactory = ObjectGeneratorFactory.randomStrings(),
-        nullabilityPolicyFactory = NullabilityPolicyFactory.random(NULL_PROBABILITY),
-    ),
+    createDataRecipe = { rngs ->
+        val primitiveGenerator = RandomPrimitiveGenerator(rngs.dataGenerationRng)
+        val referenceGenerator = StringGenerator(rngs.dataGenerationRng)
+        val nullabilityPolicy = RandomNullabilityPolicy(NULL_PROBABILITY, rngs.nullabilityDecisionsRng)
+
+        ObjectCollectionRecipe(
+            sizeDistribution = outerCollectionSizes(rngs.outerCollectionSizeRng),
+            objectGenerator = objectGenerator<CompoundElementOfNullableValues> {
+                val isNull = nullabilityPolicy.shouldGenerateNull()
+
+                CompoundElementOfNullableValues(
+                    referenceValue = if (isNull) null else referenceGenerator.next(),
+                    booleanValue = if (isNull) null else primitiveGenerator.nextBoolean(),
+                    byteValue = if (isNull) null else primitiveGenerator.nextByte(),
+                    charValue = if (isNull) null else primitiveGenerator.nextChar(),
+                    shortValue = if (isNull) null else primitiveGenerator.nextShort(),
+                    intValue = if (isNull) null else primitiveGenerator.nextInt(),
+                    floatValue = if (isNull) null else primitiveGenerator.nextFloat(),
+                    longValue = if (isNull) null else primitiveGenerator.nextLong(),
+                    doubleValue = if (isNull) null else primitiveGenerator.nextDouble(),
+                )
+            },
+        )
+    },
 ) {
     @Benchmark
     fun mapNotNull(bh: Blackhole) {
@@ -115,39 +135,6 @@ open class MapNotNullBenchmarks : ObjectCollectionBenchmark<CompoundElementOfNul
                 { array: Array<CompoundElementOfNullableValues> -> array.mapNotNull { it.doubleValue } },
                 { array: ImmutableArray<CompoundElementOfNullableValues> -> array.mapNotNull { it.doubleValue } },
             )
-        }
-    }
-}
-
-class NullableCompoundElementFactory(
-    val primitiveGeneratorFactory: PrimitiveGeneratorFactory,
-    val stringGeneratorFactory: ObjectGeneratorFactory<String>,
-    val nullabilityPolicyFactory: NullabilityPolicyFactory,
-) : ObjectGeneratorFactory<CompoundElementOfNullableValues>() {
-    override fun create(generatorRngs: GeneratorRngs): ObjectGenerator<CompoundElementOfNullableValues> {
-        val primitiveGenerator = primitiveGeneratorFactory.create(generatorRngs)
-        val referenceGenerator = stringGeneratorFactory.create(generatorRngs)
-        val nullabilityPolicy = nullabilityPolicyFactory.create(generatorRngs)
-
-        return object : ObjectGenerator<CompoundElementOfNullableValues> {
-            override val objectClass: Class<CompoundElementOfNullableValues> =
-                CompoundElementOfNullableValues::class.java
-
-            override fun next(): CompoundElementOfNullableValues {
-                val isNull = nullabilityPolicy.shouldGenerateNull()
-
-                return CompoundElementOfNullableValues(
-                    referenceValue = if (isNull) null else referenceGenerator.next(),
-                    booleanValue = if (isNull) null else primitiveGenerator.nextBoolean(),
-                    byteValue = if (isNull) null else primitiveGenerator.nextByte(),
-                    charValue = if (isNull) null else primitiveGenerator.nextChar(),
-                    shortValue = if (isNull) null else primitiveGenerator.nextShort(),
-                    intValue = if (isNull) null else primitiveGenerator.nextInt(),
-                    floatValue = if (isNull) null else primitiveGenerator.nextFloat(),
-                    longValue = if (isNull) null else primitiveGenerator.nextLong(),
-                    doubleValue = if (isNull) null else primitiveGenerator.nextDouble(),
-                )
-            }
         }
     }
 }
